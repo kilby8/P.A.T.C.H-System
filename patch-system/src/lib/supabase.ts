@@ -3,8 +3,15 @@
 // ============================================================
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
+function readEnvValue(key: 'EXPO_PUBLIC_SUPABASE_URL' | 'EXPO_PUBLIC_SUPABASE_ANON_KEY'): string | undefined {
+  const value = process.env[key];
+  if (!value) return undefined;
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : undefined;
+}
+
+const supabaseUrl = readEnvValue('EXPO_PUBLIC_SUPABASE_URL');
+const supabaseAnonKey = readEnvValue('EXPO_PUBLIC_SUPABASE_ANON_KEY');
 
 export function isSupabaseConfigured(): boolean {
   return Boolean(supabaseUrl && supabaseAnonKey);

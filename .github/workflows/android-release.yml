@@ -37,18 +37,18 @@ jobs:
       - name: Generate Android project
         run: npx expo prebuild --platform android --non-interactive
 
-      - name: Build debug APK
-        run: ./gradlew assembleDebug
+      - name: Build release APK
+        run: ./gradlew assembleRelease
         working-directory: patch-system/android
 
       - name: Publish GitHub release with APK
         uses: softprops/action-gh-release@v2
         with:
-          files: patch-system/android/app/build/outputs/apk/debug/app-debug.apk
+          files: patch-system/android/app/build/outputs/apk/release/app-release.apk
           generate_release_notes: true
           fail_on_unmatched_files: true
           name: P.A.T.C.H. System ${{ github.ref_name }}
           body: |
-            Automated Android debug APK build for ${{ github.ref_name }}.
+            Automated Android release APK build for ${{ github.ref_name }}.
 
-            Download the attached `app-debug.apk` artifact below.
+            Download the attached `app-release.apk` artifact below.

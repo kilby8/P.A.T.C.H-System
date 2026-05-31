@@ -33,7 +33,7 @@ export default function LoginTerminal() {
             value={remoteSessionCode}
             onChangeText={setRemoteSessionCode}
             placeholder="OPTIONAL SESSION CODE (E.G. ARENA-001)"
-            placeholderTextColor={Colors.textMuted}
+              : 'REMOTE SYNC OFFLINE — COPY .env.example TO .env.local AND SET EXPO_PUBLIC_SUPABASE_URL / EXPO_PUBLIC_SUPABASE_ANON_KEY'}
             autoCapitalize="characters"
             style={styles.input}
           />
