@@ -1,0 +1,177 @@
+// ============================================================
+// P.A.T.C.H. SYSTEM — Main Navigation (tab bar)
+// ============================================================
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+} from 'react-native';
+import { useCharacter } from '../store/CharacterContext';
+import { Colors, Typography, Spacing } from '../theme/theme';
+import EncounterHUD from './hud/EncounterHUD';
+import ArchetypeMatrix from './archetype/ArchetypeMatrix';
+import CondoPhaseTerminal from './condo/CondoPhaseTerminal';
+import LoginTerminal from './auth/LoginTerminal';
+import GMConsole from './gm/GMConsole';
+
+type Tab = 'GM' | 'HUD' | 'MATRIX' | 'CONDO';
+
+const PLAYER_TABS: { id: Exclude<Tab, 'GM'>; label: string; icon: string }[] = [
+  { id: 'HUD', label: 'ENCOUNTER', icon: '⚔' },
+  { id: 'MATRIX', label: 'ARCHETYPE', icon: '◎' },
+  { id: 'CONDO', label: 'CONDO', icon: '⏱' },
+];
+
+const GM_TABS: { id: Tab; label: string; icon: string }[] = [
+  { id: 'GM', label: 'GM', icon: '▣' },
+  { id: 'HUD', label: 'SHEET', icon: '⚔' },
+  { id: 'MATRIX', label: 'BUILD', icon: '◎' },
+  { id: 'CONDO', label: 'RECOVERY', icon: '⏱' },
+];
+
+export default function AppNavigator() {
+  const { session, logout, remoteSessionCode, syncStatus } = useCharacter();
+  const [activeTab, setActiveTab] = useState<Tab>('HUD');
+
+  useEffect(() => {
+    if (session.role === 'guest') {
+      setActiveTab('HUD');
+      return;
+    }
+
+    if (session.role === 'gm') {
+      setActiveTab('GM');
+      return;
+    }
+
+    setActiveTab('HUD');
+  }, [session.role]);
+
+  if (session.role === 'guest') {
+    return <LoginTerminal />;
+  }
+
+  const tabs = session.role === 'gm' ? GM_TABS : PLAYER_TABS;
+
+  return (
+    <View style={styles.root}>
+      <SafeAreaView style={styles.sessionSafe}>
+        <View style={styles.sessionBar}>
+          <Text style={styles.sessionLabel}>
+            {session.role.toUpperCase()} :: {session.actorName.toUpperCase()}
+            {remoteSessionCode ? ` :: ${remoteSessionCode} :: ${syncStatus.toUpperCase()}` : ''}
+          </Text>
+          <TouchableOpacity onPress={logout} activeOpacity={0.75}>
+            <Text style={styles.sessionLogout}>LOG OUT</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+
+      {/* Screen Content */}
+      <View style={styles.screen}>
+        {activeTab === 'GM'     && session.role === 'gm' && <GMConsole />}
+        {activeTab === 'HUD'    && <EncounterHUD />}
+        {activeTab === 'MATRIX' && <ArchetypeMatrix />}
+        {activeTab === 'CONDO'  && <CondoPhaseTerminal />}
+      </View>
+
+      {/* Tab Bar */}
+      <SafeAreaView style={styles.tabBarSafe}>
+        <View style={styles.tabBar}>
+          {tabs.map((tab) => {
+            const active = tab.id === activeTab;
+            return (
+              <TouchableOpacity
+                key={tab.id}
+                style={[styles.tab, active && styles.tabActive]}
+                onPress={() => setActiveTab(tab.id)}
+                activeOpacity={0.7}
+              >
+                <Text style={[styles.tabIcon, active && styles.tabIconActive]}>
+                  {tab.icon}
+                </Text>
+                <Text style={[styles.tabLabel, active && styles.tabLabelActive]}>
+                  {tab.label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      </SafeAreaView>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+    backgroundColor: Colors.bgVoid,
+  },
+  screen: {
+    flex: 1,
+  },
+  sessionSafe: {
+    backgroundColor: Colors.bgDeep,
+  },
+  sessionBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.sm,
+    paddingBottom: Spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.borderDefault,
+  },
+  sessionLabel: {
+    ...Typography.mono,
+    color: Colors.textSecondary,
+    fontSize: 10,
+  },
+  sessionLogout: {
+    ...Typography.mono,
+    color: Colors.amber,
+    fontSize: 10,
+  },
+  tabBarSafe: {
+    backgroundColor: Colors.bgDeep,
+  },
+  tabBar: {
+    flexDirection: 'row',
+    borderTopWidth: 1,
+    borderTopColor: Colors.borderDefault,
+    backgroundColor: Colors.bgDeep,
+    paddingBottom: Spacing.xs,
+  },
+  tab: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: Spacing.sm,
+    paddingTop: Spacing.md,
+  },
+  tabActive: {
+    borderTopWidth: 2,
+    borderTopColor: Colors.cyan,
+    marginTop: -1,
+  },
+  tabIcon: {
+    fontSize: 16,
+    color: Colors.textMuted,
+    marginBottom: 2,
+  },
+  tabIconActive: {
+    color: Colors.cyan,
+  },
+  tabLabel: {
+    ...Typography.mono,
+    fontSize: 9,
+    color: Colors.textMuted,
+    letterSpacing: 1.5,
+  },
+  tabLabelActive: {
+    color: Colors.cyan,
+  },
+});

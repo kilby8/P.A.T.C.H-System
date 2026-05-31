@@ -1,0 +1,54 @@
+name: Android Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-android-apk:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: patch-system
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: patch-system/package-lock.json
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Android project
+        run: npx expo prebuild --platform android --non-interactive
+
+      - name: Build debug APK
+        run: ./gradlew assembleDebug
+        working-directory: patch-system/android
+
+      - name: Publish GitHub release with APK
+        uses: softprops/action-gh-release@v2
+        with:
+          files: patch-system/android/app/build/outputs/apk/debug/app-debug.apk
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          name: P.A.T.C.H. System ${{ github.ref_name }}
+          body: |
+            Automated Android debug APK build for ${{ github.ref_name }}.
+
+            Download the attached `app-debug.apk` artifact below.
