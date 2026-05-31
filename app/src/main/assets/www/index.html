@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>P.A.T.C.H. System HUD</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #080a12;
+      --panel: #11152a;
+      --glow: #10f0ff;
+      --text: #d6ecff;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: radial-gradient(circle at top, #121a3d, var(--bg));
+      color: var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    }
+    .hud {
+      height: 100%;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 12px;
+      padding: 16px;
+      box-sizing: border-box;
+    }
+    .panel {
+      background: linear-gradient(180deg, #161c38, var(--panel));
+      border: 1px solid rgba(16, 240, 255, 0.35);
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(16, 240, 255, 0.15);
+      padding: 12px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 8px;
+      max-height: 55vh;
+      overflow: auto;
+    }
+    button {
+      border: 1px solid rgba(16, 240, 255, 0.5);
+      background: #0d1230;
+      color: var(--text);
+      border-radius: 8px;
+      padding: 10px;
+      cursor: pointer;
+    }
+    button.active { outline: 2px solid var(--glow); }
+  </style>
+</head>
+<body>
+  <main class="hud">
+    <section class="panel">
+      <h1>P.A.T.C.H. System HUD</h1>
+      <p>Android WebView scaffold ready. Replace this file with your full single-file HUD implementation.</p>
+    </section>
+
+    <section class="panel">
+      <h2>30-Node Talent Matrix (Sample)</h2>
+      <div id="matrix" class="grid"></div>
+    </section>
+
+    <section class="panel">
+      <strong id="selected">Selected nodes: 0</strong>
+    </section>
+  </main>
+
+  <script>
+    const matrix = document.getElementById('matrix');
+    const selectedLabel = document.getElementById('selected');
+    const key = 'patch-selected-nodes';
+    const selected = new Set(JSON.parse(localStorage.getItem(key) || '[]'));
+
+    function render() {
+      matrix.innerHTML = '';
+      for (let i = 1; i <= 30; i++) {
+        const btn = document.createElement('button');
+        btn.textContent = `Node ${i}`;
+        if (selected.has(i)) btn.classList.add('active');
+        btn.onclick = () => {
+          if (selected.has(i)) selected.delete(i); else selected.add(i);
+          localStorage.setItem(key, JSON.stringify([...selected]));
+          render();
+        };
+        matrix.appendChild(btn);
+      }
+      selectedLabel.textContent = `Selected nodes: ${selected.size}`;
+    }
+
+    render();
+  </script>
+</body>
+</html>
