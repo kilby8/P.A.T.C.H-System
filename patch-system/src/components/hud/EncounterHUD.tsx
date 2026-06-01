@@ -9,7 +9,6 @@ import {
   ScrollView,
   StyleSheet,
   Animated,
-  SafeAreaView,
 } from 'react-native';
 import { useCharacter } from '../../store/CharacterContext';
 import { CpuAttributes, getModifier, getStartingAP } from '../../models/Character';
@@ -231,7 +230,7 @@ export default function EncounterHUD() {
   }, [character.neuralShock, pulseAnim]);
 
   return (
-    <SafeAreaView style={GlobalStyles.safeArea}>
+    <View style={GlobalStyles.safeArea}>
       <ScrollView
         style={GlobalStyles.screen}
         contentContainerStyle={styles.content}
@@ -443,7 +442,7 @@ export default function EncounterHUD() {
           </View>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 

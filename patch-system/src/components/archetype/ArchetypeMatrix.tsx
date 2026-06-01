@@ -10,7 +10,6 @@ import {
   ScrollView,
   Modal,
   StyleSheet,
-  SafeAreaView,
   Dimensions,
   Animated,
 } from 'react-native';
@@ -75,7 +74,7 @@ export default function ArchetypeMatrix() {
   const zones: ArchetypeZone[] = ['BRUTE', 'GHOST', 'SPECIALIST', 'BRUTE_GHOST', 'BRUTE_SPECIALIST', 'GHOST_SPECIALIST'];
 
   return (
-    <SafeAreaView style={GlobalStyles.safeArea}>
+    <View style={GlobalStyles.safeArea}>
       <ScrollView
         style={GlobalStyles.screen}
         contentContainerStyle={styles.content}
@@ -175,7 +174,7 @@ export default function ArchetypeMatrix() {
           onClose={() => setDrawerVisible(false)}
         />
       )}
-    </SafeAreaView>
+    </View>
   );
 }
 

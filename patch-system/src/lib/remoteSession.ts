@@ -1,5 +1,8 @@
 // ============================================================
-// P.A.T.C.H. SYSTEM — Remote Session Helpers
+// P.A.T.C.H. SYSTEM — Remote Session Helpers (Broadcast)
+// Uses Supabase Realtime Broadcast — no database table required.
+// Both devices join the same channel keyed to the session code
+// and exchange state via broadcast events.
 // ============================================================
 import { RealtimeChannel } from '@supabase/supabase-js';
 import { getSupabaseClient } from './supabase';
@@ -11,6 +14,8 @@ export interface RemoteEnvelope<T> {
   payload: T;
 }
 
+const BROADCAST_EVENT = 'patch-state';
+
 export async function publishRemoteSession<T>(
   sessionCode: string,
   envelope: RemoteEnvelope<T>,
@@ -18,17 +23,16 @@ export async function publishRemoteSession<T>(
   const supabase = getSupabaseClient();
   if (!supabase) return;
 
-  const { error } = await supabase
-    .from('patch_sessions')
-    .upsert({
-      session_code: sessionCode,
-      payload: envelope,
-      updated_at: envelope.updatedAt,
-    }, { onConflict: 'session_code' });
-
-  if (error) {
-    throw error;
-  }
+  // Use presence-less broadcast — fire and forget.
+  const channel = supabase.channel(`patch-session:${sessionCode}`);
+  await channel.subscribe();
+  await channel.send({
+    type: 'broadcast',
+    event: BROADCAST_EVENT,
+    payload: envelope,
+  });
+  // Leave immediately — we re-create the channel on every publish.
+  void supabase.removeChannel(channel);
 }
 
 export function subscribeToRemoteSession<T>(
@@ -42,17 +46,11 @@ export function subscribeToRemoteSession<T>(
   const channel: RealtimeChannel = supabase
     .channel(`patch-session:${sessionCode}`)
     .on(
-      'postgres_changes',
-      {
-        event: '*',
-        schema: 'public',
-        table: 'patch_sessions',
-        filter: `session_code=eq.${sessionCode}`,
-      },
-      (payload) => {
-        const nextValue = payload.new as { payload?: RemoteEnvelope<T> } | undefined;
-        if (!nextValue?.payload) return;
-        onMessage(nextValue.payload);
+      'broadcast',
+      { event: BROADCAST_EVENT },
+      ({ payload }) => {
+        if (!payload) return;
+        onMessage(payload as RemoteEnvelope<T>);
       },
     )
     .subscribe((status) => {

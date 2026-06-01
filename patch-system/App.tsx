@@ -3,6 +3,7 @@
 // ============================================================
 import React from 'react';
 import { StatusBar } from 'expo-status-bar';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { CharacterProvider } from './src/store/CharacterContext';
 import { createCharacter } from './src/models/Character';
 import AppNavigator from './src/components/AppNavigator';
@@ -33,9 +34,11 @@ const DEMO_PARTY = [
 
 export default function App() {
   return (
-    <CharacterProvider initialCharacters={DEMO_PARTY}>
-      <StatusBar style="light" />
-      <AppNavigator />
-    </CharacterProvider>
+    <SafeAreaProvider>
+      <CharacterProvider initialCharacters={DEMO_PARTY}>
+        <StatusBar style="light" />
+        <AppNavigator />
+      </CharacterProvider>
+    </SafeAreaProvider>
   );
 }

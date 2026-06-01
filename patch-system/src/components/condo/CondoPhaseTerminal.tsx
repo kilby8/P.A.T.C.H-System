@@ -15,7 +15,6 @@ import {
   ScrollView,
   StyleSheet,
   Animated,
-  SafeAreaView,
 } from 'react-native';
 import { getBackgroundById } from '../../models/Backgrounds';
 import { useCharacter } from '../../store/CharacterContext';
@@ -168,7 +167,7 @@ export default function CondoPhaseTerminal() {
     : 0;
 
   return (
-    <SafeAreaView style={GlobalStyles.safeArea}>
+    <View style={GlobalStyles.safeArea}>
       <ScrollView
         style={GlobalStyles.screen}
         contentContainerStyle={styles.content}
@@ -321,7 +320,7 @@ export default function CondoPhaseTerminal() {
           ))}
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 

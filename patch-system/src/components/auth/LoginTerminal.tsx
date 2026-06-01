@@ -8,9 +8,9 @@ import {
   TouchableOpacity,
   TextInput,
   StyleSheet,
-  SafeAreaView,
   ScrollView,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCharacter } from '../../store/CharacterContext';
 import { getStartingAP } from '../../models/Character';
 import { BACKGROUND_CATEGORY_LABELS, getBackgroundById } from '../../models/Backgrounds';

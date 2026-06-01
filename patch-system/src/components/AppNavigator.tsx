@@ -7,8 +7,8 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  SafeAreaView,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useCharacter } from '../store/CharacterContext';
 import { Colors, Typography, Spacing } from '../theme/theme';
 import EncounterHUD from './hud/EncounterHUD';
@@ -44,6 +44,7 @@ const GM_TABS: { id: Tab; label: string; icon: string }[] = [
 export default function AppNavigator() {
   const { session, logout, remoteSessionCode, syncStatus } = useCharacter();
   const [activeTab, setActiveTab] = useState<Tab>('HUD');
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     if (session.role === 'guest') {
@@ -67,52 +68,49 @@ export default function AppNavigator() {
 
   return (
     <View style={styles.root}>
-      <SafeAreaView style={styles.sessionSafe}>
-        <View style={styles.sessionBar}>
-          <Text style={styles.sessionLabel}>
-            {session.role.toUpperCase()} :: {session.actorName.toUpperCase()}
-            {remoteSessionCode ? ` :: ${remoteSessionCode} :: ${syncStatus.toUpperCase()}` : ''}
-          </Text>
-          <TouchableOpacity onPress={logout} activeOpacity={0.75}>
-            <Text style={styles.sessionLogout}>LOG OUT</Text>
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
+      {/* Session / status bar — padded for status bar height */}
+      <View style={[styles.sessionBar, { paddingTop: insets.top + 6 }]}>
+        <Text style={styles.sessionLabel}>
+          {session.role.toUpperCase()} :: {session.actorName.toUpperCase()}
+          {remoteSessionCode ? ` :: ${remoteSessionCode} :: ${syncStatus.toUpperCase()}` : ''}
+        </Text>
+        <TouchableOpacity onPress={logout} activeOpacity={0.75}>
+          <Text style={styles.sessionLogout}>LOG OUT</Text>
+        </TouchableOpacity>
+      </View>
 
       {/* Screen Content */}
       <View style={styles.screen}>
-        {activeTab === 'GM'     && session.role === 'gm' && <GMConsole />}
-        {activeTab === 'HUD'    && <EncounterHUD />}
-        {activeTab === 'MATRIX' && <ArchetypeMatrix />}
-        {activeTab === 'GEAR'   && <GearTerminal />}
+        {activeTab === 'GM'       && session.role === 'gm' && <GMConsole />}
+        {activeTab === 'HUD'      && <EncounterHUD />}
+        {activeTab === 'MATRIX'   && <ArchetypeMatrix />}
+        {activeTab === 'GEAR'     && <GearTerminal />}
         {activeTab === 'BESTIARY' && <BestiaryTerminal />}
-        {activeTab === 'CONDO'  && <CondoPhaseTerminal />}
-        {activeTab === 'RULES'  && <RulesTerminal />}
+        {activeTab === 'CONDO'    && <CondoPhaseTerminal />}
+        {activeTab === 'RULES'    && <RulesTerminal />}
       </View>
 
-      {/* Tab Bar */}
-      <SafeAreaView style={styles.tabBarSafe}>
-        <View style={styles.tabBar}>
-          {tabs.map((tab) => {
-            const active = tab.id === activeTab;
-            return (
-              <TouchableOpacity
-                key={tab.id}
-                style={[styles.tab, active && styles.tabActive]}
-                onPress={() => setActiveTab(tab.id)}
-                activeOpacity={0.7}
-              >
-                <Text style={[styles.tabIcon, active && styles.tabIconActive]}>
-                  {tab.icon}
-                </Text>
-                <Text style={[styles.tabLabel, active && styles.tabLabelActive]}>
-                  {tab.label}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-      </SafeAreaView>
+      {/* Tab Bar — padded for Android nav bar */}
+      <View style={[styles.tabBar, { paddingBottom: insets.bottom + 4 }]}>
+        {tabs.map((tab) => {
+          const active = tab.id === activeTab;
+          return (
+            <TouchableOpacity
+              key={tab.id}
+              style={[styles.tab, active && styles.tabActive]}
+              onPress={() => setActiveTab(tab.id)}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.tabIcon, active && styles.tabIconActive]}>
+                {tab.icon}
+              </Text>
+              <Text style={[styles.tabLabel, active && styles.tabLabelActive]}>
+                {tab.label}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
     </View>
   );
 }
@@ -125,44 +123,39 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
   },
-  sessionSafe: {
-    backgroundColor: Colors.bgDeep,
-  },
   sessionBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: Spacing.lg,
-    paddingTop: Spacing.sm,
     paddingBottom: Spacing.sm,
     borderBottomWidth: 1,
     borderBottomColor: Colors.borderDefault,
+    backgroundColor: Colors.bgDeep,
   },
   sessionLabel: {
     ...Typography.mono,
     color: Colors.textSecondary,
     fontSize: 10,
+    flexShrink: 1,
+    marginRight: Spacing.sm,
   },
   sessionLogout: {
     ...Typography.mono,
     color: Colors.amber,
     fontSize: 10,
   },
-  tabBarSafe: {
-    backgroundColor: Colors.bgDeep,
-  },
   tabBar: {
     flexDirection: 'row',
     borderTopWidth: 1,
     borderTopColor: Colors.borderDefault,
     backgroundColor: Colors.bgDeep,
-    paddingBottom: Spacing.xs,
+    paddingTop: Spacing.xs,
   },
   tab: {
     flex: 1,
     alignItems: 'center',
     paddingVertical: Spacing.sm,
-    paddingTop: Spacing.md,
   },
   tabActive: {
     borderTopWidth: 2,

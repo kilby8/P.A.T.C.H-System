@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
   ScrollView,
   StyleSheet,
-  SafeAreaView,
 } from 'react-native';
 import { getSponsorBlueprints } from '../../models/Gear';
 import { useCharacter } from '../../store/CharacterContext';
@@ -77,7 +76,7 @@ export default function GMConsole() {
   const sponsorPoolSize = getSponsorBlueprints().length;
 
   return (
-    <SafeAreaView style={GlobalStyles.safeArea}>
+    <View style={GlobalStyles.safeArea}>
       <ScrollView style={GlobalStyles.screen} contentContainerStyle={styles.content}>
         <View style={styles.headerRow}>
           <View>
@@ -267,7 +266,7 @@ export default function GMConsole() {
           </View>
         ) : null}
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
