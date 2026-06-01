@@ -103,29 +103,29 @@ export default function CharacterCreationTerminal() {
     setStep('name');
   };
 
-  const renderNameStep = () => (
-    <View style={styles.stepContainer}>
-      <Text style={styles.stepTitle}>01 :: NAME YOUR OPERATOR</Text>
-      <TextInput
-        style={styles.nameInput}
-        placeholder="Enter operator name"
-        placeholderTextColor={Colors.text.muted}
-        value={characterName}
-        onChangeText={setCharacterName}
-        maxLength={32}
-      />
-      <Text style={styles.hint}>
-        {characterName.length}/32 characters
-      </Text>
-      <TouchableOpacity
-        style={[styles.button, !canProceedName && styles.buttonDisabled]}
-        onPress={() => setStep('background')}
-        disabled={!canProceedName}
-      >
-        <Text style={styles.buttonText}>CONTINUE →</Text>
-      </TouchableOpacity>
-    </View>
-  );
+   const renderNameStep = () => (
+     <View style={styles.stepContainer}>
+       <Text style={styles.stepTitle}>01 :: NAME YOUR OPERATOR</Text>
+       <TextInput
+         style={styles.nameInput}
+         placeholder="Enter operator name"
+         placeholderTextColor={Colors.textMuted}
+         value={characterName}
+         onChangeText={setCharacterName}
+         maxLength={32}
+       />
+       <Text style={styles.hint}>
+         {characterName.length}/32 characters
+       </Text>
+       <TouchableOpacity
+         style={[styles.button, !canProceedName && styles.buttonDisabled]}
+         onPress={() => setStep('background')}
+         disabled={!canProceedName}
+       >
+         <Text style={styles.buttonText}>CONTINUE →</Text>
+       </TouchableOpacity>
+     </View>
+   );
 
   const renderBackgroundStep = () => (
     <View style={styles.stepContainer}>
@@ -169,11 +169,11 @@ export default function CharacterCreationTerminal() {
     <View style={styles.stepContainer}>
       <Text style={styles.stepTitle}>03 :: ALLOCATE ATTRIBUTES</Text>
       <Text style={styles.hint}>Distribute {TOTAL_ATTRIBUTE_POINTS} points across your CPU attributes</Text>
-      <View style={styles.attributesSummary}>
-        <Text style={[styles.hint, { color: remainingPoints === 0 ? Colors.success : Colors.warning }]}>
-          Remaining: {remainingPoints > 0 ? '+' + remainingPoints : remainingPoints}
-        </Text>
-      </View>
+       <View style={styles.attributesSummary}>
+         <Text style={[styles.hint, { color: remainingPoints === 0 ? Colors.green : Colors.amber }]}>
+           Remaining: {remainingPoints > 0 ? '+' + remainingPoints : remainingPoints}
+         </Text>
+       </View>
 
       <ScrollView style={styles.attributesList}>
         {ATTRIBUTES.map((attr) => (
@@ -288,57 +288,57 @@ export default function CharacterCreationTerminal() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background.dark,
+    backgroundColor: Colors.bgVoid,
     padding: Spacing.lg,
   },
   header: {
-    ...Typography.titles.terminal,
+    ...Typography.displayLarge,
     marginBottom: Spacing.xl,
-    color: Colors.accent.primary,
+    color: Colors.cyan,
   },
   stepContainer: {
     flex: 1,
     justifyContent: 'space-between',
   },
   stepTitle: {
-    ...Typography.titles.terminal,
+    ...Typography.heading,
     fontSize: 16,
     marginBottom: Spacing.lg,
-    color: Colors.accent.primary,
+    color: Colors.cyan,
   },
   nameInput: {
     borderWidth: 1,
-    borderColor: Colors.accent.primary,
-    backgroundColor: Colors.background.darker,
-    color: Colors.text.primary,
+    borderColor: Colors.cyan,
+    backgroundColor: Colors.bgElevated,
+    color: Colors.textPrimary,
     padding: Spacing.md,
     marginBottom: Spacing.md,
-    fontFamily: Typography.fonts.mono,
+    ...Typography.mono,
     fontSize: 14,
   },
   hint: {
-    ...Typography.body.small,
-    color: Colors.text.muted,
+    ...Typography.body,
+    color: Colors.textMuted,
     marginBottom: Spacing.md,
   },
   button: {
-    backgroundColor: Colors.accent.primary,
+    backgroundColor: Colors.cyan,
     paddingVertical: Spacing.md,
     paddingHorizontal: Spacing.lg,
     alignItems: 'center',
   },
   buttonDisabled: {
-    backgroundColor: Colors.text.muted,
+    backgroundColor: Colors.textMuted,
     opacity: 0.5,
   },
   buttonSecondary: {
     backgroundColor: 'transparent',
     borderWidth: 1,
-    borderColor: Colors.accent.primary,
+    borderColor: Colors.cyan,
   },
   buttonText: {
-    ...Typography.body.small,
-    color: Colors.background.dark,
+    ...Typography.body,
+    color: Colors.bgVoid,
     fontWeight: 'bold',
   },
   buttonRow: {
@@ -352,8 +352,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   resetButtonText: {
-    ...Typography.body.small,
-    color: Colors.text.muted,
+    ...Typography.body,
+    color: Colors.textMuted,
     textDecorationLine: 'underline',
   },
   backgroundList: {
@@ -362,35 +362,35 @@ const styles = StyleSheet.create({
   },
   backgroundItem: {
     borderWidth: 1,
-    borderColor: Colors.text.muted,
+    borderColor: Colors.textMuted,
     padding: Spacing.md,
     marginBottom: Spacing.md,
-    backgroundColor: Colors.background.darker,
+    backgroundColor: Colors.bgElevated,
   },
   backgroundItemActive: {
-    borderColor: Colors.accent.primary,
-    backgroundColor: Colors.accent.primary + '20',
+    borderColor: Colors.cyan,
+    backgroundColor: Colors.bgCard,
   },
   backgroundName: {
-    ...Typography.body.small,
-    color: Colors.accent.primary,
+    ...Typography.body,
+    color: Colors.cyan,
     fontWeight: 'bold',
     marginBottom: Spacing.xs,
   },
   backgroundCategory: {
-    ...Typography.body.small,
-    color: Colors.text.secondary,
+    ...Typography.body,
+    color: Colors.textSecondary,
     marginBottom: Spacing.xs,
   },
   backgroundTrait: {
-    ...Typography.body.small,
-    color: Colors.text.muted,
+    ...Typography.body,
+    color: Colors.textMuted,
     marginBottom: Spacing.xs,
     fontSize: 12,
   },
   backgroundFocus: {
-    ...Typography.body.small,
-    color: Colors.text.muted,
+    ...Typography.body,
+    color: Colors.textMuted,
     fontSize: 12,
   },
   attributesList: {
@@ -401,7 +401,7 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.lg,
     paddingBottom: Spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: Colors.text.muted,
+    borderBottomColor: Colors.textMuted,
   },
   attributeControl: {
     flexDirection: 'row',
@@ -409,18 +409,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: Spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: Colors.background.darker,
+    borderBottomColor: Colors.bgElevated,
   },
   attributeName: {
-    ...Typography.body.small,
-    color: Colors.accent.primary,
+    ...Typography.body,
+    color: Colors.cyan,
     flex: 1,
     fontWeight: 'bold',
     minWidth: 80,
   },
   attributeValue: {
-    ...Typography.body.small,
-    color: Colors.text.primary,
+    ...Typography.body,
+    color: Colors.textPrimary,
     fontWeight: 'bold',
     minWidth: 30,
     textAlign: 'center',
@@ -433,19 +433,19 @@ const styles = StyleSheet.create({
   adjustButton: {
     width: 36,
     height: 36,
-    backgroundColor: Colors.accent.primary,
+    backgroundColor: Colors.cyan,
     justifyContent: 'center',
     alignItems: 'center',
   },
   adjustButtonText: {
-    color: Colors.background.dark,
+    color: Colors.bgVoid,
     fontSize: 20,
     fontWeight: 'bold',
   },
   confirmSummary: {
     borderWidth: 1,
-    borderColor: Colors.accent.primary,
-    backgroundColor: Colors.background.darker,
+    borderColor: Colors.cyan,
+    backgroundColor: Colors.bgElevated,
     padding: Spacing.lg,
     marginBottom: Spacing.lg,
   },
@@ -455,29 +455,29 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.sm,
   },
   summaryLabel: {
-    ...Typography.body.small,
-    color: Colors.text.secondary,
+    ...Typography.body,
+    color: Colors.textSecondary,
     flex: 1,
   },
   summaryValue: {
-    ...Typography.body.small,
-    color: Colors.accent.primary,
+    ...Typography.body,
+    color: Colors.cyan,
     fontWeight: 'bold',
   },
   divider: {
     height: 1,
-    backgroundColor: Colors.text.muted,
+    backgroundColor: Colors.textMuted,
     marginVertical: Spacing.md,
   },
   progress: {
     alignItems: 'center',
     paddingTop: Spacing.md,
     borderTopWidth: 1,
-    borderTopColor: Colors.text.muted,
+    borderTopColor: Colors.textMuted,
   },
   progressText: {
-    ...Typography.body.small,
-    color: Colors.text.muted,
+    ...Typography.body,
+    color: Colors.textMuted,
   },
 });
 
