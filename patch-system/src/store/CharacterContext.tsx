@@ -1012,7 +1012,7 @@ interface CharacterContextValue {
   blueprintMarket: BlueprintMarket;
   tradeLog: BlueprintTradeLogEntry[];
   loadCharacter: (c: Character) => void;
-  createNewCharacter: (c: Character) => Promise<void>;
+  createNewCharacter: (c: Character) => void;
   setRemoteSessionCode: (sessionCode: string) => void;
   loginAsPlayer: (characterId: string) => void;
   loginAsGM: (accessCode: string) => boolean;
@@ -1173,7 +1173,7 @@ export function CharacterProvider({
   }, [clientId, hasHydrated, remoteSyncAvailable, state.blueprintMarket, state.encounter, state.lastLootBlueprintId, state.party, state.remoteSessionCode, state.sectorDifficulty, state.selectedCharacterId, state.tradeLog]);
 
    const loadCharacter = useCallback((c: Character) => dispatch({ type: 'LOAD_CHARACTER', payload: c }), []);
-   const createNewCharacter = useCallback(async (c: Character) => {
+   const createNewCharacter = useCallback((c: Character) => {
      dispatch({ type: 'ADD_CHARACTER', payload: c });
    }, []);
    const setRemoteSessionCode = useCallback((sessionCode: string) => dispatch({ type: 'SET_REMOTE_SESSION_CODE', sessionCode }), []);

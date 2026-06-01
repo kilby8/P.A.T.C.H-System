@@ -71,23 +71,23 @@ export default function CharacterCreationTerminal() {
     });
   };
 
-  const handleCreateCharacter = async () => {
-    if (!selectedBackgroundId || !canProceedAttributes) {
-      Alert.alert('Invalid', 'Please complete attribute allocation');
-      return;
-    }
+   const handleCreateCharacter = () => {
+     if (!selectedBackgroundId || !canProceedAttributes) {
+       Alert.alert('Invalid', 'Please complete attribute allocation');
+       return;
+     }
 
-    const newCharacter = createCharacter(
-      `char-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-      characterName.trim(),
-      attributes as CpuAttributes,
-      0,
-      selectedBackgroundId,
-    );
+     const newCharacter = createCharacter(
+       `char-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+       characterName.trim(),
+       attributes as CpuAttributes,
+       0,
+       selectedBackgroundId,
+     );
 
-    await createNewCharacter(newCharacter);
-    await loginAsPlayer(newCharacter.id);
-  };
+     createNewCharacter(newCharacter);
+     loginAsPlayer(newCharacter.id);
+   };
 
   const handleReset = () => {
     setCharacterName('');
