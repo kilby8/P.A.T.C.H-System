@@ -11,7 +11,7 @@ import {
   SafeAreaView,
   ScrollView,
 } from 'react-native';
-import { useCharacter, GM_ACCESS_CODE } from '../../store/CharacterContext';
+import { useCharacter } from '../../store/CharacterContext';
 import { getStartingAP } from '../../models/Character';
 import { BACKGROUND_CATEGORY_LABELS, getBackgroundById } from '../../models/Backgrounds';
 import { CardStyles, Colors, GlobalStyles, Radius, Spacing, Typography } from '../../theme/theme';
@@ -100,7 +100,6 @@ export default function LoginTerminal() {
             <Text style={styles.gmButtonText}>AUTHORIZE GM</Text>
           </TouchableOpacity>
           {error ? <Text style={styles.errorText}>{error}</Text> : null}
-          <Text style={styles.hintText}>LOCAL DEV CODE: {GM_ACCESS_CODE}</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -197,13 +196,9 @@ const styles = StyleSheet.create({
     color: Colors.crimson,
     marginTop: Spacing.sm,
   },
-  hintText: {
-    ...Typography.mono,
-    color: Colors.textMuted,
-    marginTop: Spacing.md,
-  },
   syncHint: {
     ...Typography.mono,
     color: Colors.textSecondary,
   },
 });
+
