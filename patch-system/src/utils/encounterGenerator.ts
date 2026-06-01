@@ -5,7 +5,7 @@ import {
   ARENA_BESTIARY,
   BestiaryEntity,
   SpectacleBracket,
-  getBestiaryEntityByName,
+  getBestiaryEntityById,
   getSpectacleBracket,
 } from '../models/ArenaBestiary';
 
@@ -26,7 +26,7 @@ export interface GeneratedEncounter {
 
 function expandForce(bracket: SpectacleBracket): BestiaryEntity[] {
   return bracket.force.flatMap((entry) => {
-    const template = getBestiaryEntityByName(entry.name);
+    const template = getBestiaryEntityById(entry.templateId);
     if (!template) {
       return [];
     }

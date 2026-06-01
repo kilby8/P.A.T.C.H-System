@@ -13,18 +13,21 @@ const DEMO_PARTY = [
     'Ghost//Runner',
     { POWER: 12, PING: 16, HARDWARE: 10, DATA: 14, SYSTEM: 14, CLOUT: 10 },
     5,
+    'neon-runner',
   ),
   createCharacter(
     'op-002',
     'Chrome Saint',
     { POWER: 14, PING: 11, HARDWARE: 15, DATA: 10, SYSTEM: 12, CLOUT: 9 },
     4,
+    'riot-breaker',
   ),
   createCharacter(
     'op-003',
     'Null Velvet',
     { POWER: 9, PING: 15, HARDWARE: 11, DATA: 16, SYSTEM: 13, CLOUT: 14 },
     6,
+    'memory-broker',
   ),
 ];
 

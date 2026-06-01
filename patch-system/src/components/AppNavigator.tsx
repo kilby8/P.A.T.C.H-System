@@ -16,20 +16,29 @@ import ArchetypeMatrix from './archetype/ArchetypeMatrix';
 import CondoPhaseTerminal from './condo/CondoPhaseTerminal';
 import LoginTerminal from './auth/LoginTerminal';
 import GMConsole from './gm/GMConsole';
+import RulesTerminal from './rules/RulesTerminal';
+import GearTerminal from './gear/GearTerminal';
+import BestiaryTerminal from './bestiary/BestiaryTerminal';
 
-type Tab = 'GM' | 'HUD' | 'MATRIX' | 'CONDO';
+type Tab = 'GM' | 'HUD' | 'MATRIX' | 'CONDO' | 'RULES' | 'GEAR' | 'BESTIARY';
 
 const PLAYER_TABS: { id: Exclude<Tab, 'GM'>; label: string; icon: string }[] = [
   { id: 'HUD', label: 'ENCOUNTER', icon: '⚔' },
   { id: 'MATRIX', label: 'ARCHETYPE', icon: '◎' },
+  { id: 'GEAR', label: 'GEAR', icon: '⌁' },
+  { id: 'BESTIARY', label: 'BESTIARY', icon: '☠' },
   { id: 'CONDO', label: 'CONDO', icon: '⏱' },
+  { id: 'RULES', label: 'RULES', icon: '☰' },
 ];
 
 const GM_TABS: { id: Tab; label: string; icon: string }[] = [
   { id: 'GM', label: 'GM', icon: '▣' },
   { id: 'HUD', label: 'SHEET', icon: '⚔' },
   { id: 'MATRIX', label: 'BUILD', icon: '◎' },
+  { id: 'GEAR', label: 'GEAR', icon: '⌁' },
+  { id: 'BESTIARY', label: 'BESTIARY', icon: '☠' },
   { id: 'CONDO', label: 'RECOVERY', icon: '⏱' },
+  { id: 'RULES', label: 'RULES', icon: '☰' },
 ];
 
 export default function AppNavigator() {
@@ -75,7 +84,10 @@ export default function AppNavigator() {
         {activeTab === 'GM'     && session.role === 'gm' && <GMConsole />}
         {activeTab === 'HUD'    && <EncounterHUD />}
         {activeTab === 'MATRIX' && <ArchetypeMatrix />}
+        {activeTab === 'GEAR'   && <GearTerminal />}
+        {activeTab === 'BESTIARY' && <BestiaryTerminal />}
         {activeTab === 'CONDO'  && <CondoPhaseTerminal />}
+        {activeTab === 'RULES'  && <RulesTerminal />}
       </View>
 
       {/* Tab Bar */}

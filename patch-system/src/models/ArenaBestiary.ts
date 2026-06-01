@@ -55,7 +55,7 @@ export interface BestiaryEntity {
 }
 
 export interface SpectacleForceEntry {
-  name: string;
+  templateId: number;
   count: number;
 }
 
@@ -73,9 +73,9 @@ export const SPECTACLE_BRACKETS: SpectacleBracket[] = [
     label: 'Dull Broadcast',
     scoreRange: [1, 2],
     force: [
-      { name: 'Auditor', count: 1 },
-      { name: 'Blight-Drone', count: 2 },
-      { name: 'Glitch-Scrapper', count: 3 },
+      { templateId: 11, count: 1 },
+      { templateId: 14, count: 2 },
+      { templateId: 1, count: 3 },
     ],
     modifiers: [],
   },
@@ -84,10 +84,10 @@ export const SPECTACLE_BRACKETS: SpectacleBracket[] = [
     label: 'Active Engagement',
     scoreRange: [3, 4],
     force: [
-      { name: 'Liquidator', count: 1 },
-      { name: 'Censor', count: 1 },
-      { name: 'Debt-Dodger', count: 2 },
-      { name: 'Net-Junkie', count: 2 },
+      { templateId: 13, count: 1 },
+      { templateId: 12, count: 1 },
+      { templateId: 3, count: 2 },
+      { templateId: 2, count: 2 },
     ],
     modifiers: [],
   },
@@ -96,10 +96,10 @@ export const SPECTACLE_BRACKETS: SpectacleBracket[] = [
     label: 'Prime-Time Surge',
     scoreRange: [5, 6],
     force: [
-      { name: 'Auditor', count: 1 },
-      { name: 'Liquidator', count: 1 },
-      { name: 'Censor', count: 2 },
-      { name: 'Corp Shill', count: 1 },
+      { templateId: 11, count: 1 },
+      { templateId: 13, count: 1 },
+      { templateId: 12, count: 2 },
+      { templateId: 10, count: 1 },
     ],
     modifiers: ['Damage double effect'],
   },
@@ -165,4 +165,8 @@ export function getSpectacleBracket(score: number): SpectacleBracket {
 
 export function getBestiaryEntityByName(name: string): BestiaryEntity | undefined {
   return ARENA_BESTIARY.find((entity) => entity.name.toLowerCase() === name.toLowerCase());
+}
+
+export function getBestiaryEntityById(templateId: number): BestiaryEntity | undefined {
+  return ARENA_BESTIARY.find((entity) => entity.id === templateId);
 }

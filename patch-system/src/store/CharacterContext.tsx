@@ -21,11 +21,25 @@ import {
   getStartingAP,
 } from '../models/Character';
 import {
+  BlueprintMarket,
+  BlueprintTradeLogEntry,
+  GearCategory,
+  GearTheme,
+  createDefaultBlueprintMarket,
+  getBlueprintById,
+  getGearItemById,
+  getSponsorBlueprints,
+  getThemeEngagementRequirement,
+  isSponsorBlueprint,
+} from '../models/Gear';
+import {
   GeneratedEncounter,
   EncounterSpawn,
   generateEncounterFromSpectacle,
   rollSpectacleEncounter,
 } from '../utils/encounterGenerator';
+import { generateEncounterFragmentDrop } from '../utils/lootEconomy';
+import { SectorDifficulty, rollSectorBlueprint } from '../utils/sectorLoot';
 import { publishRemoteSession, RemoteEnvelope, subscribeToRemoteSession } from '../lib/remoteSession';
 import { isSupabaseConfigured } from '../lib/supabase';
 
@@ -54,6 +68,7 @@ export interface ActiveEncounter {
   bracketLabel: string;
   modifiers: string[];
   mobs: ActiveMob[];
+  lootClaimed: boolean;
 }
 
 interface CharacterStoreState {
@@ -62,11 +77,15 @@ interface CharacterStoreState {
   session: SessionState;
   encounter: ActiveEncounter | null;
   remoteSessionCode: string;
+  sectorDifficulty: SectorDifficulty;
+  blueprintMarket: BlueprintMarket;
+  tradeLog: BlueprintTradeLogEntry[];
+  lastLootBlueprintId: string | null;
 }
 
 type Action =
   | { type: 'HYDRATE_STORE'; payload: CharacterStoreState }
-  | { type: 'HYDRATE_REMOTE_STATE'; payload: Pick<CharacterStoreState, 'party' | 'selectedCharacterId' | 'encounter'> }
+  | { type: 'HYDRATE_REMOTE_STATE'; payload: Pick<CharacterStoreState, 'party' | 'selectedCharacterId' | 'encounter' | 'sectorDifficulty' | 'blueprintMarket' | 'tradeLog' | 'lastLootBlueprintId'> }
   | { type: 'LOAD_CHARACTER'; payload: Character }
   | { type: 'SET_REMOTE_SESSION_CODE'; sessionCode: string }
   | { type: 'SET_SELECTED_CHARACTER'; characterId: string }
@@ -88,7 +107,22 @@ type Action =
   | { type: 'HEAL_MOB'; mobId: string; amount: number }
   | { type: 'SPEND_MOB_AP'; mobId: string; amount: number }
   | { type: 'RESTORE_MOB_AP'; mobId: string }
-  | { type: 'REMOVE_MOB'; mobId: string };
+  | { type: 'REMOVE_MOB'; mobId: string }
+  | { type: 'INSTALL_BLUEPRINT'; category: GearCategory; hardpointIndex: number; blueprintId: string }
+  | { type: 'TRANSFER_BLUEPRINT'; fromCharacterId: string; toCharacterId: string; blueprintId: string; amount: number }
+  | { type: 'INJECT_BLUEPRINT'; toCharacterId: string; blueprintId: string; amount: number }
+  | { type: 'SET_BLUEPRINT_PRICE'; blueprintId: string; price: number }
+  | { type: 'SET_BLUEPRINT_AVAILABILITY'; blueprintId: string; amount: number }
+  | { type: 'SET_BLUEPRINT_WEIGHT_MULTIPLIER'; blueprintId: string; multiplier: number }
+  | { type: 'SET_BLUEPRINT_LOOT_ENABLED'; blueprintId: string; enabled: boolean }
+  | { type: 'SET_THEME_GATE'; theme: GearTheme; unlocked: boolean }
+  | { type: 'SET_SECTOR_DIFFICULTY'; difficulty: SectorDifficulty }
+  | { type: 'ROLL_SECTOR_LOOT' }
+  | { type: 'SPONSOR_DROP'; toCharacterId: string }
+  | { type: 'LOOT_OVERRIDE'; toCharacterId: string; blueprintId: string }
+  | { type: 'PURCHASE_BLUEPRINT'; blueprintId: string; amount: number }
+  | { type: 'CLAIM_ENCOUNTER_LOOT' }
+  | { type: 'AWARD_FRAGMENTS'; toCharacterId: string; amount: number; note?: string };
 
 const STORAGE_KEY = 'patch-system/session-store/v1';
 
@@ -120,6 +154,7 @@ function hydrateEncounter(encounter: GeneratedEncounter): ActiveEncounter {
     spectacleScore: encounter.spectacleScore,
     bracketLabel: encounter.bracket.label,
     modifiers: encounter.modifiers,
+    lootClaimed: false,
     mobs: encounter.spawns.map((spawn) => {
       const maxIntegrity = getMobBaseIntegrity(spawn.role);
       const maxAP = getMobBaseAP(spawn.role);
@@ -150,6 +185,10 @@ function createDefaultState(initialCharacters?: Character[]): CharacterStoreStat
     },
     encounter: null,
     remoteSessionCode: '',
+    sectorDifficulty: 1,
+    blueprintMarket: createDefaultBlueprintMarket(),
+    tradeLog: [],
+    lastLootBlueprintId: null,
   };
 }
 
@@ -160,6 +199,7 @@ function sanitizeEncounter(encounter: ActiveEncounter | null | undefined): Activ
     spectacleScore: encounter.spectacleScore,
     bracketLabel: encounter.bracketLabel,
     modifiers: encounter.modifiers ?? [],
+    lootClaimed: encounter.lootClaimed ?? false,
     mobs: (encounter.mobs ?? []).map((mob) => ({
       ...mob,
       maxIntegrity: Math.max(1, mob.maxIntegrity),
@@ -168,6 +208,34 @@ function sanitizeEncounter(encounter: ActiveEncounter | null | undefined): Activ
       currentAP: Math.max(0, Math.min(mob.currentAP, mob.maxAP)),
       defeated: mob.defeated || mob.currentIntegrity <= 0,
     })),
+  };
+}
+
+function sanitizeBlueprintMarket(market: BlueprintMarket | undefined): BlueprintMarket {
+  const fallback = createDefaultBlueprintMarket();
+  if (!market) return fallback;
+
+  return {
+    prices: {
+      ...fallback.prices,
+      ...(market.prices ?? {}),
+    },
+    availability: {
+      ...fallback.availability,
+      ...(market.availability ?? {}),
+    },
+    themeGates: {
+      ...fallback.themeGates,
+      ...(market.themeGates ?? {}),
+    },
+    lootEnabled: {
+      ...fallback.lootEnabled,
+      ...(market.lootEnabled ?? {}),
+    },
+    weightMultipliers: {
+      ...fallback.weightMultipliers,
+      ...(market.weightMultipliers ?? {}),
+    },
   };
 }
 
@@ -183,6 +251,10 @@ function hydrateStoreSnapshot(snapshot: CharacterStoreState, fallbackState: Char
     session: snapshot.session ?? fallbackState.session,
     encounter: sanitizeEncounter(snapshot.encounter),
     remoteSessionCode: snapshot.remoteSessionCode ?? '',
+    sectorDifficulty: snapshot.sectorDifficulty ?? fallbackState.sectorDifficulty,
+    blueprintMarket: sanitizeBlueprintMarket(snapshot.blueprintMarket ?? fallbackState.blueprintMarket),
+    tradeLog: snapshot.tradeLog ?? [],
+    lastLootBlueprintId: snapshot.lastLootBlueprintId ?? null,
   };
 }
 
@@ -190,12 +262,16 @@ interface RemoteSharedState {
   party: Character[];
   selectedCharacterId: string;
   encounter: ActiveEncounter | null;
+  sectorDifficulty: SectorDifficulty;
+  blueprintMarket: BlueprintMarket;
+  tradeLog: BlueprintTradeLogEntry[];
+  lastLootBlueprintId: string | null;
 }
 
 function hydrateRemoteSharedState(
   payload: RemoteSharedState,
   fallbackState: CharacterStoreState,
-): Pick<CharacterStoreState, 'party' | 'selectedCharacterId' | 'encounter'> {
+): Pick<CharacterStoreState, 'party' | 'selectedCharacterId' | 'encounter' | 'sectorDifficulty' | 'blueprintMarket' | 'tradeLog' | 'lastLootBlueprintId'> {
   const party = (payload.party?.length ? payload.party : fallbackState.party).map(hydrateCharacter);
   const selectedCharacterId = party.some((character) => character.id === payload.selectedCharacterId)
     ? payload.selectedCharacterId
@@ -205,6 +281,10 @@ function hydrateRemoteSharedState(
     party,
     selectedCharacterId,
     encounter: sanitizeEncounter(payload.encounter),
+    sectorDifficulty: payload.sectorDifficulty ?? fallbackState.sectorDifficulty,
+    blueprintMarket: sanitizeBlueprintMarket(payload.blueprintMarket ?? fallbackState.blueprintMarket),
+    tradeLog: payload.tradeLog ?? [],
+    lastLootBlueprintId: payload.lastLootBlueprintId ?? null,
   };
 }
 
@@ -249,6 +329,87 @@ function updateSelectedCharacter(
 function canAccessCharacter(state: CharacterStoreState, characterId: string): boolean {
   if (state.session.role === 'gm') return true;
   return state.session.playerCharacterId === characterId;
+}
+
+function pushTradeLog(state: CharacterStoreState, entry: Omit<BlueprintTradeLogEntry, 'id' | 'at'>): BlueprintTradeLogEntry[] {
+  const nextEntry: BlueprintTradeLogEntry = {
+    ...entry,
+    id: `log-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    at: new Date().toISOString(),
+  };
+  return [nextEntry, ...state.tradeLog].slice(0, 120);
+}
+
+function adjustBlueprintCount(character: Character, blueprintId: string, delta: number): Character {
+  const next = Math.max(0, (character.blueprintInventory[blueprintId] ?? 0) + delta);
+  return {
+    ...character,
+    blueprintInventory: {
+      ...character.blueprintInventory,
+      [blueprintId]: next,
+    },
+  };
+}
+
+function adjustDataFragments(character: Character, delta: number): Character {
+  return {
+    ...character,
+    dataFragments: Math.max(0, character.dataFragments + delta),
+  };
+}
+
+function adjustBroadcastState(
+  character: Character,
+  engagementDelta: number,
+  viewerDelta: number,
+): Character {
+  return {
+    ...character,
+    engagement: Math.max(0, Math.min(100, character.engagement + engagementDelta)),
+    viewerCount: Math.max(0, character.viewerCount + viewerDelta),
+  };
+}
+
+function enqueueSponsorInbox(character: Character, blueprintId: string): Character {
+  if (!isSponsorBlueprint(blueprintId)) {
+    return character;
+  }
+
+  return {
+    ...character,
+    sponsorInbox: [blueprintId, ...character.sponsorInbox.filter((entry) => entry !== blueprintId)].slice(0, 12),
+  };
+}
+
+function rewardBlueprint(character: Character, blueprintId: string, amount: number): Character {
+  let nextCharacter = setBlueprintTradable(
+    adjustBlueprintCount(character, blueprintId, amount),
+    blueprintId,
+    true,
+  );
+
+  if (isSponsorBlueprint(blueprintId)) {
+    nextCharacter = enqueueSponsorInbox(nextCharacter, blueprintId);
+    nextCharacter = adjustBroadcastState(nextCharacter, 12 * amount, 450 * amount);
+  } else {
+    nextCharacter = adjustBroadcastState(nextCharacter, 3 * amount, 60 * amount);
+  }
+
+  return nextCharacter;
+}
+
+function getEngagementPayoutMultiplier(engagement: number): number {
+  return 1 + Math.floor(engagement / 20) * 0.05;
+}
+
+function setBlueprintTradable(character: Character, blueprintId: string, tradable: boolean): Character {
+  return {
+    ...character,
+    blueprintTradable: {
+      ...character.blueprintTradable,
+      [blueprintId]: tradable,
+    },
+  };
 }
 
 function characterReducer(state: CharacterStoreState, action: Action): CharacterStoreState {
@@ -314,10 +475,10 @@ function characterReducer(state: CharacterStoreState, action: Action): Character
       };
 
     case 'SPEND_AP':
-      return updateSelectedCharacter(state, (character) => ({
+      return updateSelectedCharacter(state, (character) => adjustBroadcastState({
         ...character,
         currentAP: Math.max(0, character.currentAP - action.amount),
-      }));
+      }, action.amount, action.amount * 12));
 
     case 'RESTORE_AP':
       return updateSelectedCharacter(state, (character) => ({
@@ -326,16 +487,18 @@ function characterReducer(state: CharacterStoreState, action: Action): Character
       }));
 
     case 'APPLY_DAMAGE_OVERSHIELD':
-      return updateSelectedCharacter(state, (character) => hydrateCharacter({
+      if (state.session.role !== 'gm') return state;
+      return updateSelectedCharacter(state, (character) => adjustBroadcastState(hydrateCharacter({
         ...character,
         overshield: clampVital(character.overshield, -action.amount),
-      }));
+      }), action.amount, action.amount * 18));
 
     case 'APPLY_DAMAGE_HARDWARE':
-      return updateSelectedCharacter(state, (character) => syncVitalsAndAP(character, {
+      if (state.session.role !== 'gm') return state;
+      return updateSelectedCharacter(state, (character) => adjustBroadcastState(syncVitalsAndAP(character, {
         ...character,
         hardwareIntegrity: clampVital(character.hardwareIntegrity, -action.amount),
-      }));
+      }), action.amount * 2, action.amount * 35));
 
     case 'HEAL_HARDWARE':
       return updateSelectedCharacter(state, (character) => syncVitalsAndAP(character, {
@@ -395,6 +558,7 @@ function characterReducer(state: CharacterStoreState, action: Action): Character
       };
 
     case 'DAMAGE_MOB':
+      if (state.session.role !== 'gm') return state;
       return {
         ...state,
         encounter: state.encounter
@@ -414,6 +578,7 @@ function characterReducer(state: CharacterStoreState, action: Action): Character
       };
 
     case 'HEAL_MOB':
+      if (state.session.role !== 'gm') return state;
       return {
         ...state,
         encounter: state.encounter
@@ -433,6 +598,7 @@ function characterReducer(state: CharacterStoreState, action: Action): Character
       };
 
     case 'SPEND_MOB_AP':
+      if (state.session.role !== 'gm') return state;
       return {
         ...state,
         encounter: state.encounter
@@ -448,6 +614,7 @@ function characterReducer(state: CharacterStoreState, action: Action): Character
       };
 
     case 'RESTORE_MOB_AP':
+      if (state.session.role !== 'gm') return state;
       return {
         ...state,
         encounter: state.encounter
@@ -461,6 +628,7 @@ function characterReducer(state: CharacterStoreState, action: Action): Character
       };
 
     case 'REMOVE_MOB':
+      if (state.session.role !== 'gm') return state;
       return {
         ...state,
         encounter: state.encounter
@@ -470,6 +638,350 @@ function characterReducer(state: CharacterStoreState, action: Action): Character
             }
           : null,
       };
+
+    case 'INSTALL_BLUEPRINT':
+      {
+        let didInstall = false;
+        const nextParty = state.party.map((character) => {
+          if (character.id !== state.selectedCharacterId) return character;
+
+          const equipped = character.gearLoadout[action.category];
+          if (!equipped) return character;
+
+          const item = getGearItemById(equipped.itemId);
+          const blueprint = getBlueprintById(action.blueprintId);
+          if (!item || !blueprint) return character;
+          if (!blueprint.compatibleCategories.includes(action.category)) return character;
+          if (!state.blueprintMarket.themeGates[blueprint.theme]) return character;
+          if (action.hardpointIndex < 0 || action.hardpointIndex >= item.hardpoints) return character;
+          if ((character.blueprintInventory[action.blueprintId] ?? 0) <= 0) return character;
+
+          const nextHardpoints = [...equipped.hardpoints];
+          nextHardpoints[action.hardpointIndex] = action.blueprintId;
+
+          const nextCharacter = adjustBlueprintCount(character, action.blueprintId, -1);
+          didInstall = true;
+          return adjustBroadcastState({
+            ...nextCharacter,
+            gearLoadout: {
+              ...nextCharacter.gearLoadout,
+              [action.category]: {
+                ...equipped,
+                hardpoints: nextHardpoints,
+              },
+            },
+          }, isSponsorBlueprint(action.blueprintId) ? 14 : 5, isSponsorBlueprint(action.blueprintId) ? 320 : 80);
+        });
+
+        if (!didInstall) {
+          return state;
+        }
+
+        return {
+        ...state,
+          party: nextParty,
+          tradeLog: pushTradeLog(state, {
+            type: 'install',
+            blueprintId: action.blueprintId,
+            amount: 1,
+            toCharacterId: state.selectedCharacterId,
+            note: `${action.category} hardpoint ${action.hardpointIndex + 1}`,
+          }),
+        };
+      }
+
+    case 'TRANSFER_BLUEPRINT': {
+      if (action.amount <= 0) return state;
+      const fromCharacter = state.party.find((character) => character.id === action.fromCharacterId);
+      const toCharacter = state.party.find((character) => character.id === action.toCharacterId);
+      if (!fromCharacter || !toCharacter) return state;
+      if ((fromCharacter.blueprintInventory[action.blueprintId] ?? 0) < action.amount) return state;
+      if (!fromCharacter.blueprintTradable[action.blueprintId]) return state;
+
+      return {
+        ...state,
+        party: state.party.map((character) => {
+          if (character.id === action.fromCharacterId) {
+            return adjustBlueprintCount(character, action.blueprintId, -action.amount);
+          }
+          if (character.id === action.toCharacterId) {
+            return adjustBlueprintCount(character, action.blueprintId, action.amount);
+          }
+          return character;
+        }),
+        tradeLog: pushTradeLog(state, {
+          type: 'trade',
+          blueprintId: action.blueprintId,
+          amount: action.amount,
+          fromCharacterId: action.fromCharacterId,
+          toCharacterId: action.toCharacterId,
+        }),
+      };
+    }
+
+    case 'INJECT_BLUEPRINT': {
+      if (action.amount <= 0) return state;
+      if (!state.party.some((character) => character.id === action.toCharacterId)) return state;
+      return {
+        ...state,
+        party: state.party.map((character) => (
+          character.id === action.toCharacterId
+            ? rewardBlueprint(character, action.blueprintId, action.amount)
+            : character
+        )),
+        tradeLog: pushTradeLog(state, {
+          type: 'inject',
+          blueprintId: action.blueprintId,
+          amount: action.amount,
+          toCharacterId: action.toCharacterId,
+        }),
+      };
+    }
+
+    case 'SET_BLUEPRINT_PRICE':
+      return {
+        ...state,
+        blueprintMarket: {
+          ...state.blueprintMarket,
+          prices: {
+            ...state.blueprintMarket.prices,
+            [action.blueprintId]: Math.max(0, Math.floor(action.price)),
+          },
+        },
+      };
+
+    case 'SET_BLUEPRINT_AVAILABILITY':
+      return {
+        ...state,
+        blueprintMarket: {
+          ...state.blueprintMarket,
+          availability: {
+            ...state.blueprintMarket.availability,
+            [action.blueprintId]: Math.max(0, Math.floor(action.amount)),
+          },
+        },
+      };
+
+    case 'SET_BLUEPRINT_WEIGHT_MULTIPLIER':
+      return {
+        ...state,
+        blueprintMarket: {
+          ...state.blueprintMarket,
+          weightMultipliers: {
+            ...state.blueprintMarket.weightMultipliers,
+            [action.blueprintId]: Math.max(0.05, Math.min(5, Number(action.multiplier.toFixed(2)))),
+          },
+        },
+      };
+
+    case 'SET_BLUEPRINT_LOOT_ENABLED':
+      return {
+        ...state,
+        blueprintMarket: {
+          ...state.blueprintMarket,
+          lootEnabled: {
+            ...state.blueprintMarket.lootEnabled,
+            [action.blueprintId]: action.enabled,
+          },
+        },
+      };
+
+    case 'SET_THEME_GATE':
+      return {
+        ...state,
+        blueprintMarket: {
+          ...state.blueprintMarket,
+          themeGates: {
+            ...state.blueprintMarket.themeGates,
+            [action.theme]: action.unlocked,
+          },
+        },
+      };
+
+    case 'SET_SECTOR_DIFFICULTY':
+      return {
+        ...state,
+        sectorDifficulty: Math.max(1, Math.min(5, action.difficulty)) as SectorDifficulty,
+      };
+
+    case 'ROLL_SECTOR_LOOT': {
+      const dropped = rollSectorBlueprint(state.sectorDifficulty, state.blueprintMarket);
+      if (!dropped) return state;
+
+      return {
+        ...state,
+        party: state.party.map((character) => (
+          character.id === state.selectedCharacterId
+            ? rewardBlueprint(character, dropped.blueprint.id, 1)
+            : character
+        )),
+        blueprintMarket: {
+          ...state.blueprintMarket,
+          availability: {
+            ...state.blueprintMarket.availability,
+            [dropped.blueprint.id]: Math.max(0, (state.blueprintMarket.availability[dropped.blueprint.id] ?? 0) - 1),
+          },
+        },
+        lastLootBlueprintId: dropped.blueprint.id,
+        tradeLog: pushTradeLog(state, {
+          type: 'loot',
+          blueprintId: dropped.blueprint.id,
+          amount: 1,
+          toCharacterId: state.selectedCharacterId,
+          note: `sector ${state.sectorDifficulty} roll ${dropped.roll} (${dropped.theme})`,
+        }),
+      };
+    }
+
+    case 'SPONSOR_DROP': {
+      const target = state.party.find((character) => character.id === action.toCharacterId);
+      if (!target) return state;
+      if (target.engagement < 60) return state;
+
+      const sponsorPool = getSponsorBlueprints();
+      if (sponsorPool.length === 0) return state;
+
+      const blueprint = sponsorPool[Math.floor(Math.random() * sponsorPool.length)];
+      if (!blueprint) return state;
+
+      return {
+        ...state,
+        party: state.party.map((character) => (
+          character.id === action.toCharacterId
+            ? rewardBlueprint(character, blueprint.id, 1)
+            : character
+        )),
+        lastLootBlueprintId: blueprint.id,
+        tradeLog: pushTradeLog(state, {
+          type: 'override',
+          blueprintId: blueprint.id,
+          amount: 1,
+          toCharacterId: action.toCharacterId,
+          note: 'producer sponsor drop',
+        }),
+      };
+    }
+
+    case 'LOOT_OVERRIDE': {
+      const blueprint = getBlueprintById(action.blueprintId);
+      if (!blueprint) return state;
+      if (!state.party.some((character) => character.id === action.toCharacterId)) return state;
+
+      return {
+        ...state,
+        party: state.party.map((character) => (
+          character.id === action.toCharacterId
+            ? rewardBlueprint(character, action.blueprintId, 1)
+            : character
+        )),
+        lastLootBlueprintId: action.blueprintId,
+        tradeLog: pushTradeLog(state, {
+          type: 'override',
+          blueprintId: action.blueprintId,
+          amount: 1,
+          toCharacterId: action.toCharacterId,
+          note: 'gm loot override',
+        }),
+      };
+    }
+
+    case 'PURCHASE_BLUEPRINT': {
+      const amount = Math.max(1, Math.floor(action.amount));
+      const blueprint = getBlueprintById(action.blueprintId);
+      if (!blueprint) return state;
+      if (!state.blueprintMarket.themeGates[blueprint.theme]) return state;
+
+      const price = Math.max(0, Math.floor(state.blueprintMarket.prices[action.blueprintId] ?? 0));
+      const stock = Math.max(0, Math.floor(state.blueprintMarket.availability[action.blueprintId] ?? 0));
+      if (stock < amount) return state;
+
+      const selected = state.party.find((character) => character.id === state.selectedCharacterId);
+      if (!selected) return state;
+      if (selected.engagement < getThemeEngagementRequirement(blueprint.theme)) return state;
+
+      const totalCost = price * amount;
+      if (selected.dataFragments < totalCost) return state;
+
+      return {
+        ...state,
+        party: state.party.map((character) => {
+          if (character.id !== state.selectedCharacterId) return character;
+          const withBlueprint = rewardBlueprint(character, action.blueprintId, amount);
+          return adjustDataFragments(withBlueprint, -totalCost);
+        }),
+        blueprintMarket: {
+          ...state.blueprintMarket,
+          availability: {
+            ...state.blueprintMarket.availability,
+            [action.blueprintId]: stock - amount,
+          },
+        },
+        tradeLog: pushTradeLog(state, {
+          type: 'purchase',
+          blueprintId: action.blueprintId,
+          amount,
+          toCharacterId: state.selectedCharacterId,
+          fragmentDelta: -totalCost,
+          note: `purchase @ ${price} each`,
+        }),
+      };
+    }
+
+    case 'CLAIM_ENCOUNTER_LOOT': {
+      if (!state.encounter || state.encounter.lootClaimed) return state;
+      const encounter = state.encounter;
+
+      const totalMobs = encounter.mobs.length;
+      const defeatedMobs = encounter.mobs.filter((mob) => mob.defeated || mob.currentIntegrity <= 0).length;
+      const drop = generateEncounterFragmentDrop({
+        spectacleScore: encounter.spectacleScore,
+        totalMobs,
+        defeatedMobs,
+      });
+      const selected = state.party.find((character) => character.id === state.selectedCharacterId);
+      if (!selected) return state;
+      const payout = Math.max(0, Math.round(drop.total * getEngagementPayoutMultiplier(selected.engagement)));
+
+      return {
+        ...state,
+        party: state.party.map((character) => (
+          character.id === state.selectedCharacterId
+            ? adjustBroadcastState(adjustDataFragments(character, payout), Math.max(4, encounter.spectacleScore * 3), payout * 6)
+            : character
+        )),
+        encounter: {
+          ...encounter,
+          lootClaimed: true,
+        },
+        tradeLog: pushTradeLog(state, {
+          type: 'loot',
+          amount: 1,
+          toCharacterId: state.selectedCharacterId,
+          fragmentDelta: payout,
+          note: `spectacle ${encounter.spectacleScore} / defeated ${defeatedMobs}/${totalMobs} / feed x${getEngagementPayoutMultiplier(selected.engagement).toFixed(2)}`,
+        }),
+      };
+    }
+
+    case 'AWARD_FRAGMENTS': {
+      const amount = Math.max(1, Math.floor(action.amount));
+      if (!state.party.some((character) => character.id === action.toCharacterId)) return state;
+      return {
+        ...state,
+        party: state.party.map((character) => (
+          character.id === action.toCharacterId
+            ? adjustBroadcastState(adjustDataFragments(character, amount), action.note?.includes('ad-read') ? 8 : 2, amount * 4)
+            : character
+        )),
+        tradeLog: pushTradeLog(state, {
+          type: 'award',
+          amount: 1,
+          toCharacterId: action.toCharacterId,
+          fragmentDelta: amount,
+          note: action.note ?? 'gm award',
+        }),
+      };
+    }
 
     default:
       return state;
@@ -482,9 +994,13 @@ interface CharacterContextValue {
   selectedCharacterId: string;
   session: SessionState;
   encounter: ActiveEncounter | null;
+  sectorDifficulty: SectorDifficulty;
+  lastLootBlueprintId: string | null;
   remoteSessionCode: string;
   syncStatus: SyncStatus;
   remoteSyncAvailable: boolean;
+  blueprintMarket: BlueprintMarket;
+  tradeLog: BlueprintTradeLogEntry[];
   loadCharacter: (c: Character) => void;
   setRemoteSessionCode: (sessionCode: string) => void;
   loginAsPlayer: (characterId: string) => void;
@@ -508,6 +1024,21 @@ interface CharacterContextValue {
   spendMobAP: (mobId: string, amount?: number) => void;
   restoreMobAP: (mobId: string) => void;
   removeMob: (mobId: string) => void;
+  installBlueprint: (category: GearCategory, hardpointIndex: number, blueprintId: string) => void;
+  transferBlueprint: (toCharacterId: string, blueprintId: string, amount?: number) => void;
+  injectBlueprint: (toCharacterId: string, blueprintId: string, amount?: number) => void;
+  setBlueprintPrice: (blueprintId: string, price: number) => void;
+  setBlueprintAvailability: (blueprintId: string, amount: number) => void;
+  setBlueprintWeightMultiplier: (blueprintId: string, multiplier: number) => void;
+  setBlueprintLootEnabled: (blueprintId: string, enabled: boolean) => void;
+  setThemeGate: (theme: GearTheme, unlocked: boolean) => void;
+  setSectorDifficulty: (difficulty: SectorDifficulty) => void;
+  rollSectorLoot: () => void;
+  sponsorDrop: (toCharacterId: string) => void;
+  lootOverride: (toCharacterId: string, blueprintId: string) => void;
+  purchaseBlueprint: (blueprintId: string, amount?: number) => void;
+  claimEncounterLoot: () => void;
+  awardFragments: (toCharacterId: string, amount: number, note?: string) => void;
 }
 
 const CharacterContext = createContext<CharacterContextValue | null>(null);
@@ -618,13 +1149,17 @@ export function CharacterProvider({
         party: state.party,
         selectedCharacterId: state.selectedCharacterId,
         encounter: state.encounter,
+        sectorDifficulty: state.sectorDifficulty,
+        blueprintMarket: state.blueprintMarket,
+        tradeLog: state.tradeLog,
+        lastLootBlueprintId: state.lastLootBlueprintId,
       },
     };
 
     void publishRemoteSession(state.remoteSessionCode, envelope)
       .then(() => setSyncStatus('connected'))
       .catch(() => setSyncStatus('error'));
-  }, [clientId, hasHydrated, remoteSyncAvailable, state.encounter, state.party, state.remoteSessionCode, state.selectedCharacterId]);
+  }, [clientId, hasHydrated, remoteSyncAvailable, state.blueprintMarket, state.encounter, state.lastLootBlueprintId, state.party, state.remoteSessionCode, state.sectorDifficulty, state.selectedCharacterId, state.tradeLog]);
 
   const loadCharacter = useCallback((c: Character) => dispatch({ type: 'LOAD_CHARACTER', payload: c }), []);
   const setRemoteSessionCode = useCallback((sessionCode: string) => dispatch({ type: 'SET_REMOTE_SESSION_CODE', sessionCode }), []);
@@ -633,8 +1168,14 @@ export function CharacterProvider({
   const selectCharacter = useCallback((characterId: string) => dispatch({ type: 'SET_SELECTED_CHARACTER', characterId }), []);
   const spendAP = useCallback((amount = 1) => dispatch({ type: 'SPEND_AP', amount }), []);
   const restoreAP = useCallback(() => dispatch({ type: 'RESTORE_AP' }), []);
-  const applyDamageOvershield = useCallback((amount: number) => dispatch({ type: 'APPLY_DAMAGE_OVERSHIELD', amount }), []);
-  const applyDamageHardware = useCallback((amount: number) => dispatch({ type: 'APPLY_DAMAGE_HARDWARE', amount }), []);
+  const applyDamageOvershield = useCallback((amount: number) => {
+    if (state.session.role !== 'gm') return;
+    dispatch({ type: 'APPLY_DAMAGE_OVERSHIELD', amount });
+  }, [state.session.role]);
+  const applyDamageHardware = useCallback((amount: number) => {
+    if (state.session.role !== 'gm') return;
+    dispatch({ type: 'APPLY_DAMAGE_HARDWARE', amount });
+  }, [state.session.role]);
   const healHardware = useCallback((amount: number) => dispatch({ type: 'HEAL_HARDWARE', amount }), []);
   const restoreOvershield = useCallback((amount: number) => dispatch({ type: 'RESTORE_OVERSHIELD', amount }), []);
   const unlockNode = useCallback((nodeId: string) => dispatch({ type: 'UNLOCK_NODE', nodeId }), []);
@@ -643,11 +1184,88 @@ export function CharacterProvider({
   const generateEncounter = useCallback((spectacleScore: number) => dispatch({ type: 'SET_ENCOUNTER', payload: generateEncounterFromSpectacle(spectacleScore) }), []);
   const rollEncounter = useCallback(() => dispatch({ type: 'SET_ENCOUNTER', payload: rollSpectacleEncounter() }), []);
   const clearEncounter = useCallback(() => dispatch({ type: 'CLEAR_ENCOUNTER' }), []);
-  const damageMob = useCallback((mobId: string, amount: number) => dispatch({ type: 'DAMAGE_MOB', mobId, amount }), []);
-  const healMob = useCallback((mobId: string, amount: number) => dispatch({ type: 'HEAL_MOB', mobId, amount }), []);
-  const spendMobAP = useCallback((mobId: string, amount = 1) => dispatch({ type: 'SPEND_MOB_AP', mobId, amount }), []);
-  const restoreMobAP = useCallback((mobId: string) => dispatch({ type: 'RESTORE_MOB_AP', mobId }), []);
-  const removeMob = useCallback((mobId: string) => dispatch({ type: 'REMOVE_MOB', mobId }), []);
+  const damageMob = useCallback((mobId: string, amount: number) => {
+    if (state.session.role !== 'gm') return;
+    dispatch({ type: 'DAMAGE_MOB', mobId, amount });
+  }, [state.session.role]);
+  const healMob = useCallback((mobId: string, amount: number) => {
+    if (state.session.role !== 'gm') return;
+    dispatch({ type: 'HEAL_MOB', mobId, amount });
+  }, [state.session.role]);
+  const spendMobAP = useCallback((mobId: string, amount = 1) => {
+    if (state.session.role !== 'gm') return;
+    dispatch({ type: 'SPEND_MOB_AP', mobId, amount });
+  }, [state.session.role]);
+  const restoreMobAP = useCallback((mobId: string) => {
+    if (state.session.role !== 'gm') return;
+    dispatch({ type: 'RESTORE_MOB_AP', mobId });
+  }, [state.session.role]);
+  const removeMob = useCallback((mobId: string) => {
+    if (state.session.role !== 'gm') return;
+    dispatch({ type: 'REMOVE_MOB', mobId });
+  }, [state.session.role]);
+  const installBlueprint = useCallback((category: GearCategory, hardpointIndex: number, blueprintId: string) => (
+    dispatch({ type: 'INSTALL_BLUEPRINT', category, hardpointIndex, blueprintId })
+  ), []);
+  const transferBlueprint = useCallback((toCharacterId: string, blueprintId: string, amount = 1) => {
+    dispatch({
+      type: 'TRANSFER_BLUEPRINT',
+      fromCharacterId: state.selectedCharacterId,
+      toCharacterId,
+      blueprintId,
+      amount,
+    });
+  }, [state.selectedCharacterId]);
+  const injectBlueprint = useCallback((toCharacterId: string, blueprintId: string, amount = 1) => {
+    if (state.session.role !== 'gm') return;
+    dispatch({ type: 'INJECT_BLUEPRINT', toCharacterId, blueprintId, amount });
+  }, [state.session.role]);
+  const setBlueprintPrice = useCallback((blueprintId: string, price: number) => {
+    if (state.session.role !== 'gm') return;
+    dispatch({ type: 'SET_BLUEPRINT_PRICE', blueprintId, price });
+  }, [state.session.role]);
+  const setBlueprintAvailability = useCallback((blueprintId: string, amount: number) => {
+    if (state.session.role !== 'gm') return;
+    dispatch({ type: 'SET_BLUEPRINT_AVAILABILITY', blueprintId, amount });
+  }, [state.session.role]);
+  const setBlueprintWeightMultiplier = useCallback((blueprintId: string, multiplier: number) => {
+    if (state.session.role !== 'gm') return;
+    dispatch({ type: 'SET_BLUEPRINT_WEIGHT_MULTIPLIER', blueprintId, multiplier });
+  }, [state.session.role]);
+  const setBlueprintLootEnabled = useCallback((blueprintId: string, enabled: boolean) => {
+    if (state.session.role !== 'gm') return;
+    dispatch({ type: 'SET_BLUEPRINT_LOOT_ENABLED', blueprintId, enabled });
+  }, [state.session.role]);
+  const setThemeGate = useCallback((theme: GearTheme, unlocked: boolean) => {
+    if (state.session.role !== 'gm') return;
+    dispatch({ type: 'SET_THEME_GATE', theme, unlocked });
+  }, [state.session.role]);
+  const setSectorDifficulty = useCallback((difficulty: SectorDifficulty) => {
+    if (state.session.role !== 'gm') return;
+    dispatch({ type: 'SET_SECTOR_DIFFICULTY', difficulty });
+  }, [state.session.role]);
+  const rollSectorLoot = useCallback(() => {
+    if (state.session.role !== 'gm') return;
+    dispatch({ type: 'ROLL_SECTOR_LOOT' });
+  }, [state.session.role]);
+  const sponsorDrop = useCallback((toCharacterId: string) => {
+    if (state.session.role !== 'gm') return;
+    dispatch({ type: 'SPONSOR_DROP', toCharacterId });
+  }, [state.session.role]);
+  const lootOverride = useCallback((toCharacterId: string, blueprintId: string) => {
+    if (state.session.role !== 'gm') return;
+    dispatch({ type: 'LOOT_OVERRIDE', toCharacterId, blueprintId });
+  }, [state.session.role]);
+  const purchaseBlueprint = useCallback((blueprintId: string, amount = 1) => {
+    dispatch({ type: 'PURCHASE_BLUEPRINT', blueprintId, amount });
+  }, []);
+  const claimEncounterLoot = useCallback(() => {
+    dispatch({ type: 'CLAIM_ENCOUNTER_LOOT' });
+  }, []);
+  const awardFragments = useCallback((toCharacterId: string, amount: number, note?: string) => {
+    if (state.session.role !== 'gm') return;
+    dispatch({ type: 'AWARD_FRAGMENTS', toCharacterId, amount, note });
+  }, [state.session.role]);
 
   const loginAsGM = useCallback((accessCode: string) => {
     const normalizedCode = accessCode.trim().toUpperCase();
@@ -670,9 +1288,13 @@ export function CharacterProvider({
         selectedCharacterId: state.selectedCharacterId,
         session: state.session,
         encounter: state.encounter,
+        sectorDifficulty: state.sectorDifficulty,
+        lastLootBlueprintId: state.lastLootBlueprintId,
         remoteSessionCode: state.remoteSessionCode,
         syncStatus,
         remoteSyncAvailable,
+        blueprintMarket: state.blueprintMarket,
+        tradeLog: state.tradeLog,
         loadCharacter,
         setRemoteSessionCode,
         loginAsPlayer,
@@ -696,6 +1318,21 @@ export function CharacterProvider({
         spendMobAP,
         restoreMobAP,
         removeMob,
+        installBlueprint,
+        transferBlueprint,
+        injectBlueprint,
+        setBlueprintPrice,
+        setBlueprintAvailability,
+        setBlueprintWeightMultiplier,
+        setBlueprintLootEnabled,
+        setThemeGate,
+        setSectorDifficulty,
+        rollSectorLoot,
+        sponsorDrop,
+        lootOverride,
+        purchaseBlueprint,
+        claimEncounterLoot,
+        awardFragments,
       }}
     >
       {children}

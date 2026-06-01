@@ -17,6 +17,7 @@ import {
   Animated,
   SafeAreaView,
 } from 'react-native';
+import { getBackgroundById } from '../../models/Backgrounds';
 import { useCharacter } from '../../store/CharacterContext';
 import {
   Colors,
@@ -32,6 +33,17 @@ import {
 const REAL_SECONDS_PER_GAME_HOUR = 5 * 60;   // 5 real minutes
 const HEAL_PERCENT_PER_GAME_HOUR = 0.25;       // 25% max HW per hour
 const TABLE_BREAK_REAL_SECONDS   = 15 * 60;   // 15 real minutes
+const CONDO_CORPORATE_TICKER = [
+  'LIVING MODULE STATUS: ALL RECOVERY WINDOWS ARE RECORDED FOR PERFORMANCE AUDIT.',
+  'TERMINAL NOTICE: FIELD MODIFICATIONS SHOULD BE COMPLETED BEFORE THE NEXT TELEMETRY CYCLE.',
+  'CORPORATE REMINDER: REST IS AN AUTHORIZED MAINTENANCE INTERVAL, NOT A VACATION BENEFIT.',
+  'GREEN ROOM FEED: HIGH-VISIBILITY OPERATORS RECEIVE PRIORITY MARKET REVIEW.',
+];
+const GLITCHER_INTERCEPT_LINES = [
+  'INTERCEPTED SIGNAL: THEY CALL IT RECOVERY. REALLY IT IS JUST CALIBRATION FOR THE NEXT SLAUGHTERCAST.',
+  'INTERCEPTED SIGNAL: KEEP THE TERMINAL OPEN AND IT LEARNS YOUR HABITS. CLOSE IT AND IT WRITES ITS OWN.',
+  'INTERCEPTED SIGNAL: THE VIEWER COUNT IS JUST ANOTHER TARGETING SYSTEM WITH BETTER GRAPHICS.',
+];
 
 // ── Helpers ──────────────────────────────────────────────────
 function formatTime(totalSeconds: number): string {
@@ -47,6 +59,7 @@ function gameHoursElapsed(elapsedRealSeconds: number): number {
 // ── Component ────────────────────────────────────────────────
 export default function CondoPhaseTerminal() {
   const { character, healHardware } = useCharacter();
+  const background = getBackgroundById(character.backgroundId);
 
   // Timer state
   const [running, setRunning]             = useState(false);
@@ -55,6 +68,7 @@ export default function CondoPhaseTerminal() {
   const [hoursHealed, setHoursHealed]     = useState(0);
   const [breakComplete, setBreakComplete] = useState(false);
   const [healLog, setHealLog]             = useState<string[]>([]);
+  const [tickerIndex, setTickerIndex]     = useState(0);
 
   const intervalRef   = useRef<ReturnType<typeof setInterval> | null>(null);
   const prevHoursRef  = useRef(0);
@@ -74,6 +88,14 @@ export default function CondoPhaseTerminal() {
       pulseAnim.setValue(1);
     }
   }, [running, pulseAnim]);
+
+  useEffect(() => {
+    const tickerInterval = setInterval(() => {
+      setTickerIndex((current) => (current + 1) % CONDO_CORPORATE_TICKER.length);
+    }, 4500);
+
+    return () => clearInterval(tickerInterval);
+  }, []);
 
   // Tick
   useEffect(() => {
@@ -158,6 +180,20 @@ export default function CondoPhaseTerminal() {
           <Text style={styles.subtitle}>META-GAME RECOVERY PROTOCOL</Text>
           <View style={GlobalStyles.dividerGlow} />
         </View>
+
+        <View style={styles.bannerCard}>
+          <Text style={styles.bannerLabel}>CORPORATE GREEN ROOM FEED</Text>
+          <Text style={styles.bannerText}>{CONDO_CORPORATE_TICKER[tickerIndex]}</Text>
+        </View>
+
+        {background?.category === 'glitcher' && (
+          <View style={styles.interceptCard}>
+            <Text style={styles.interceptLabel}>INTERCEPTED SIGNAL</Text>
+            <Text style={styles.interceptText}>
+              {GLITCHER_INTERCEPT_LINES[tickerIndex % GLITCHER_INTERCEPT_LINES.length]}
+            </Text>
+          </View>
+        )}
 
         {/* ── Timer Display ───────────────────────────────── */}
         <View style={[CardStyles.glow, styles.timerCard]}>
@@ -316,6 +352,46 @@ const styles = StyleSheet.create({
     ...Typography.mono,
     color: Colors.textMuted,
     marginBottom: Spacing.sm,
+  },
+  bannerCard: {
+    borderWidth: 1,
+    borderColor: Colors.amber,
+    borderRadius: Radius.md,
+    backgroundColor: Colors.bgDeep,
+    padding: Spacing.md,
+    marginBottom: Spacing.md,
+  },
+  bannerLabel: {
+    ...Typography.mono,
+    color: Colors.amber,
+    fontSize: 10,
+    marginBottom: 4,
+  },
+  bannerText: {
+    ...Typography.mono,
+    color: Colors.textPrimary,
+    fontSize: 11,
+    lineHeight: 18,
+  },
+  interceptCard: {
+    borderWidth: 1,
+    borderColor: Colors.crimson,
+    borderRadius: Radius.md,
+    backgroundColor: Colors.bgDeep,
+    padding: Spacing.md,
+    marginBottom: Spacing.md,
+  },
+  interceptLabel: {
+    ...Typography.mono,
+    color: Colors.crimson,
+    fontSize: 10,
+    marginBottom: 4,
+  },
+  interceptText: {
+    ...Typography.mono,
+    color: Colors.textSecondary,
+    fontSize: 11,
+    lineHeight: 18,
   },
   timerCard: {
     alignItems: 'center',

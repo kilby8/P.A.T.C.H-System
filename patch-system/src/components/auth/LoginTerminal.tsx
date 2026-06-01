@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { useCharacter, GM_ACCESS_CODE } from '../../store/CharacterContext';
 import { getStartingAP } from '../../models/Character';
+import { BACKGROUND_CATEGORY_LABELS, getBackgroundById } from '../../models/Backgrounds';
 import { CardStyles, Colors, GlobalStyles, Radius, Spacing, Typography } from '../../theme/theme';
 
 export default function LoginTerminal() {
@@ -33,7 +34,7 @@ export default function LoginTerminal() {
             value={remoteSessionCode}
             onChangeText={setRemoteSessionCode}
             placeholder="OPTIONAL SESSION CODE (E.G. ARENA-001)"
-              : 'REMOTE SYNC OFFLINE — COPY .env.example TO .env.local AND SET EXPO_PUBLIC_SUPABASE_URL / EXPO_PUBLIC_SUPABASE_ANON_KEY'}
+            placeholderTextColor={Colors.textMuted}
             autoCapitalize="characters"
             style={styles.input}
           />
@@ -46,7 +47,9 @@ export default function LoginTerminal() {
 
         <View style={CardStyles.glow}>
           <Text style={styles.sectionTitle}>PLAYER LOGIN</Text>
-          {party.map((character) => (
+          {party.map((character) => {
+            const background = getBackgroundById(character.backgroundId);
+            return (
             <TouchableOpacity
               key={character.id}
               style={styles.playerButton}
@@ -55,13 +58,19 @@ export default function LoginTerminal() {
             >
               <View>
                 <Text style={styles.playerName}>{character.name.toUpperCase()}</Text>
+                {background ? (
+                  <Text style={styles.playerBackground}>
+                    {background.name.toUpperCase()} • {BACKGROUND_CATEGORY_LABELS[background.category]}
+                  </Text>
+                ) : null}
                 <Text style={styles.playerMeta}>
                   AP {character.currentAP}/{getStartingAP(character)} • HW {character.hardwareIntegrity.current}/{character.hardwareIntegrity.max}
                 </Text>
               </View>
               <Text style={styles.playerArrow}>ENTER</Text>
             </TouchableOpacity>
-          ))}
+            );
+          })}
         </View>
 
         <View style={[CardStyles.base, styles.gmCard]}>
@@ -143,6 +152,12 @@ const styles = StyleSheet.create({
     ...Typography.mono,
     color: Colors.textSecondary,
     marginTop: 2,
+  },
+  playerBackground: {
+    ...Typography.mono,
+    color: Colors.amber,
+    marginTop: 2,
+    fontSize: 10,
   },
   playerArrow: {
     ...Typography.mono,

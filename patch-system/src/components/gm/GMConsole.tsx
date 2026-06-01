@@ -1,7 +1,7 @@
 // ============================================================
 // P.A.T.C.H. SYSTEM — GM Console
 // ============================================================
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   View,
   Text,
@@ -10,8 +10,41 @@ import {
   StyleSheet,
   SafeAreaView,
 } from 'react-native';
+import { getSponsorBlueprints } from '../../models/Gear';
 import { useCharacter } from '../../store/CharacterContext';
 import { CardStyles, Colors, GlobalStyles, Radius, Spacing, Typography } from '../../theme/theme';
+
+const BROADCAST_HEAT_LABELS = {
+  1: 'COLD FEED',
+  2: 'WARM FEED',
+  3: 'TRENDING',
+  4: 'FEATURED',
+  5: 'MAXIMUM HEAT',
+} as const;
+
+const AD_READS = [
+  {
+    title: 'KINETIC COLA',
+    copy: 'Tonight\'s firefight is brought to you by Kinetic Cola: drink voltage, survive the edit.',
+    fragmentReward: 15,
+    overshieldBoost: 2,
+    note: 'corporate ad-read: kinetic cola',
+  },
+  {
+    title: 'BULWARK LIFE',
+    copy: 'Bulwark Life assures every viewer that operator survivability remains a premium growth sector.',
+    fragmentReward: 20,
+    overshieldBoost: 4,
+    note: 'corporate ad-read: bulwark life',
+  },
+  {
+    title: 'PATCH PRIME',
+    copy: 'PATCH Prime subscribers enjoy expanded angles, biometric overlays, and same-hour casualty analytics.',
+    fragmentReward: 25,
+    overshieldBoost: 3,
+    note: 'corporate ad-read: patch prime',
+  },
+];
 
 export default function GMConsole() {
   const {
@@ -28,7 +61,20 @@ export default function GMConsole() {
     spendMobAP,
     restoreMobAP,
     removeMob,
+    applyDamageOvershield,
+    applyDamageHardware,
+    restoreOvershield,
+    sectorDifficulty,
+    setSectorDifficulty,
+    sponsorDrop,
+    awardFragments,
   } = useCharacter();
+
+  const selectedCharacter = useMemo(
+    () => party.find((character) => character.id === selectedCharacterId) ?? party[0],
+    [party, selectedCharacterId],
+  );
+  const sponsorPoolSize = getSponsorBlueprints().length;
 
   return (
     <SafeAreaView style={GlobalStyles.safeArea}>
@@ -66,9 +112,98 @@ export default function GMConsole() {
                 <Text style={styles.playerVitals}>
                   PWR {character.attributes.POWER} • PNG {character.attributes.PING} • HDW {character.attributes.HARDWARE} • DAT {character.attributes.DATA} • SYS {character.attributes.SYSTEM} • CLT {character.attributes.CLOUT}
                 </Text>
+                <Text style={styles.playerVitals}>
+                  FEED {character.engagement}% • VIEWERS {character.viewerCount.toLocaleString()}
+                </Text>
+                {character.aiPriorityMarked && (
+                  <Text style={styles.priorityFlag}>PRIORITY TARGETING FLAG :: HOSTILE AI BIAS ACTIVE</Text>
+                )}
               </TouchableOpacity>
             );
           })}
+        </View>
+
+        <View style={[CardStyles.warning, styles.sectionSpacing]}>
+          <Text style={styles.sectionTitle}>PRODUCER DASHBOARD</Text>
+          <Text style={styles.producerMeta}>
+            LIVE BROADCAST HEAT :: S{sectorDifficulty} :: {BROADCAST_HEAT_LABELS[sectorDifficulty]}
+          </Text>
+          <View style={styles.scoreRow}>
+            {([1, 2, 3, 4, 5] as const).map((difficulty) => (
+              <TouchableOpacity
+                key={`heat-${difficulty}`}
+                style={[styles.scoreButton, sectorDifficulty === difficulty && styles.scoreButtonActive]}
+                onPress={() => setSectorDifficulty(difficulty)}
+                activeOpacity={0.75}
+              >
+                <Text style={[styles.scoreButtonText, sectorDifficulty === difficulty && styles.scoreButtonTextActive]}>
+                  {difficulty}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          <View style={styles.generatorActionRow}>
+            <TouchableOpacity
+              style={styles.rollButton}
+              onPress={() => setSectorDifficulty(Math.min(5, sectorDifficulty + 1) as 1 | 2 | 3 | 4 | 5)}
+              activeOpacity={0.75}
+            >
+              <Text style={styles.rollButtonText}>HAZARD SPIKE</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.clearButton}
+              onPress={() => setSectorDifficulty(Math.max(1, sectorDifficulty - 1) as 1 | 2 | 3 | 4 | 5)}
+              activeOpacity={0.75}
+            >
+              <Text style={styles.clearButtonText}>COOL FEED</Text>
+            </TouchableOpacity>
+          </View>
+
+          {selectedCharacter && (
+            <View style={styles.adReadTargetCard}>
+              <Text style={styles.adReadTargetLabel}>ACTIVE SPONSOR TARGET</Text>
+              <Text style={styles.adReadTargetValue}>{selectedCharacter.name.toUpperCase()}</Text>
+              <Text style={styles.adReadTargetMeta}>
+                ENGAGEMENT {selectedCharacter.engagement}% · VIEWERS {selectedCharacter.viewerCount.toLocaleString()} · SPONSOR POOL {sponsorPoolSize}
+              </Text>
+              <View style={styles.mobActionRow}>
+                <MiniButton label="OS -1" onPress={() => applyDamageOvershield(1)} danger />
+                <MiniButton label="OS -3" onPress={() => applyDamageOvershield(3)} danger />
+                <MiniButton label="HW -1" onPress={() => applyDamageHardware(1)} danger />
+                <MiniButton label="HW -3" onPress={() => applyDamageHardware(3)} danger />
+              </View>
+            </View>
+          )}
+
+          {selectedCharacter && (
+            <TouchableOpacity
+              style={[styles.rollButton, selectedCharacter.engagement < 60 && styles.disabledAction]}
+              onPress={() => sponsorDrop(selectedCharacter.id)}
+              disabled={selectedCharacter.engagement < 60}
+              activeOpacity={0.75}
+            >
+              <Text style={styles.rollButtonText}>
+                {selectedCharacter.engagement < 60 ? 'SPONSOR DROP LOCKED <60 ENGAGEMENT' : 'TRIGGER SPONSOR DROP'}
+              </Text>
+            </TouchableOpacity>
+          )}
+
+          {selectedCharacter && AD_READS.map((adRead) => (
+            <View key={adRead.title} style={styles.adReadCard}>
+              <Text style={styles.adReadTitle}>{adRead.title}</Text>
+              <Text style={styles.adReadCopy}>{adRead.copy.toUpperCase()}</Text>
+              <View style={styles.mobActionRow}>
+                <MiniButton
+                  label={`AIR AD-READ +${adRead.fragmentReward} DF`}
+                  onPress={() => awardFragments(selectedCharacter.id, adRead.fragmentReward, adRead.note)}
+                />
+                <MiniButton
+                  label={`SPONSOR SHIELD +${adRead.overshieldBoost}`}
+                  onPress={() => restoreOvershield(adRead.overshieldBoost)}
+                />
+              </View>
+            </View>
+          ))}
         </View>
 
         <View style={[CardStyles.base, styles.sectionSpacing]}>
@@ -105,9 +240,11 @@ export default function GMConsole() {
             {encounter.mobs.map((mob) => (
               <View key={mob.id} style={[styles.mobCard, mob.defeated && styles.mobCardDefeated]}>
                 <View style={styles.mobHeader}>
-                  <View>
-                    <Text style={styles.mobName}>{mob.name.toUpperCase()}</Text>
-                    <Text style={styles.mobRole}>{mob.role}</Text>
+                  <View style={styles.mobIdentity}>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.mobName}>{mob.name.toUpperCase()}</Text>
+                      <Text style={styles.mobRole}>{mob.role}</Text>
+                    </View>
                   </View>
                   <TouchableOpacity onPress={() => removeMob(mob.id)}>
                     <Text style={styles.removeText}>REMOVE</Text>
@@ -243,13 +380,74 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: Colors.bgElevated,
   },
+  scoreButtonActive: {
+    borderColor: Colors.amber,
+    backgroundColor: Colors.bgCard,
+  },
   scoreButtonText: {
     ...Typography.heading,
     color: Colors.textPrimary,
   },
+  scoreButtonTextActive: {
+    color: Colors.amber,
+  },
   generatorActionRow: {
     flexDirection: 'row',
     gap: Spacing.sm,
+  },
+  producerMeta: {
+    ...Typography.mono,
+    color: Colors.amber,
+    marginBottom: Spacing.md,
+  },
+  priorityFlag: {
+    ...Typography.mono,
+    color: Colors.crimson,
+    marginTop: Spacing.xs,
+    fontSize: 10,
+  },
+  adReadTargetCard: {
+    borderWidth: 1,
+    borderColor: Colors.borderDefault,
+    borderRadius: Radius.md,
+    backgroundColor: Colors.bgElevated,
+    padding: Spacing.md,
+    marginBottom: Spacing.sm,
+  },
+  adReadTargetLabel: {
+    ...Typography.mono,
+    color: Colors.textMuted,
+    fontSize: 10,
+    marginBottom: 2,
+  },
+  adReadTargetValue: {
+    ...Typography.heading,
+    color: Colors.textPrimary,
+  },
+  adReadTargetMeta: {
+    ...Typography.mono,
+    color: Colors.textSecondary,
+    fontSize: 10,
+    marginTop: Spacing.xs,
+  },
+  adReadCard: {
+    borderWidth: 1,
+    borderColor: Colors.borderDefault,
+    borderRadius: Radius.md,
+    backgroundColor: Colors.bgElevated,
+    padding: Spacing.md,
+    marginBottom: Spacing.sm,
+  },
+  adReadTitle: {
+    ...Typography.subheading,
+    color: Colors.cyan,
+    marginBottom: Spacing.xs,
+  },
+  adReadCopy: {
+    ...Typography.mono,
+    color: Colors.textSecondary,
+    fontSize: 11,
+    lineHeight: 18,
   },
   rollButton: {
     flex: 1,
@@ -259,6 +457,9 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.bgElevated,
     paddingVertical: Spacing.md,
     alignItems: 'center',
+  },
+  disabledAction: {
+    opacity: 0.4,
   },
   rollButtonText: {
     ...Typography.subheading,
@@ -301,6 +502,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  mobIdentity: {
+    flex: 1,
   },
   mobName: {
     ...Typography.heading,
