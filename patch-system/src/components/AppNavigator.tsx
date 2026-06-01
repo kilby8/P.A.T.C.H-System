@@ -15,6 +15,7 @@ import EncounterHUD from './hud/EncounterHUD';
 import ArchetypeMatrix from './archetype/ArchetypeMatrix';
 import CondoPhaseTerminal from './condo/CondoPhaseTerminal';
 import LoginTerminal from './auth/LoginTerminal';
+import CharacterCreationTerminal from './character-creation/CharacterCreationTerminal';
 import GMConsole from './gm/GMConsole';
 import RulesTerminal from './rules/RulesTerminal';
 import GearTerminal from './gear/GearTerminal';
@@ -44,6 +45,7 @@ const GM_TABS: { id: Tab; label: string; icon: string }[] = [
 export default function AppNavigator() {
   const { session, logout, remoteSessionCode, syncStatus } = useCharacter();
   const [activeTab, setActiveTab] = useState<Tab>('HUD');
+  const [creatingCharacter, setCreatingCharacter] = useState(false);
   const insets = useSafeAreaInsets();
 
   useEffect(() => {
@@ -60,8 +62,12 @@ export default function AppNavigator() {
     setActiveTab('HUD');
   }, [session.role]);
 
+  if (creatingCharacter) {
+    return <CharacterCreationTerminal />;
+  }
+
   if (session.role === 'guest') {
-    return <LoginTerminal />;
+    return <LoginTerminal onCreateNew={() => setCreatingCharacter(true)} />;
   }
 
   const tabs = session.role === 'gm' ? GM_TABS : PLAYER_TABS;

@@ -87,6 +87,7 @@ type Action =
   | { type: 'HYDRATE_STORE'; payload: CharacterStoreState }
   | { type: 'HYDRATE_REMOTE_STATE'; payload: Pick<CharacterStoreState, 'party' | 'selectedCharacterId' | 'encounter' | 'sectorDifficulty' | 'blueprintMarket' | 'tradeLog' | 'lastLootBlueprintId'> }
   | { type: 'LOAD_CHARACTER'; payload: Character }
+  | { type: 'ADD_CHARACTER'; payload: Character }
   | { type: 'SET_REMOTE_SESSION_CODE'; sessionCode: string }
   | { type: 'SET_SELECTED_CHARACTER'; characterId: string }
   | { type: 'LOGIN_PLAYER'; characterId: string }
@@ -431,6 +432,15 @@ function characterReducer(state: CharacterStoreState, action: Action): Character
 
     case 'LOAD_CHARACTER':
       return updateSelectedCharacter(state, () => hydrateCharacter(action.payload));
+
+    case 'ADD_CHARACTER': {
+      const newParty = [...state.party, hydrateCharacter(action.payload)];
+      return {
+        ...state,
+        party: newParty,
+        selectedCharacterId: action.payload.id,
+      };
+    }
 
     case 'SET_SELECTED_CHARACTER': {
       if (!state.party.some((character) => character.id === action.characterId)) return state;
@@ -1002,6 +1012,7 @@ interface CharacterContextValue {
   blueprintMarket: BlueprintMarket;
   tradeLog: BlueprintTradeLogEntry[];
   loadCharacter: (c: Character) => void;
+  createNewCharacter: (c: Character) => Promise<void>;
   setRemoteSessionCode: (sessionCode: string) => void;
   loginAsPlayer: (characterId: string) => void;
   loginAsGM: (accessCode: string) => boolean;
@@ -1161,9 +1172,12 @@ export function CharacterProvider({
       .catch(() => setSyncStatus('error'));
   }, [clientId, hasHydrated, remoteSyncAvailable, state.blueprintMarket, state.encounter, state.lastLootBlueprintId, state.party, state.remoteSessionCode, state.sectorDifficulty, state.selectedCharacterId, state.tradeLog]);
 
-  const loadCharacter = useCallback((c: Character) => dispatch({ type: 'LOAD_CHARACTER', payload: c }), []);
-  const setRemoteSessionCode = useCallback((sessionCode: string) => dispatch({ type: 'SET_REMOTE_SESSION_CODE', sessionCode }), []);
-  const loginAsPlayer = useCallback((characterId: string) => dispatch({ type: 'LOGIN_PLAYER', characterId }), []);
+   const loadCharacter = useCallback((c: Character) => dispatch({ type: 'LOAD_CHARACTER', payload: c }), []);
+   const createNewCharacter = useCallback(async (c: Character) => {
+     dispatch({ type: 'ADD_CHARACTER', payload: c });
+   }, []);
+   const setRemoteSessionCode = useCallback((sessionCode: string) => dispatch({ type: 'SET_REMOTE_SESSION_CODE', sessionCode }), []);
+   const loginAsPlayer = useCallback((characterId: string) => dispatch({ type: 'LOGIN_PLAYER', characterId }), []);
   const logout = useCallback(() => dispatch({ type: 'LOGOUT' }), []);
   const selectCharacter = useCallback((characterId: string) => dispatch({ type: 'SET_SELECTED_CHARACTER', characterId }), []);
   const spendAP = useCallback((amount = 1) => dispatch({ type: 'SPEND_AP', amount }), []);
@@ -1296,6 +1310,7 @@ export function CharacterProvider({
         blueprintMarket: state.blueprintMarket,
         tradeLog: state.tradeLog,
         loadCharacter,
+        createNewCharacter,
         setRemoteSessionCode,
         loginAsPlayer,
         loginAsGM,

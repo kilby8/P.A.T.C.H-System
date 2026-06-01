@@ -16,7 +16,11 @@ import { getStartingAP } from '../../models/Character';
 import { BACKGROUND_CATEGORY_LABELS, getBackgroundById } from '../../models/Backgrounds';
 import { CardStyles, Colors, GlobalStyles, Radius, Spacing, Typography } from '../../theme/theme';
 
-export default function LoginTerminal() {
+interface LoginTerminalProps {
+  onCreateNew?: () => void;
+}
+
+export default function LoginTerminal({ onCreateNew }: LoginTerminalProps) {
   const { party, loginAsPlayer, loginAsGM, remoteSessionCode, setRemoteSessionCode, syncStatus, remoteSyncAvailable } = useCharacter();
   const [gmCode, setGmCode] = useState('');
   const [error, setError] = useState('');
@@ -45,33 +49,42 @@ export default function LoginTerminal() {
           </Text>
         </View>
 
-        <View style={CardStyles.glow}>
-          <Text style={styles.sectionTitle}>PLAYER LOGIN</Text>
-          {party.map((character) => {
-            const background = getBackgroundById(character.backgroundId);
-            return (
-            <TouchableOpacity
-              key={character.id}
-              style={styles.playerButton}
-              onPress={() => loginAsPlayer(character.id)}
-              activeOpacity={0.75}
-            >
-              <View>
-                <Text style={styles.playerName}>{character.name.toUpperCase()}</Text>
-                {background ? (
-                  <Text style={styles.playerBackground}>
-                    {background.name.toUpperCase()} • {BACKGROUND_CATEGORY_LABELS[background.category]}
-                  </Text>
-                ) : null}
-                <Text style={styles.playerMeta}>
-                  AP {character.currentAP}/{getStartingAP(character)} • HW {character.hardwareIntegrity.current}/{character.hardwareIntegrity.max}
-                </Text>
-              </View>
-              <Text style={styles.playerArrow}>ENTER</Text>
-            </TouchableOpacity>
-            );
-          })}
-        </View>
+         <View style={CardStyles.glow}>
+           <Text style={styles.sectionTitle}>PLAYER LOGIN</Text>
+           {party.map((character) => {
+             const background = getBackgroundById(character.backgroundId);
+             return (
+             <TouchableOpacity
+               key={character.id}
+               style={styles.playerButton}
+               onPress={() => loginAsPlayer(character.id)}
+               activeOpacity={0.75}
+             >
+               <View>
+                 <Text style={styles.playerName}>{character.name.toUpperCase()}</Text>
+                 {background ? (
+                   <Text style={styles.playerBackground}>
+                     {background.name.toUpperCase()} • {BACKGROUND_CATEGORY_LABELS[background.category]}
+                   </Text>
+                 ) : null}
+                 <Text style={styles.playerMeta}>
+                   AP {character.currentAP}/{getStartingAP(character)} • HW {character.hardwareIntegrity.current}/{character.hardwareIntegrity.max}
+                 </Text>
+               </View>
+               <Text style={styles.playerArrow}>ENTER</Text>
+             </TouchableOpacity>
+             );
+           })}
+           {onCreateNew && (
+             <TouchableOpacity
+               style={[styles.playerButton, styles.createNewButton]}
+               onPress={onCreateNew}
+               activeOpacity={0.75}
+             >
+               <Text style={styles.createNewText}>+ CREATE NEW OPERATOR</Text>
+             </TouchableOpacity>
+           )}
+         </View>
 
         <View style={[CardStyles.base, styles.gmCard]}>
           <Text style={styles.sectionTitle}>GM LOGIN</Text>
@@ -158,11 +171,22 @@ const styles = StyleSheet.create({
     marginTop: 2,
     fontSize: 10,
   },
-  playerArrow: {
-    ...Typography.mono,
-    color: Colors.cyan,
-  },
-  gmCard: {
+   playerArrow: {
+     ...Typography.mono,
+     color: Colors.cyan,
+   },
+   createNewButton: {
+     justifyContent: 'center',
+     alignItems: 'center',
+     borderStyle: 'dashed',
+     borderColor: Colors.amber,
+   },
+   createNewText: {
+     ...Typography.subheading,
+     color: Colors.amber,
+     textAlign: 'center',
+   },
+   gmCard: {
     marginTop: Spacing.lg,
   },
   syncCard: {
