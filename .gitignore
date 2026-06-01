@@ -6,4 +6,9 @@ patch-system/.claude/
 patch-system/assets/docs/images/
 patch-system/assets/docs/convo with ai for patch system game design.txt
 
+# Local env files (never commit secrets)
+patch-system/.env
+patch-system/.env.*
+!patch-system/.env.example
+
 local.properties
