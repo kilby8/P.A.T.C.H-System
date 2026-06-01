@@ -1,0 +1,7 @@
+.gradle/
+.gradle/**
+gradle.properties
+
+patch-system/.claude/
+patch-system/assets/docs/images/
+patch-system/assets/docs/convo with ai for patch system game design.txt
