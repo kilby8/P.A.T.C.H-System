@@ -11,7 +11,7 @@ import {
   Animated,
 } from 'react-native';
 import { useCharacter } from '../../store/CharacterContext';
-import { CpuAttributes, getModifier, getStartingAP } from '../../models/Character';
+import { CpuAttributes, getAttributeBonus, getStartingAP } from '../../models/Character';
 import {
   CATEGORY_LABELS,
   GEAR_CATEGORIES,
@@ -53,46 +53,50 @@ function formatModifier(mod: number): string {
 }
 
 function getWeaponRollProfile(itemId: string, attributes: CpuAttributes): { attackRoll: string; damageRoll: string } {
-  const powerMod = formatModifier(getModifier(attributes.POWER));
-  const pingMod = formatModifier(getModifier(attributes.PING));
-  const hardwareMod = formatModifier(getModifier(attributes.HARDWARE));
-  const dataMod = formatModifier(getModifier(attributes.DATA));
+  const powerMod = formatModifier(getAttributeBonus(attributes.POWER));
+  const powerPool = `${attributes.POWER}d6`;
+  const pingMod = formatModifier(getAttributeBonus(attributes.PING));
+  const pingPool = `${attributes.PING}d6`;
+  const hardwareMod = formatModifier(getAttributeBonus(attributes.HARDWARE));
+  const hardwarePool = `${attributes.HARDWARE}d6`;
+  const dataMod = formatModifier(getAttributeBonus(attributes.DATA));
+  const dataPool = `${attributes.DATA}d6`;
 
   if (itemId === 'i-recurve-bow') {
-    return { attackRoll: `1d20 ${pingMod}`, damageRoll: `1d8 ${pingMod} KINETIC` };
+    return { attackRoll: `${pingPool} + SKILL`, damageRoll: `1d8 ${pingMod} KINETIC` };
   }
   if (itemId === 'i-tactical-carbine') {
-    return { attackRoll: `1d20 ${pingMod}`, damageRoll: `2d6 ${pingMod} KINETIC` };
+    return { attackRoll: `${pingPool} + SKILL`, damageRoll: `2d6 ${pingMod} KINETIC` };
   }
   if (itemId === 'i-hard-light-lance') {
-    return { attackRoll: `1d20 ${hardwareMod}`, damageRoll: `2d8 ${hardwareMod} ENERGY` };
+    return { attackRoll: `${hardwarePool} + SKILL`, damageRoll: `2d8 ${hardwareMod} ENERGY` };
   }
   if (itemId === 'i-iron-spear') {
-    return { attackRoll: `1d20 ${powerMod}`, damageRoll: `1d10 ${powerMod} PIERCING` };
+    return { attackRoll: `${powerPool} + SKILL`, damageRoll: `1d10 ${powerMod} PIERCING` };
   }
   if (itemId === 'i-weighted-club') {
-    return { attackRoll: `1d20 ${powerMod}`, damageRoll: `1d8 ${powerMod} BLUNT` };
+    return { attackRoll: `${powerPool} + SKILL`, damageRoll: `1d8 ${powerMod} BLUNT` };
   }
   if (itemId === 'i-multi-tool') {
-    return { attackRoll: `1d20 ${dataMod}`, damageRoll: `1d4 ${dataMod} UTILITY` };
+    return { attackRoll: `${dataPool} + SKILL`, damageRoll: `1d4 ${dataMod} UTILITY` };
   }
   if (itemId === 'i-field-radio') {
-    return { attackRoll: `1d20 ${dataMod}`, damageRoll: `1d4 ${dataMod} SIGNAL` };
+    return { attackRoll: `${dataPool} + SKILL`, damageRoll: `1d4 ${dataMod} SIGNAL` };
   }
   if (itemId === 'i-signal-jammer') {
-    return { attackRoll: `1d20 ${dataMod}`, damageRoll: `1d6 ${dataMod} DISRUPTION` };
+    return { attackRoll: `${dataPool} + SKILL`, damageRoll: `1d6 ${dataMod} DISRUPTION` };
   }
   if (itemId === 'i-thick-hide-tunic') {
-    return { attackRoll: `1d20 ${hardwareMod}`, damageRoll: `1d4 ${hardwareMod} COUNTER` };
+    return { attackRoll: `${hardwarePool} + SKILL`, damageRoll: `1d4 ${hardwareMod} COUNTER` };
   }
   if (itemId === 'i-kevlar-vest') {
-    return { attackRoll: `1d20 ${hardwareMod}`, damageRoll: `1d6 ${hardwareMod} COUNTER` };
+    return { attackRoll: `${hardwarePool} + SKILL`, damageRoll: `1d6 ${hardwareMod} COUNTER` };
   }
   if (itemId === 'i-kinetic-shielding') {
-    return { attackRoll: `1d20 ${hardwareMod}`, damageRoll: `1d8 ${hardwareMod} COUNTER` };
+    return { attackRoll: `${hardwarePool} + SKILL`, damageRoll: `1d8 ${hardwareMod} COUNTER` };
   }
 
-  return { attackRoll: `1d20 ${powerMod}`, damageRoll: `1d6 ${powerMod}` };
+  return { attackRoll: `${powerPool} + SKILL`, damageRoll: `1d6 ${powerMod}` };
 }
 
 function getOffensiveProfile(itemId: string, fallback: string): { title: string; detail: string } {
@@ -434,9 +438,7 @@ export default function EncounterHUD() {
               <View key={key} style={styles.attrCell}>
                 <Text style={styles.attrKey}>{key}</Text>
                 <Text style={styles.attrVal}>{val}</Text>
-                <Text style={styles.attrMod}>
-                  {val >= 10 ? '+' : ''}{Math.floor((val - 10) / 2)}
-                </Text>
+                <Text style={styles.attrMod}>{val}d6</Text>
               </View>
             ))}
           </View>

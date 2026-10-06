@@ -33,7 +33,10 @@ export interface VitalLayer {
  * Full character state for the P.A.T.C.H. System.
  *
  * Active Processing Pool (AP)
- *   baseAP = 2 + Math.floor(systemModifier / 2)
+ * CPU Attributes run 1–5 (3 is average). A check rolls a d6 pool of
+ * attribute + skill and totals it against a fixed target (see Resolution.ts).
+ *
+ *   baseAP = 1 + Math.floor(SYSTEM / 2)
  *   If Neural Shock is active: startingAP = baseAP - 1 (minimum 0)
  *
  * Neural Shock triggers when Hardware Integrity current < 50 % of max.
@@ -114,7 +117,7 @@ function getStartingDataFragments(backgroundId: BackgroundId): number {
 }
 
 function getStartingEngagement(attributes: CpuAttributes, backgroundId: BackgroundId): number {
-  const base = 25 + getModifier(attributes.CLOUT) * 8;
+  const base = 25 + getAttributeBonus(attributes.CLOUT) * 8;
   const category = getBackgroundById(backgroundId)?.category;
   const categoryBonus = category === 'volunteer' ? 8 : category === 'glitcher' ? 5 : 0;
   return Math.max(10, Math.min(MAX_ENGAGEMENT, base + categoryBonus));
@@ -123,7 +126,7 @@ function getStartingEngagement(attributes: CpuAttributes, backgroundId: Backgrou
 function getStartingViewerCount(attributes: CpuAttributes, backgroundId: BackgroundId): number {
   const category = getBackgroundById(backgroundId)?.category;
   const categoryBonus = category === 'volunteer' ? 180 : category === 'glitcher' ? 90 : 0;
-  return Math.max(80, 120 + attributes.CLOUT * 18 + categoryBonus);
+  return Math.max(80, 120 + normalizeAttribute(attributes.CLOUT) * 60 + categoryBonus);
 }
 
 function sanitizeSponsorInbox(sponsorInbox?: string[]): string[] {
@@ -259,25 +262,57 @@ function sanitizeGearLoadout(loadout: GearLoadout | undefined, fallbackBackgroun
   }, { ...fallback });
 }
 
-// ── Attribute Modifier (standard -5 … +5 scale) ─────────────
-export function getModifier(attributeValue: number): number {
-  return Math.floor((attributeValue - 10) / 2);
+// ── Attribute Scale (1–5, 3 is average) ─────────────────────
+export const ATTRIBUTE_MIN = 1;
+export const ATTRIBUTE_MAX = 5;
+export const ATTRIBUTE_AVERAGE = 3;
+
+const ATTRIBUTE_KEYS: (keyof CpuAttributes)[] = ['POWER', 'PING', 'HARDWARE', 'DATA', 'SYSTEM', 'CLOUT'];
+
+/**
+ * Put a value on the 1–5 attribute scale.
+ * Older saves used a D&D-style scale (10 = average). Anything above the new
+ * max is converted first (6 -> 2, 10 -> 3, 13 -> 4, 16 -> 5), then clamped.
+ */
+export function normalizeAttribute(value: number): number {
+  if (!Number.isFinite(value)) return ATTRIBUTE_AVERAGE;
+  const converted = value > ATTRIBUTE_MAX ? Math.round((value - 1) / 3) : Math.round(value);
+  return Math.max(ATTRIBUTE_MIN, Math.min(ATTRIBUTE_MAX, converted));
+}
+
+export function sanitizeAttributes(attributes: Partial<CpuAttributes> | undefined): CpuAttributes {
+  return ATTRIBUTE_KEYS.reduce<CpuAttributes>(
+    (acc, key) => {
+      acc[key] = normalizeAttribute(attributes?.[key] ?? ATTRIBUTE_AVERAGE);
+      return acc;
+    },
+    {
+      POWER: ATTRIBUTE_AVERAGE,
+      PING: ATTRIBUTE_AVERAGE,
+      HARDWARE: ATTRIBUTE_AVERAGE,
+      DATA: ATTRIBUTE_AVERAGE,
+      SYSTEM: ATTRIBUTE_AVERAGE,
+      CLOUT: ATTRIBUTE_AVERAGE,
+    },
+  );
+}
+
+/** Flat bonus relative to an average operator (-2 … +2). Used for damage and broadcast math. */
+export function getAttributeBonus(attributeValue: number): number {
+  return normalizeAttribute(attributeValue) - ATTRIBUTE_AVERAGE;
 }
 
 // ── Derived AP ───────────────────────────────────────────────
 export function getBaseAP(systemValue: number): number {
-  const mod = getModifier(systemValue);
-  return 2 + Math.floor(mod / 2);
+  return 1 + Math.floor(normalizeAttribute(systemValue) / 2);
 }
 
 export function getHardwareIntegrityMax(attributes: CpuAttributes): number {
-  const hardwareModifier = getModifier(attributes.HARDWARE);
-  return 10 + attributes.HARDWARE + hardwareModifier * 2;
+  return 5 + normalizeAttribute(attributes.HARDWARE) * 5;
 }
 
 export function getOvershieldMax(attributes: CpuAttributes): number {
-  const dataModifier = getModifier(attributes.DATA);
-  return 15 + attributes.SYSTEM + dataModifier;
+  return 16 + normalizeAttribute(attributes.SYSTEM) * 2 + normalizeAttribute(attributes.DATA);
 }
 
 export function getStartingAP(character: Character): number {
@@ -294,8 +329,9 @@ export function checkNeuralShock(hi: VitalLayer): boolean {
 
 export function hydrateCharacter(character: Character): Character {
   const sanitizedBackgroundId = sanitizeBackgroundId(character.backgroundId);
-  const hardwareIntegrityMax = getHardwareIntegrityMax(character.attributes);
-  const overshieldMax = getOvershieldMax(character.attributes);
+  const attributes = sanitizeAttributes(character.attributes);
+  const hardwareIntegrityMax = getHardwareIntegrityMax(attributes);
+  const overshieldMax = getOvershieldMax(attributes);
   const hardwareIntegrity: VitalLayer = {
     max: hardwareIntegrityMax,
     current: Math.min(hardwareIntegrityMax, Math.max(0, character.hardwareIntegrity.current)),
@@ -307,6 +343,7 @@ export function hydrateCharacter(character: Character): Character {
   const neuralShock = checkNeuralShock(hardwareIntegrity);
   const hydrated = {
     ...character,
+    attributes,
     hardwareIntegrity,
     overshield,
     neuralShock,
@@ -324,8 +361,8 @@ export function hydrateCharacter(character: Character): Character {
     blueprintInventory,
     blueprintTradable: sanitizeBlueprintTradable(character.blueprintTradable, blueprintInventory),
     dataFragments: Math.max(0, Math.floor(character.dataFragments ?? 0)),
-    engagement: Math.max(0, Math.min(MAX_ENGAGEMENT, Math.floor(character.engagement ?? getStartingEngagement(character.attributes, sanitizedBackgroundId)))),
-    viewerCount: Math.max(0, Math.floor(character.viewerCount ?? getStartingViewerCount(character.attributes, sanitizedBackgroundId))),
+    engagement: Math.max(0, Math.min(MAX_ENGAGEMENT, Math.floor(character.engagement ?? getStartingEngagement(attributes, sanitizedBackgroundId)))),
+    viewerCount: Math.max(0, Math.floor(character.viewerCount ?? getStartingViewerCount(attributes, sanitizedBackgroundId))),
     sponsorInbox: sanitizeSponsorInbox(character.sponsorInbox),
     aiPriorityMarked: character.aiPriorityMarked ?? hasGlitcherAnomalyTrait(sanitizedBackgroundId),
     backgroundId: sanitizedBackgroundId,
@@ -336,11 +373,12 @@ export function hydrateCharacter(character: Character): Character {
 export function createCharacter(
   id: string,
   name: string,
-  attributes: CpuAttributes,
+  rawAttributes: CpuAttributes,
   advancementPoints = 0,
   backgroundId: BackgroundId = 'enforcer',
 ): Character {
   const sanitizedBackgroundId = sanitizeBackgroundId(backgroundId);
+  const attributes = sanitizeAttributes(rawAttributes);
   const starterBlueprintInventory = createBackgroundStarterBlueprintInventory(sanitizedBackgroundId);
   const hardwareIntegrityMax = getHardwareIntegrityMax(attributes);
   const overshieldMax = getOvershieldMax(attributes);
