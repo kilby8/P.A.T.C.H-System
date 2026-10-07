@@ -174,7 +174,7 @@ function hydrateEncounter(encounter: GeneratedEncounter): ActiveEncounter {
 function createDefaultState(initialCharacters?: Character[]): CharacterStoreState {
   const hydratedParty = (initialCharacters && initialCharacters.length > 0
     ? initialCharacters
-    : [createCharacter('default', 'Unknown Operator', { POWER: 10, PING: 10, HARDWARE: 10, DATA: 10, SYSTEM: 10, CLOUT: 10 })]
+    : [createCharacter('default', 'Unknown Operator', { POWER: 3, PING: 3, HARDWARE: 3, DATA: 3, SYSTEM: 3, CLOUT: 3 })]
   ).map(hydrateCharacter);
 
   return {

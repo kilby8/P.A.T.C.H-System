@@ -6,6 +6,7 @@
 import { AI_COLLAB_RULES_SECTION } from './rules/ai-collaboration';
 import { CORPORATE_INDUCTION_SECTION } from './rules/corporate-induction';
 import { CORE_RULES_SECTION } from './rules/core';
+import { RESOLUTION_RULES_SECTION } from './rules/resolution';
 import { RulesSection } from './rules/types';
 
 export type { RulesSection } from './rules/types';
@@ -13,5 +14,6 @@ export type { RulesSection } from './rules/types';
 export const RULES_SECTIONS: RulesSection[] = [
   CORPORATE_INDUCTION_SECTION,
   CORE_RULES_SECTION,
+  RESOLUTION_RULES_SECTION,
   AI_COLLAB_RULES_SECTION,
 ];

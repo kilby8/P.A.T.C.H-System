@@ -15,7 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCharacter } from '../../store/CharacterContext';
 import { Colors, Typography, Spacing, GlobalStyles } from '../../theme/theme';
 import { BACKGROUND_PROFILES, BACKGROUND_CATEGORY_LABELS, CoreAttribute } from '../../models/Backgrounds';
-import { createCharacter, CpuAttributes } from '../../models/Character';
+import { ATTRIBUTE_MIN, createCharacter, CpuAttributes } from '../../models/Character';
 
 interface AttributeAllocation {
   POWER: number;
@@ -27,10 +27,12 @@ interface AttributeAllocation {
 }
 
 const ATTRIBUTES: CoreAttribute[] = ['POWER', 'PING', 'HARDWARE', 'DATA', 'SYSTEM', 'CLOUT'];
-const BASE_ATTRIBUTE = 10;
-const TOTAL_ATTRIBUTE_POINTS = 27; // Points to distribute
-const MIN_ATTRIBUTE = 8;
-const MAX_ATTRIBUTE = 15;
+// Attributes run 1–5. Every attribute starts at 1; the points below raise them.
+// Creation caps at 4 so a 5 has to be earned in the arena.
+const BASE_ATTRIBUTE = ATTRIBUTE_MIN;
+const TOTAL_ATTRIBUTE_POINTS = 12; // 6 attributes averaging 3
+const MIN_ATTRIBUTE = ATTRIBUTE_MIN;
+const MAX_ATTRIBUTE = 4;
 
 export default function CharacterCreationTerminal() {
   const { createNewCharacter, loginAsPlayer, party } = useCharacter();
@@ -61,9 +63,7 @@ export default function CharacterCreationTerminal() {
   const handleAttributeChange = (attr: CoreAttribute, delta: number) => {
     const newValue = attributes[attr] + delta;
     if (newValue < MIN_ATTRIBUTE || newValue > MAX_ATTRIBUTE) return;
-
-    const pointDelta = delta;
-    if (remainingPoints - pointDelta < -TOTAL_ATTRIBUTE_POINTS / 6) return; // Can't go more than 1 below per attr
+    if (delta > 0 && remainingPoints < delta) return;
 
     setAttributes({
       ...attributes,
@@ -168,7 +168,7 @@ export default function CharacterCreationTerminal() {
   const renderAttributesStep = () => (
     <View style={styles.stepContainer}>
       <Text style={styles.stepTitle}>03 :: ALLOCATE ATTRIBUTES</Text>
-      <Text style={styles.hint}>Distribute {TOTAL_ATTRIBUTE_POINTS} points across your CPU attributes</Text>
+      <Text style={styles.hint}>Distribute {TOTAL_ATTRIBUTE_POINTS} points. Attributes run 1–5 and start at {BASE_ATTRIBUTE}; {MAX_ATTRIBUTE} is the cap at creation.</Text>
        <View style={styles.attributesSummary}>
          <Text style={[styles.hint, { color: remainingPoints === 0 ? Colors.green : Colors.amber }]}>
            Remaining: {remainingPoints > 0 ? '+' + remainingPoints : remainingPoints}
