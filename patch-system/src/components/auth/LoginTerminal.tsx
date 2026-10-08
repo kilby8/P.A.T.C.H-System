@@ -121,7 +121,10 @@ export default function LoginTerminal({ onCreateNew }: LoginTerminalProps) {
           <TouchableOpacity
             style={styles.getAppLink}
             onPress={() => {
-              void Linking.openURL('/install');
+              // Same tab on web; Linking.openURL would open a new one.
+              const location = (globalThis as { location?: { assign: (url: string) => void } }).location;
+              if (location) location.assign('/install');
+              else void Linking.openURL('/install');
             }}
             accessibilityRole="link"
             activeOpacity={0.75}
