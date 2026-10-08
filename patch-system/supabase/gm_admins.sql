@@ -21,5 +21,5 @@ create policy "gm can read own row"
 -- Make an existing account a GM (create the user first under
 -- Authentication → Users → Add user). Change the email to add more GMs.
 insert into public.gm_admins (user_id)
-select id from auth.users where email = 'underthesunsolar24@gmail.com'
+select id from auth.users where email = 'carpenterjames88@gmail.com'
 on conflict (user_id) do nothing;

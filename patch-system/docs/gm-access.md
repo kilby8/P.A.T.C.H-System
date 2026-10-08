@@ -8,7 +8,7 @@ listed in `public.gm_admins`. The old shared code (`PATCH-GM`) no longer works.
 1. **Authentication → Users → Add user → Create new user.** Enter the GM's
    email and a password, tick **Auto Confirm User**, then **Create user**.
 2. **SQL Editor → New query**, paste `supabase/gm_admins.sql`, and **Run**.
-   The last statement makes `underthesunsolar24@gmail.com` a GM; change the
+   The last statement makes `carpenterjames88@gmail.com` a GM; change the
    email (and run just that `insert`) to add someone else.
 3. Recommended: **Authentication → Sign In / Providers → Email**, turn off
    **Allow new users to sign up**. GMs are created by hand, so nobody needs to
