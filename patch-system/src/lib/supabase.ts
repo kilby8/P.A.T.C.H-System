@@ -13,14 +13,19 @@ function readEnvValue(keys: string[]): string | undefined {
   return undefined;
 }
 
-const supabaseUrl = readEnvValue([
-  'EXPO_PUBLIC_SUPABASE_URL',
-  'NEXT_PUBLIC_SUPABASE_URL',
-]);
-const supabaseAnonKey = readEnvValue([
-  'EXPO_PUBLIC_SUPABASE_ANON_KEY',
-  'NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY',
-]);
+// The project's public URL and publishable key. Both ship inside every
+// client build (web and APK), so they are safe in source. Shared sessions use
+// Realtime Broadcast only; there are no tables for this key to reach.
+// Set EXPO_PUBLIC_SUPABASE_URL / EXPO_PUBLIC_SUPABASE_ANON_KEY to point a
+// build at a different project.
+const DEFAULT_SUPABASE_URL = 'https://ugnoysbrqxbwixeqqprr.supabase.co';
+const DEFAULT_SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_2sMehP-zd2MmPKveKIQUcw_fvaWc9hS';
+
+const supabaseUrl =
+  readEnvValue(['EXPO_PUBLIC_SUPABASE_URL', 'NEXT_PUBLIC_SUPABASE_URL']) ?? DEFAULT_SUPABASE_URL;
+const supabaseAnonKey =
+  readEnvValue(['EXPO_PUBLIC_SUPABASE_ANON_KEY', 'NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY']) ??
+  DEFAULT_SUPABASE_PUBLISHABLE_KEY;
 
 export function isSupabaseConfigured(): boolean {
   return Boolean(supabaseUrl && supabaseAnonKey);

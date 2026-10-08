@@ -45,9 +45,11 @@ export default function LoginTerminal({ onCreateNew }: LoginTerminalProps) {
             style={styles.input}
           />
           <Text style={styles.syncHint}>
-            {remoteSyncAvailable
-              ? `REMOTE SYNC ${syncStatus.toUpperCase()}`
-              : 'REMOTE SYNC OFFLINE — SET EXPO_PUBLIC_SUPABASE_URL AND EXPO_PUBLIC_SUPABASE_ANON_KEY'}
+            {!remoteSyncAvailable
+              ? 'REMOTE SYNC OFFLINE — THIS BUILD HAS NO SYNC SERVER'
+              : remoteSessionCode
+                ? `REMOTE SYNC ${syncStatus.toUpperCase()} — EVERYONE ON ${remoteSessionCode.trim().toUpperCase()} SHARES THIS TABLE`
+                : 'ENTER THE SAME CODE ON EVERY DEVICE TO SHARE ONE TABLE'}
           </Text>
         </View>
 
