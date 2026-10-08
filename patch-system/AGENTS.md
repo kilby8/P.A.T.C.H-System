@@ -38,7 +38,7 @@ Key paths:
 ### GM authority
 - **Only the GM role can mutate combat state.** The reducer enforces this with `if (state.session.role !== 'gm') return state` guards on: `APPLY_DAMAGE_OVERSHIELD`, `APPLY_DAMAGE_HARDWARE`, `DAMAGE_MOB`, `HEAL_MOB`, `SPEND_MOB_AP`, `RESTORE_MOB_AP`, `REMOVE_MOB`, `INJECT_BLUEPRINT`, `SET_BLUEPRINT_*`, `SET_THEME_GATE`, `SET_SECTOR_DIFFICULTY`, `ROLL_SECTOR_LOOT`, `SPONSOR_DROP`, `AWARD_FRAGMENTS`.
 - The same guard is duplicated in the `useCallback` wrappers exposed on the context. Keep both in sync.
-- GM access code is the constant `GM_ACCESS_CODE = 'PATCH-GM'` — do not hard-code the string elsewhere.
+- GM login is Supabase Auth (email + password) plus the `public.gm_admins` allowlist; see `docs/gm-access.md`. All auth calls live in `src/lib/gmAuth.ts`. There is no shared GM code.
 
 ### Sessions / roles
 Three roles: `'guest'` → `LoginTerminal` shown, `'player'` → player tabs, `'gm'` → GM tabs (extra GM tab).

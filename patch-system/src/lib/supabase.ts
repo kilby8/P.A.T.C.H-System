@@ -2,6 +2,7 @@
 // P.A.T.C.H. SYSTEM — Optional Supabase Client
 // ============================================================
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function readEnvValue(keys: string[]): string | undefined {
   for (const key of keys) {
@@ -38,8 +39,12 @@ export function getSupabaseClient(): SupabaseClient | null {
   if (!client) {
     client = createClient(supabaseUrl as string, supabaseAnonKey as string, {
       auth: {
-        persistSession: false,
-        autoRefreshToken: false,
+        // Keeps the GM signed in across app restarts (AsyncStorage is
+        // localStorage on web).
+        storage: AsyncStorage,
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: false,
       },
     });
   }

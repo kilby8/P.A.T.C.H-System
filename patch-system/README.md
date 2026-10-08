@@ -29,4 +29,4 @@ If you want remote session sync to work, set those variables in `.env.local` bef
 
 ## GM Access
 
-The built-in GM override code is `PATCH-GM`.
+GM is a real sign-in (email + password) for accounts listed in the Supabase `gm_admins` table. Setup and adding GMs: [docs/gm-access.md](docs/gm-access.md).

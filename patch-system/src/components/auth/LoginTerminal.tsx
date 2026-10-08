@@ -24,8 +24,23 @@ interface LoginTerminalProps {
 
 export default function LoginTerminal({ onCreateNew }: LoginTerminalProps) {
   const { party, loginAsPlayer, loginAsGM, remoteSessionCode, setRemoteSessionCode, syncStatus, remoteSyncAvailable } = useCharacter();
-  const [gmCode, setGmCode] = useState('');
+  const [gmEmail, setGmEmail] = useState('');
+  const [gmPassword, setGmPassword] = useState('');
+  const [gmBusy, setGmBusy] = useState(false);
   const [error, setError] = useState('');
+
+  const authorizeGm = async () => {
+    if (gmBusy) return;
+    setGmBusy(true);
+    setError('');
+    const result = await loginAsGM(gmEmail, gmPassword);
+    setGmBusy(false);
+    if (!result.ok) {
+      setError(result.error);
+      return;
+    }
+    setGmPassword('');
+  };
 
   return (
     <SafeAreaView style={GlobalStyles.safeArea}>
@@ -93,28 +108,49 @@ export default function LoginTerminal({ onCreateNew }: LoginTerminalProps) {
         <View style={[CardStyles.base, styles.gmCard]}>
           <Text style={styles.sectionTitle}>GM LOGIN</Text>
           <TextInput
-            value={gmCode}
+            value={gmEmail}
             onChangeText={(value) => {
-              setGmCode(value);
+              setGmEmail(value);
               setError('');
             }}
-            placeholder="ENTER GM ACCESS CODE"
+            placeholder="GM EMAIL"
             placeholderTextColor={Colors.textMuted}
-            autoCapitalize="characters"
+            autoCapitalize="none"
+            autoCorrect={false}
+            keyboardType="email-address"
+            autoComplete="email"
+            textContentType="username"
+            accessibilityLabel="GM email"
+            style={styles.input}
+          />
+          <TextInput
+            value={gmPassword}
+            onChangeText={(value) => {
+              setGmPassword(value);
+              setError('');
+            }}
+            placeholder="PASSWORD"
+            placeholderTextColor={Colors.textMuted}
+            autoCapitalize="none"
+            autoCorrect={false}
+            secureTextEntry
+            autoComplete="password"
+            textContentType="password"
+            accessibilityLabel="GM password"
+            onSubmitEditing={() => {
+              void authorizeGm();
+            }}
             style={styles.input}
           />
           <TouchableOpacity
-            style={styles.gmButton}
+            style={[styles.gmButton, gmBusy && styles.gmButtonBusy]}
             onPress={() => {
-              if (!loginAsGM(gmCode)) {
-                setError('INVALID GM ACCESS CODE');
-                return;
-              }
-              setGmCode('');
+              void authorizeGm();
             }}
+            disabled={gmBusy}
             activeOpacity={0.75}
           >
-            <Text style={styles.gmButtonText}>AUTHORIZE GM</Text>
+            <Text style={styles.gmButtonText}>{gmBusy ? 'VERIFYING…' : 'SIGN IN AS GM'}</Text>
           </TouchableOpacity>
           {error ? <Text style={styles.errorText}>{error}</Text> : null}
         </View>
@@ -230,6 +266,9 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.bgElevated,
     paddingVertical: Spacing.md,
     alignItems: 'center',
+  },
+  gmButtonBusy: {
+    opacity: 0.6,
   },
   gmButtonText: {
     ...Typography.subheading,
