@@ -19,7 +19,11 @@
       "predictiveBackGestureEnabled": false
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "name": "P.A.T.C.H. System",
+      "shortName": "P.A.T.C.H.",
+      "themeColor": "#050507",
+      "backgroundColor": "#050507"
     }
   }
 }
