@@ -9,6 +9,8 @@ import {
   TextInput,
   StyleSheet,
   ScrollView,
+  Platform,
+  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCharacter } from '../../store/CharacterContext';
@@ -114,6 +116,19 @@ export default function LoginTerminal({ onCreateNew }: LoginTerminalProps) {
           </TouchableOpacity>
           {error ? <Text style={styles.errorText}>{error}</Text> : null}
         </View>
+
+        {Platform.OS === 'web' ? (
+          <TouchableOpacity
+            style={styles.getAppLink}
+            onPress={() => {
+              void Linking.openURL('/install');
+            }}
+            accessibilityRole="link"
+            activeOpacity={0.75}
+          >
+            <Text style={styles.getAppText}>GET THE APP ON YOUR PHONE →</Text>
+          </TouchableOpacity>
+        ) : null}
       </ScrollView>
     </SafeAreaView>
   );
@@ -214,6 +229,16 @@ const styles = StyleSheet.create({
   gmButtonText: {
     ...Typography.subheading,
     color: Colors.amber,
+  },
+  getAppLink: {
+    marginTop: Spacing.lg,
+    paddingVertical: Spacing.md,
+    alignItems: 'center',
+  },
+  getAppText: {
+    ...Typography.mono,
+    color: Colors.cyan,
+    textDecorationLine: 'underline',
   },
   errorText: {
     ...Typography.mono,
