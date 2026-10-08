@@ -42,8 +42,8 @@ import { generateEncounterFragmentDrop } from '../utils/lootEconomy';
 import { SectorDifficulty, rollSectorBlueprint } from '../utils/sectorLoot';
 import { publishRemoteSession, RemoteEnvelope, subscribeToRemoteSession } from '../lib/remoteSession';
 import { isSupabaseConfigured } from '../lib/supabase';
+import { GmSignInResult, hasActiveGmSession, signInAsGm, signOutGm } from '../lib/gmAuth';
 
-export const GM_ACCESS_CODE = 'PATCH-GM';
 
 export type SessionRole = 'guest' | 'player' | 'gm';
 
@@ -1015,7 +1015,7 @@ interface CharacterContextValue {
   createNewCharacter: (c: Character) => void;
   setRemoteSessionCode: (sessionCode: string) => void;
   loginAsPlayer: (characterId: string) => void;
-  loginAsGM: (accessCode: string) => boolean;
+  loginAsGM: (email: string, password: string) => Promise<GmSignInResult>;
   logout: () => void;
   selectCharacter: (characterId: string) => void;
   spendAP: (amount?: number) => void;
@@ -1108,6 +1108,24 @@ export function CharacterProvider({
     void AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }, [hasHydrated, state]);
 
+  // A saved GM role only survives a restart if the saved sign-in is still an
+  // authorized GM account.
+  const restoredRoleRef = useRef<SessionRole | null>(null);
+  useEffect(() => {
+    if (!hasHydrated || restoredRoleRef.current !== null) return;
+    restoredRoleRef.current = state.session.role;
+    if (state.session.role !== 'gm') return;
+    let cancelled = false;
+    void hasActiveGmSession()
+      .catch(() => false)
+      .then((stillGm) => {
+        if (!cancelled && !stillGm) dispatch({ type: 'LOGOUT' });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [hasHydrated, state.session.role]);
+
   useEffect(() => {
     if (!hasHydrated) return;
     if (!remoteSyncAvailable || !state.remoteSessionCode) {
@@ -1178,7 +1196,10 @@ export function CharacterProvider({
    }, []);
    const setRemoteSessionCode = useCallback((sessionCode: string) => dispatch({ type: 'SET_REMOTE_SESSION_CODE', sessionCode }), []);
    const loginAsPlayer = useCallback((characterId: string) => dispatch({ type: 'LOGIN_PLAYER', characterId }), []);
-  const logout = useCallback(() => dispatch({ type: 'LOGOUT' }), []);
+  const logout = useCallback(() => {
+    if (state.session.role === 'gm') void signOutGm();
+    dispatch({ type: 'LOGOUT' });
+  }, [state.session.role]);
   const selectCharacter = useCallback((characterId: string) => dispatch({ type: 'SET_SELECTED_CHARACTER', characterId }), []);
   const spendAP = useCallback((amount = 1) => dispatch({ type: 'SPEND_AP', amount }), []);
   const restoreAP = useCallback(() => dispatch({ type: 'RESTORE_AP' }), []);
@@ -1281,13 +1302,10 @@ export function CharacterProvider({
     dispatch({ type: 'AWARD_FRAGMENTS', toCharacterId, amount, note });
   }, [state.session.role]);
 
-  const loginAsGM = useCallback((accessCode: string) => {
-    const normalizedCode = accessCode.trim().toUpperCase();
-    if (normalizedCode !== GM_ACCESS_CODE) {
-      return false;
-    }
-    dispatch({ type: 'LOGIN_GM' });
-    return true;
+  const loginAsGM = useCallback(async (email: string, password: string) => {
+    const result = await signInAsGm(email, password);
+    if (result.ok) dispatch({ type: 'LOGIN_GM' });
+    return result;
   }, []);
 
   if (!hasHydrated) {
