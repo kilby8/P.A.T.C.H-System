@@ -71,8 +71,12 @@ function buildAttacksFromGear(character: Character): DerivedAttack[] {
     const rules = getGearRules(item.id);
     const skill = getSkillById(rules.skill);
     const rank = getSkillRank(skills, rules.skill);
-    const pool = attributes[rules.attribute] + rank;
-    const bonus = formatModifier(getAttributeBonus(attributes[rules.attribute]));
+    const installed = equipped.hardpoints.filter((id): id is string => !!id);
+    // Installed blueprints the HUD can fold in: sights add a die, a reinforced frame adds damage.
+    const extraDice = installed.filter((id) => id === 'bp-precision-sight' || id === 'bp-ghostline-scope').length;
+    const extraDamage = installed.filter((id) => id === 'bp-weighted-reinforced-frame').length;
+    const pool = attributes[rules.attribute] + rank + (category === 'offensive' ? extraDice : 0);
+    const bonus = formatModifier(getAttributeBonus(attributes[rules.attribute]) + (category === 'offensive' ? extraDamage : 0));
     const schematicLines = equipped.hardpoints
       .map((blueprintId) => (blueprintId ? getBlueprintById(blueprintId) : undefined))
       .filter((blueprint): blueprint is NonNullable<typeof blueprint> => Boolean(blueprint))
@@ -98,7 +102,7 @@ function buildAttacksFromGear(character: Character): DerivedAttack[] {
       title: `${item.name.toUpperCase()} · ${rules.range.toUpperCase()}`,
       category,
       apCost: 1,
-      attackRoll: `${pool}d6  (${rules.attribute} ${attributes[rules.attribute]} + ${(skill?.name ?? rules.skill).toUpperCase()} ${rank}) VS DEFENSE`,
+      attackRoll: `${pool}d6  (${rules.attribute} ${attributes[rules.attribute]} + ${(skill?.name ?? rules.skill).toUpperCase()} ${rank}${category === 'offensive' && extraDice ? ` + ${extraDice} SIGHT` : ''}) VS DEFENSE`,
       damageRoll: `${rules.damage} ${bonus} ${rules.damageType.toUpperCase()}  · +1 PER FULL 5 FLAIR`,
       detail: rules.feature.toUpperCase(),
       schematicLines,
@@ -117,6 +121,7 @@ export default function EncounterHUD() {
     startTurn,
     toggleCondition,
     rollCrashSave,
+    endEncounterForOperator,
     applyDamageOvershield,
     applyDamageHardware,
     healHardware,
@@ -212,19 +217,19 @@ export default function EncounterHUD() {
               label="SPEND  1 AP"
               subtitle="ATTACK · DASH · HIDE · HELP · REACTION"
               onPress={() => spendAP(1)}
-              disabled={character.currentAP <= 0}
+              disabled={character.currentAP <= 0 || flatlined}
               color={Colors.cyan}
             />
             <ActionButton
               label="SPEND  2 AP"
               subtitle="PATCH UP · 2-AP ABILITY"
               onPress={() => spendAP(2)}
-              disabled={character.currentAP < 2}
+              disabled={character.currentAP < 2 || flatlined}
               color={Colors.amber}
             />
           </View>
-          <TouchableOpacity style={styles.restoreBtn} onPress={startTurn} accessibilityLabel="Start turn">
-            <Text style={styles.restoreBtnText}>▶  START TURN — GAIN {turnGain} AP</Text>
+          <TouchableOpacity style={styles.restoreBtn} onPress={startTurn} accessibilityLabel="Start turn" disabled={flatlined}>
+            <Text style={styles.restoreBtnText}>{flatlined ? 'FLATLINED — NO AP' : `▶  START TURN — GAIN ${turnGain} AP`}</Text>
           </TouchableOpacity>
           {session.role === 'gm' && (
             <TouchableOpacity style={styles.restoreBtn} onPress={restoreAP}>
@@ -325,7 +330,7 @@ export default function EncounterHUD() {
               label="REBOOT SHIELD  (2 AP)"
               subtitle={`Regain 1d6 + ${character.attributes.SYSTEM} Overshield`}
               onPress={rebootShield}
-              disabled={character.currentAP < 2 || character.overshield.current >= character.overshield.max}
+              disabled={flatlined || character.currentAP < 2 || character.overshield.current >= character.overshield.max}
               color={Colors.cyan}
             />
             <ActionButton
@@ -346,9 +351,9 @@ export default function EncounterHUD() {
             />
             <ActionButton
               label="ENCOUNTER OVER"
-              subtitle="Overshield resets to full"
-              onPress={() => restoreOvershield(character.overshield.max)}
-              disabled={character.overshield.current >= character.overshield.max}
+              subtitle="Shield full · stable → 1 HW · clear conditions"
+              onPress={endEncounterForOperator}
+              disabled={false}
               color={Colors.cyan}
             />
           </View>

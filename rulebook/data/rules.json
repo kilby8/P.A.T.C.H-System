@@ -206,7 +206,7 @@
    "id": "offworlder",
    "label": "OFF-WORLDER",
    "trait": "Unregistered",
-   "traitText": "Use any background. +1 skill rank at creation. Once per deployment, one Federation identity system finds nothing on you. 120 fragments, no Engagement bonus.",
+   "traitText": "Use any background (a Glitcher background keeps its own support item, no roll). +1 skill rank at creation. Once per deployment, one Federation identity system finds nothing on you. 120 fragments, no Engagement bonus.",
    "story": "Pulled from a planet outside the Federation: conscripted, or you took a deal without knowing what it was. You play to get home, or to earn citizenship."
   }
  ],

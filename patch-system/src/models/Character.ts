@@ -7,6 +7,7 @@ import {
   createStarterLoadout,
   GEAR_ITEM_DEFS,
   GearLoadout,
+  EquippedGear,
   GEAR_CATEGORIES,
   getBlueprintById,
   getGearItemById,
@@ -118,6 +119,9 @@ export interface Character {
 
   /** Crash saves while Flatlined (0 Hardware Integrity). */
   crashSaves: CrashSaves;
+
+  /** Gear items not currently equipped, with their installed blueprints. */
+  itemLocker: EquippedGear[];
 }
 
 const BASE_STARTING_FRAGMENTS = 120;
@@ -270,6 +274,20 @@ function sanitizeBlueprintTradable(
   return sanitized;
 }
 
+function sanitizeItemLocker(locker: EquippedGear[] | undefined): EquippedGear[] {
+  if (!locker) return [];
+  return locker.flatMap((entry) => {
+    const item = entry && getGearItemById(entry.itemId);
+    if (!item) return [];
+    const hardpoints = Array.from({ length: item.hardpoints }, (_, index) => {
+      const id = entry.hardpoints?.[index] ?? null;
+      const blueprint = id ? getBlueprintById(id) : undefined;
+      return blueprint && blueprint.compatibleCategories.includes(item.category) ? blueprint.id : null;
+    });
+    return [{ itemId: item.id, hardpoints }];
+  }).slice(0, 20);
+}
+
 function sanitizeGearLoadout(loadout: GearLoadout | undefined, fallbackBackgroundId: BackgroundId, origin: OriginId): GearLoadout {
   const fallback = createBackgroundStarterLoadout(fallbackBackgroundId, origin);
   if (!loadout) return fallback;
@@ -382,6 +400,7 @@ export function getMaxBankedAP(character: Pick<Character, 'attributes'>): number
 
 /** AP after the start-of-turn gain: bank + gain, capped. Stunned/Surprised gain nothing; Staggered gains 1 less. */
 export function getAPAfterTurnStart(character: Character): number {
+  if (isFlatlined(character)) return 0;
   const blocked = character.conditions.includes('stunned') || character.conditions.includes('surprised');
   const staggered = character.conditions.includes('staggered') ? 1 : 0;
   const gain = blocked ? 0 : Math.max(0, getStartingAP(character) - staggered);
@@ -451,6 +470,7 @@ export function hydrateCharacter(character: Character): Character {
     skills: character.skills ? sanitizeSkillRanks(character.skills) : getStartingSkills(sanitizedBackgroundId),
     conditions: sanitizeConditions(character.conditions),
     crashSaves: hardwareIntegrity.current > 0 ? { successes: 0, failures: 0 } : sanitizeCrashSaves(character.crashSaves),
+    itemLocker: sanitizeItemLocker(character.itemLocker),
   };
 }
 
@@ -506,5 +526,6 @@ export function createCharacter(
     skills: getStartingSkills(sanitizedBackgroundId, options.extraSkillRanks),
     conditions: [],
     crashSaves: { successes: 0, failures: 0 },
+    itemLocker: [],
   };
 }

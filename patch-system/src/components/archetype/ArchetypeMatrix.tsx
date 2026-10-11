@@ -99,7 +99,7 @@ export default function ArchetypeMatrix() {
 
         {/* ── Skills & attributes ─────────────────────────── */}
         <View style={styles.trainCard}>
-          <Text style={styles.trainTitle}>ATTRIBUTES  ·  {ATTRIBUTE_COST} AP EACH, MAX {ATTRIBUTE_MAX}</Text>
+          <Text style={styles.trainTitle}>ATTRIBUTES  ·  {ATTRIBUTE_COST} ADV PTS EACH, MAX {ATTRIBUTE_MAX}</Text>
           <View style={styles.trainGrid}>
             {(Object.keys(character.attributes) as (keyof CpuAttributes)[]).map((attr) => {
               const value = character.attributes[attr];
@@ -118,7 +118,7 @@ export default function ArchetypeMatrix() {
               );
             })}
           </View>
-          <Text style={styles.trainTitle}>SKILLS  ·  {SKILL_RANK_COST} AP PER RANK, MAX {MAX_SKILL_RANK}</Text>
+          <Text style={styles.trainTitle}>SKILLS  ·  {SKILL_RANK_COST} ADV PTS PER RANK, MAX {MAX_SKILL_RANK}</Text>
           <View style={styles.trainGrid}>
             {SKILL_DEFS.map((skill) => {
               const rank = getSkillRank(character.skills, skill.id);
@@ -302,7 +302,7 @@ function NodeDrawer({
         {isNodeUnlocked ? (
           <View style={[styles.unlockStatus, { borderColor: zoneColor }]}>
             <Text style={[styles.unlockStatusText, { color: zoneColor }]}>
-              ✓  NODE ACTIVE — ABILITY UNLOCKED
+              ✓  NODE UNLOCKED — BUY ITS SUB-SKILLS BELOW
             </Text>
           </View>
         ) : (
@@ -363,7 +363,7 @@ function ExpandableSubSkill({
   const maxHeight = animHeight.interpolate({ inputRange: [0, 1], outputRange: [0, 320] });
   // No refunds on who you become: only the GM can reverse a purchase.
   const toggleLabel = unlocked
-    ? (isGM ? `GM: REVERSE PURCHASE (+${subSkill.advancementCost} AP)` : '✓ UNLOCKED')
+    ? (isGM ? `GM: REVERSE PURCHASE (+${subSkill.advancementCost} ADV PT)` : '✓ UNLOCKED')
     : `UNLOCK SUB-SKILL (-${subSkill.advancementCost} ADVANCEMENT POINT)`;
   const disabled = !nodeUnlocked || (unlocked ? !isGM : !canAfford);
 
@@ -373,7 +373,7 @@ function ExpandableSubSkill({
         <Text style={[styles.subSkillChevron, { color: zoneColor }]}>{open ? '▾' : '▸'}</Text>
         <Text style={[styles.subSkillName, { color: zoneColor }]}>{subSkill.name}</Text>
         <View style={styles.costStack}>
-          <Text style={[styles.costBadge, { color: zoneColor, borderColor: zoneColor }]}>{subSkill.apCost ? `${subSkill.apCost} AP` : 'PASSIVE'}</Text>
+          <Text style={[styles.costBadge, { color: zoneColor, borderColor: zoneColor }]}>{subSkill.apCost ? `${subSkill.apCost} AP` : subSkill.use.startsWith('Free') ? 'FREE' : 'PASSIVE'}</Text>
         </View>
       </TouchableOpacity>
       <Animated.View style={[styles.subSkillBody, { maxHeight, overflow: 'hidden' }]}>

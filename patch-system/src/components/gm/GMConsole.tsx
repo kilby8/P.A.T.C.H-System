@@ -68,6 +68,8 @@ export default function GMConsole() {
     sponsorDrop,
     awardFragments,
     awardAdvancement,
+    adjustEngagement,
+    adjustFragments,
   } = useCharacter();
 
   const selectedCharacter = useMemo(
@@ -176,6 +178,17 @@ export default function GMConsole() {
               <View style={styles.mobActionRow}>
                 <MiniButton label="+1 ADV POINT" onPress={() => awardAdvancement(selectedCharacter.id, 1)} />
                 <MiniButton label="-1 ADV POINT" onPress={() => awardAdvancement(selectedCharacter.id, -1)} danger />
+              </View>
+              <Text style={styles.adReadTargetMeta}>ENGAGEMENT: HIGHLIGHTS, GOING DARK, STORY SWINGS · FRAGMENTS: MOB THEFT, LOOT, AUDITS</Text>
+              <View style={styles.mobActionRow}>
+                <MiniButton label="ENG +1" onPress={() => adjustEngagement(selectedCharacter.id, 1)} />
+                <MiniButton label="ENG -1" onPress={() => adjustEngagement(selectedCharacter.id, -1)} danger />
+                <MiniButton label="ENG -5" onPress={() => adjustEngagement(selectedCharacter.id, -5)} danger />
+              </View>
+              <View style={styles.mobActionRow}>
+                <MiniButton label="DF +5" onPress={() => adjustFragments(selectedCharacter.id, 5, 'gm: fragments found')} />
+                <MiniButton label="DF -2" onPress={() => adjustFragments(selectedCharacter.id, -2, 'gm: fragments lost')} danger />
+                <MiniButton label="DF -10" onPress={() => adjustFragments(selectedCharacter.id, -10, 'gm: fragments lost')} danger />
               </View>
             </View>
           )}

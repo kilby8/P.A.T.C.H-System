@@ -16,6 +16,7 @@ import { useCharacter } from '../../store/CharacterContext';
 import { Colors, Typography, Spacing, GlobalStyles } from '../../theme/theme';
 import { BACKGROUND_PROFILES, CoreAttribute, ORIGIN_PROFILES, OriginId, getOriginProfile } from '../../models/Backgrounds';
 import { ATTRIBUTE_MIN, createCharacter, CpuAttributes, getDefense, getBaseAP, STARTING_ADVANCEMENT_POINTS } from '../../models/Character';
+import { GEAR_ITEM_DEFS } from '../../models/Gear';
 import {
   SKILL_DEFS,
   SkillId,
@@ -90,6 +91,13 @@ export default function CharacterCreationTerminal({ onCancel }: { onCancel?: () 
     setExtraRanks({});
     const first = next === 'offworlder' ? BACKGROUND_PROFILES[0] : BACKGROUND_PROFILES.find((bg) => bg.category === next);
     if (first) setSelectedBackgroundId(first.id);
+  };
+  const kitFor = (backgroundId: typeof BACKGROUND_PROFILES[number]['id']) => {
+    const sample = createCharacter('kit', 'kit', attributes as CpuAttributes, STARTING_ADVANCEMENT_POINTS, backgroundId, { origin });
+    return (['offensive', 'defensive', 'support'] as const)
+      .map((slot) => (origin === 'glitcher' && slot === 'support' ? 'rolled support item' : GEAR_ITEM_DEFS.find((item) => item.id === sample.gearLoadout[slot]?.itemId)?.name))
+      .filter(Boolean)
+      .join(', ');
   };
   const preview = selectedBackground
     ? createCharacter('preview', characterName || 'preview', attributes as CpuAttributes, STARTING_ADVANCEMENT_POINTS, selectedBackground.id, { origin, extraSkillRanks: extraRanks })
@@ -216,7 +224,7 @@ export default function CharacterCreationTerminal({ onCancel }: { onCancel?: () 
             <Text style={styles.backgroundName}>{bg.name}</Text>
             <Text style={styles.backgroundCategory}>FOCUS {bg.buildFocus}  ·  SKILLS {bg.skills.map((id) => SKILL_DEFS.find((sk) => sk.id === id)?.name).join(', ').toUpperCase()}</Text>
             <Text style={styles.backgroundTrait}>{bg.flavor}</Text>
-            <Text style={styles.backgroundFocus}>Kit: {bg.starterGear.join(', ')}</Text>
+            <Text style={styles.backgroundFocus}>Kit: {kitFor(bg.id)}</Text>
           </TouchableOpacity>
         ))}
       </ScrollView>

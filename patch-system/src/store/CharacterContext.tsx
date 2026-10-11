@@ -21,6 +21,7 @@ import {
   getStartingAP,
   getMaxBankedAP,
   getAPAfterTurnStart,
+  isFlatlined,
   CpuAttributes,
   ATTRIBUTE_MAX,
   normalizeAttribute,
@@ -122,6 +123,11 @@ type Action =
   | { type: 'BUY_ATTRIBUTE'; attribute: keyof CpuAttributes }
   | { type: 'TOGGLE_CONDITION'; condition: ConditionId }
   | { type: 'ROLL_CRASH_SAVE'; roll: number }
+  | { type: 'END_ENCOUNTER_FOR_OPERATOR' }
+  | { type: 'GRANT_ITEM'; toCharacterId: string; itemId: string }
+  | { type: 'SWAP_ITEM'; lockerIndex: number }
+  | { type: 'ADJUST_ENGAGEMENT'; toCharacterId: string; amount: number }
+  | { type: 'ADJUST_FRAGMENTS'; toCharacterId: string; amount: number; note?: string }
   | { type: 'APPLY_DAMAGE_OVERSHIELD'; amount: number }
   | { type: 'APPLY_DAMAGE_HARDWARE'; amount: number }
   | { type: 'HEAL_HARDWARE'; amount: number }
@@ -332,6 +338,27 @@ function syncVitalsAndAP(previous: Character, next: Character): Character {
   };
 }
 
+/**
+ * Damage hits Overshield first and overflows into Hardware (unless it bypasses Overshield).
+ * Engagement pays per point actually taken: +1 Overshield, +2 Hardware. Damage past 0 is ignored;
+ * damage while Flatlined counts as one crash-save failure.
+ */
+function applyDamage(character: Character, amount: number, bypassOvershield: boolean): Character {
+  const hits = Math.max(0, Math.floor(amount));
+  if (!hits) return character;
+  if (isFlatlined(character)) {
+    return { ...character, crashSaves: { ...character.crashSaves, failures: Math.min(3, character.crashSaves.failures + 1) } };
+  }
+  const toShield = bypassOvershield ? 0 : Math.min(character.overshield.current, hits);
+  const toHardware = Math.min(character.hardwareIntegrity.current, hits - toShield);
+  const next = syncVitalsAndAP(character, {
+    ...character,
+    overshield: clampVital(character.overshield, -toShield),
+    hardwareIntegrity: clampVital(character.hardwareIntegrity, -toHardware),
+  });
+  return adjustBroadcastState(next, toShield + toHardware * 2, toShield * 18 + toHardware * 35);
+}
+
 function updateSelectedCharacter(
   state: CharacterStoreState,
   updater: (character: Character) => Character,
@@ -502,10 +529,10 @@ function characterReducer(state: CharacterStoreState, action: Action): Character
       };
 
     case 'SPEND_AP':
-      return updateSelectedCharacter(state, (character) => adjustBroadcastState({
+      return updateSelectedCharacter(state, (character) => (isFlatlined(character) ? character : adjustBroadcastState({
         ...character,
         currentAP: Math.max(0, character.currentAP - action.amount),
-      }, action.amount, action.amount * 12));
+      }, action.amount, action.amount * 12)));
 
     case 'RESTORE_AP':
       return updateSelectedCharacter(state, (character) => ({
@@ -565,6 +592,75 @@ function characterReducer(state: CharacterStoreState, action: Action): Character
           : [...character.conditions, action.condition],
       }));
 
+    case 'END_ENCOUNTER_FOR_OPERATOR':
+      // Overshield resets; a stable Flatlined operator gets up with 1 Hardware; encounter-long conditions end.
+      return updateSelectedCharacter(state, (character) => {
+        const stable = isFlatlined(character) && character.crashSaves.successes >= 3;
+        return syncVitalsAndAP(character, {
+          ...character,
+          overshield: { ...character.overshield, current: character.overshield.max },
+          hardwareIntegrity: stable ? { ...character.hardwareIntegrity, current: 1 } : character.hardwareIntegrity,
+          conditions: character.conditions.filter((id) => !['glitched', 'surprised', 'stealthed', 'marked', 'pinned', 'prone', 'lagged', 'stunned', 'staggered'].includes(id)),
+        });
+      });
+
+    case 'GRANT_ITEM': {
+      if (state.session.role !== 'gm') return state;
+      const item = getGearItemById(action.itemId);
+      if (!item) return state;
+      return {
+        ...state,
+        party: state.party.map((character) => (
+          character.id === action.toCharacterId
+            ? { ...character, itemLocker: [...character.itemLocker, { itemId: item.id, hardpoints: Array.from({ length: item.hardpoints }, () => null) }] }
+            : character
+        )),
+      };
+    }
+
+    case 'SWAP_ITEM':
+      return updateSelectedCharacter(state, (character) => {
+        const incoming = character.itemLocker[action.lockerIndex];
+        const item = incoming && getGearItemById(incoming.itemId);
+        if (!item) return character;
+        const outgoing = character.gearLoadout[item.category];
+        const locker = character.itemLocker.filter((_, index) => index !== action.lockerIndex);
+        return syncVitalsAndAP(character, {
+          ...character,
+          gearLoadout: { ...character.gearLoadout, [item.category]: incoming },
+          itemLocker: outgoing ? [...locker, outgoing] : locker,
+        });
+      });
+
+    case 'ADJUST_ENGAGEMENT': {
+      if (state.session.role !== 'gm') return state;
+      return {
+        ...state,
+        party: state.party.map((character) => (
+          character.id === action.toCharacterId ? adjustBroadcastState(character, Math.floor(action.amount), 0) : character
+        )),
+      };
+    }
+
+    case 'ADJUST_FRAGMENTS': {
+      if (state.session.role !== 'gm') return state;
+      const amount = Math.floor(action.amount);
+      if (!amount || !state.party.some((character) => character.id === action.toCharacterId)) return state;
+      return {
+        ...state,
+        party: state.party.map((character) => (
+          character.id === action.toCharacterId ? adjustDataFragments(character, amount) : character
+        )),
+        tradeLog: pushTradeLog(state, {
+          type: 'award',
+          amount: 1,
+          toCharacterId: action.toCharacterId,
+          fragmentDelta: amount,
+          note: action.note ?? 'gm adjustment',
+        }),
+      };
+    }
+
     case 'ROLL_CRASH_SAVE':
       return updateSelectedCharacter(state, (character) => {
         if (character.hardwareIntegrity.current > 0) return character;
@@ -574,18 +670,9 @@ function characterReducer(state: CharacterStoreState, action: Action): Character
       });
 
     case 'APPLY_DAMAGE_OVERSHIELD':
-      if (state.session.role !== 'gm') return state;
-      return updateSelectedCharacter(state, (character) => adjustBroadcastState(hydrateCharacter({
-        ...character,
-        overshield: clampVital(character.overshield, -action.amount),
-      }), action.amount, action.amount * 18));
-
     case 'APPLY_DAMAGE_HARDWARE':
       if (state.session.role !== 'gm') return state;
-      return updateSelectedCharacter(state, (character) => adjustBroadcastState(syncVitalsAndAP(character, {
-        ...character,
-        hardwareIntegrity: clampVital(character.hardwareIntegrity, -action.amount),
-      }), action.amount * 2, action.amount * 35));
+      return updateSelectedCharacter(state, (character) => applyDamage(character, action.amount, action.type === 'APPLY_DAMAGE_HARDWARE'));
 
     case 'HEAL_HARDWARE':
       return updateSelectedCharacter(state, (character) => syncVitalsAndAP(character, {
@@ -629,11 +716,11 @@ function characterReducer(state: CharacterStoreState, action: Action): Character
       if (state.session.role !== 'gm') return state;
       return updateSelectedCharacter(state, (character) => {
         if (!character.unlockedSubSkills.includes(action.subSkillId)) return character;
-        return {
+        return syncVitalsAndAP(character, {
           ...character,
           advancementPoints: character.advancementPoints + action.refund,
           unlockedSubSkills: character.unlockedSubSkills.filter((id) => id !== action.subSkillId),
-        };
+        });
       });
 
     case 'SET_ENCOUNTER':
@@ -980,6 +1067,8 @@ function characterReducer(state: CharacterStoreState, action: Action): Character
       const amount = Math.max(1, Math.floor(action.amount));
       const blueprint = getBlueprintById(action.blueprintId);
       if (!blueprint) return state;
+      // Named, legendary and sponsor-grade blueprints are never sold.
+      if (blueprint.dropRule !== 'standard' || blueprint.sponsorGrade) return state;
       if (!state.blueprintMarket.themeGates[blueprint.theme]) return state;
 
       const price = Math.max(0, Math.floor(state.blueprintMarket.prices[action.blueprintId] ?? 0));
@@ -1107,6 +1196,11 @@ interface CharacterContextValue {
   buyAttribute: (attribute: keyof CpuAttributes) => void;
   toggleCondition: (condition: ConditionId) => void;
   rollCrashSave: (roll?: number) => void;
+  endEncounterForOperator: () => void;
+  grantItem: (toCharacterId: string, itemId: string) => void;
+  swapItem: (lockerIndex: number) => void;
+  adjustEngagement: (toCharacterId: string, amount: number) => void;
+  adjustFragments: (toCharacterId: string, amount: number, note?: string) => void;
   applyDamageOvershield: (amount: number) => void;
   applyDamageHardware: (amount: number) => void;
   healHardware: (amount: number) => void;
@@ -1298,6 +1392,20 @@ export function CharacterProvider({
   const buySkillRank = useCallback((skillId: SkillId) => dispatch({ type: 'BUY_SKILL_RANK', skillId }), []);
   const buyAttribute = useCallback((attribute: keyof CpuAttributes) => dispatch({ type: 'BUY_ATTRIBUTE', attribute }), []);
   const toggleCondition = useCallback((condition: ConditionId) => dispatch({ type: 'TOGGLE_CONDITION', condition }), []);
+  const endEncounterForOperator = useCallback(() => dispatch({ type: 'END_ENCOUNTER_FOR_OPERATOR' }), []);
+  const grantItem = useCallback((toCharacterId: string, itemId: string) => {
+    if (state.session.role !== 'gm') return;
+    dispatch({ type: 'GRANT_ITEM', toCharacterId, itemId });
+  }, [state.session.role]);
+  const swapItem = useCallback((lockerIndex: number) => dispatch({ type: 'SWAP_ITEM', lockerIndex }), []);
+  const adjustEngagement = useCallback((toCharacterId: string, amount: number) => {
+    if (state.session.role !== 'gm') return;
+    dispatch({ type: 'ADJUST_ENGAGEMENT', toCharacterId, amount });
+  }, [state.session.role]);
+  const adjustFragments = useCallback((toCharacterId: string, amount: number, note?: string) => {
+    if (state.session.role !== 'gm') return;
+    dispatch({ type: 'ADJUST_FRAGMENTS', toCharacterId, amount, note });
+  }, [state.session.role]);
   const rollCrashSave = useCallback((roll?: number) => dispatch({ type: 'ROLL_CRASH_SAVE', roll: roll ?? 1 + Math.floor(Math.random() * 6) }), []);
   const applyDamageOvershield = useCallback((amount: number) => {
     if (state.session.role !== 'gm') return;
@@ -1441,6 +1549,11 @@ export function CharacterProvider({
         buyAttribute,
         toggleCondition,
         rollCrashSave,
+        endEncounterForOperator,
+        grantItem,
+        swapItem,
+        adjustEngagement,
+        adjustFragments,
         applyDamageOvershield,
         applyDamageHardware,
         healHardware,
