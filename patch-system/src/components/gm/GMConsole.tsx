@@ -1,7 +1,7 @@
 // ============================================================
 // P.A.T.C.H. SYSTEM — GM Console
 // ============================================================
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -77,6 +77,8 @@ export default function GMConsole() {
     [party, selectedCharacterId],
   );
   const sponsorPoolSize = getSponsorBlueprints().length;
+  // An ad read pays the fee OR the sponsor shield, never both.
+  const [airedAdReads, setAiredAdReads] = useState<Record<string, 'fee' | 'shield'>>({});
 
   return (
     <View style={GlobalStyles.safeArea}>
@@ -210,16 +212,34 @@ export default function GMConsole() {
             <View key={adRead.title} style={styles.adReadCard}>
               <Text style={styles.adReadTitle}>{adRead.title}</Text>
               <Text style={styles.adReadCopy}>{adRead.copy.toUpperCase()}</Text>
-              <View style={styles.mobActionRow}>
-                <MiniButton
-                  label={`AIR AD-READ +${adRead.fragmentReward} DF`}
-                  onPress={() => awardFragments(selectedCharacter.id, adRead.fragmentReward, adRead.note)}
-                />
-                <MiniButton
-                  label={`SPONSOR SHIELD +${adRead.overshieldBoost}`}
-                  onPress={() => restoreOvershield(adRead.overshieldBoost)}
-                />
-              </View>
+              {(() => {
+                const key = `${selectedCharacter.id}:${adRead.title}`;
+                const aired = airedAdReads[key];
+                const choose = (choice: 'fee' | 'shield') => setAiredAdReads((prev) => ({ ...prev, [key]: choice }));
+                if (aired) {
+                  return (
+                    <View style={styles.mobActionRow}>
+                      <Text style={styles.adReadCopy}>AIRED · PAID {aired === 'fee' ? `+${adRead.fragmentReward} DF` : `SHIELD +${adRead.overshieldBoost}`}</Text>
+                      <MiniButton
+                        label="NEW AD READ"
+                        onPress={() => setAiredAdReads((prev) => { const next = { ...prev }; delete next[key]; return next; })}
+                      />
+                    </View>
+                  );
+                }
+                return (
+                  <View style={styles.mobActionRow}>
+                    <MiniButton
+                      label={`AIR AD-READ +${adRead.fragmentReward} DF`}
+                      onPress={() => { awardFragments(selectedCharacter.id, adRead.fragmentReward, adRead.note); choose('fee'); }}
+                    />
+                    <MiniButton
+                      label={`OR SPONSOR SHIELD +${adRead.overshieldBoost}`}
+                      onPress={() => { restoreOvershield(adRead.overshieldBoost); choose('shield'); }}
+                    />
+                  </View>
+                );
+              })()}
             </View>
           ))}
         </View>
