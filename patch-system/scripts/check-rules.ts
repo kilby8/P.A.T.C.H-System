@@ -1,9 +1,14 @@
 // Model-level checks for the rules the app now enforces. Run: npx tsx scripts/check-rules.ts
-import assert from 'node:assert/strict';
 import { createCharacter, getDefense, getAPAfterTurnStart, getMaxBankedAP, hydrateCharacter, getStartingAP } from '../src/models/Character';
 import { canUnlockNode, ARCHETYPE_NODES } from '../src/models/ArchetypeNodes';
 import { getMobProfile } from '../src/models/ArenaBestiary';
 import { applyCrashSaveRoll } from '../src/models/Conditions';
+
+const assert = {
+  equal(a: unknown, b: unknown) { if (a !== b) throw new Error(`expected ${String(b)}, got ${String(a)}`); },
+  deepEqual(a: unknown, b: unknown) { if (JSON.stringify(a) !== JSON.stringify(b)) throw new Error(`expected ${JSON.stringify(b)}, got ${JSON.stringify(a)}`); },
+  match(a: string, re: RegExp) { if (!re.test(a)) throw new Error(`${a} does not match ${re}`); },
+};
 
 const avg = { POWER: 3, PING: 3, HARDWARE: 3, DATA: 3, SYSTEM: 3, CLOUT: 3 };
 let n = 0;
