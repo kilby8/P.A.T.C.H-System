@@ -1,5 +1,5 @@
 // ============================================================
-// P.A.T.C.H. SYSTEM — 30-Node Archetype Matrix Component
+// P.A.T.C.H. SYSTEM — 39-Node Archetype Matrix Component
 // Three overlapping Venn zones: BRUTE / GHOST / SPECIALIST
 // ============================================================
 import React, { useState, useCallback, useRef } from 'react';
@@ -13,8 +13,10 @@ import {
   Dimensions,
   Animated,
 } from 'react-native';
-import { useCharacter } from '../../store/CharacterContext';
-import { ARCHETYPE_NODES, ArchetypeNode, ArchetypeZone, SubSkill } from '../../models/ArchetypeNodes';
+import { useCharacter, SKILL_RANK_COST, ATTRIBUTE_COST } from '../../store/CharacterContext';
+import { ARCHETYPE_NODES, ArchetypeNode, ArchetypeZone, SubSkill, canUnlockNode, getNodePrerequisiteText } from '../../models/ArchetypeNodes';
+import { SKILL_DEFS, MAX_SKILL_RANK, getSkillRank } from '../../models/Skills';
+import { ATTRIBUTE_MAX, CpuAttributes } from '../../models/Character';
 import {
   Colors,
   Typography,
@@ -37,7 +39,8 @@ const ZONE_CONFIG: Record<ArchetypeZone, { label: string; attrs: string; color: 
 
 // ── Main Component ───────────────────────────────────────────
 export default function ArchetypeMatrix() {
-  const { character, unlockNode, unlockSubSkill, refundSubSkill } = useCharacter();
+  const { character, session, unlockNode, unlockSubSkill, refundSubSkill, buySkillRank, buyAttribute } = useCharacter();
+  const isGM = session.role === 'gm';
   const [selectedNode, setSelectedNode] = useState<ArchetypeNode | null>(null);
   const [drawerVisible, setDrawerVisible] = useState(false);
 
@@ -83,12 +86,57 @@ export default function ArchetypeMatrix() {
         {/* ── Header ──────────────────────────────────────── */}
         <View style={styles.header}>
           <Text style={styles.title}>ARCHETYPE MATRIX</Text>
-          <Text style={styles.subtitle}>30-NODE ADVANCEMENT LATTICE</Text>
+          <Text style={styles.subtitle}>39-NODE ADVANCEMENT LATTICE</Text>
           <View style={GlobalStyles.dividerGlow} />
           <Text style={styles.apInfo}>
             ADVANCEMENT POINTS AVAILABLE:{' '}
             <Text style={styles.apValue}>{character.advancementPoints}</Text>
           </Text>
+          <Text style={styles.costLine}>
+            NODE 1 · SUB-SKILL 1 · SKILL RANK {SKILL_RANK_COST} · ATTRIBUTE {ATTRIBUTE_COST}. TIER 2 NEEDS A TIER 1 IN ITS ZONE; TIER 3 NEEDS A TIER 2; OVERLAPS NEED BOTH PARENT ZONES.
+          </Text>
+        </View>
+
+        {/* ── Skills & attributes ─────────────────────────── */}
+        <View style={styles.trainCard}>
+          <Text style={styles.trainTitle}>ATTRIBUTES  ·  {ATTRIBUTE_COST} AP EACH, MAX {ATTRIBUTE_MAX}</Text>
+          <View style={styles.trainGrid}>
+            {(Object.keys(character.attributes) as (keyof CpuAttributes)[]).map((attr) => {
+              const value = character.attributes[attr];
+              const canBuy = value < ATTRIBUTE_MAX && character.advancementPoints >= ATTRIBUTE_COST;
+              return (
+                <TouchableOpacity
+                  key={attr}
+                  style={[styles.trainChip, !canBuy && styles.trainChipOff]}
+                  onPress={() => buyAttribute(attr)}
+                  disabled={!canBuy}
+                  accessibilityLabel={`Raise ${attr}`}
+                >
+                  <Text style={styles.trainName}>{attr}</Text>
+                  <Text style={styles.trainValue}>{value}{canBuy ? '  +' : ''}</Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+          <Text style={styles.trainTitle}>SKILLS  ·  {SKILL_RANK_COST} AP PER RANK, MAX {MAX_SKILL_RANK}</Text>
+          <View style={styles.trainGrid}>
+            {SKILL_DEFS.map((skill) => {
+              const rank = getSkillRank(character.skills, skill.id);
+              const canBuy = rank < MAX_SKILL_RANK && character.advancementPoints >= SKILL_RANK_COST;
+              return (
+                <TouchableOpacity
+                  key={skill.id}
+                  style={[styles.trainChip, !canBuy && styles.trainChipOff]}
+                  onPress={() => buySkillRank(skill.id)}
+                  disabled={!canBuy}
+                  accessibilityLabel={`Train ${skill.name}`}
+                >
+                  <Text style={styles.trainName}>{skill.name.toUpperCase()}</Text>
+                  <Text style={styles.trainValue}>{rank}{canBuy ? '  +' : ''}</Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
         </View>
 
         {/* ── Zones ───────────────────────────────────────── */}
@@ -165,6 +213,8 @@ export default function ArchetypeMatrix() {
           node={selectedNode}
           visible={drawerVisible}
           isNodeUnlocked={isUnlocked(selectedNode.id)}
+          canUnlock={canUnlockNode(selectedNode.id, character.unlockedNodes)}
+          isGM={isGM}
           isSubSkillUnlocked={isSubSkillUnlocked}
           advancementPoints={character.advancementPoints}
           zoneColor={ZONE_CONFIG[selectedNode.zone].color}
@@ -183,6 +233,8 @@ function NodeDrawer({
   node,
   visible,
   isNodeUnlocked,
+  canUnlock,
+  isGM,
   isSubSkillUnlocked,
   advancementPoints,
   zoneColor,
@@ -194,6 +246,8 @@ function NodeDrawer({
   node: ArchetypeNode;
   visible: boolean;
   isNodeUnlocked: boolean;
+  canUnlock: boolean;
+  isGM: boolean;
   isSubSkillUnlocked: (id: string) => boolean;
   advancementPoints: number;
   zoneColor: string;
@@ -202,7 +256,7 @@ function NodeDrawer({
   onRefundSubSkill: (subSkillId: string, refund: number) => void;
   onClose: () => void;
 }) {
-  const canAfford = advancementPoints > 0;
+  const canAfford = advancementPoints > 0 && canUnlock;
 
   return (
     <Modal
@@ -225,6 +279,7 @@ function NodeDrawer({
         <View style={GlobalStyles.divider} />
 
         <Text style={styles.drawerDesc}>{node.description}</Text>
+        <Text style={styles.subSkillMeta}>PREREQ: {getNodePrerequisiteText(node).toUpperCase()}</Text>
 
         <Text style={styles.subSkillHeader}>SUB-SKILLS</Text>
         {node.subSkills.map((sk) => (
@@ -235,6 +290,7 @@ function NodeDrawer({
             subSkill={sk}
             zoneColor={zoneColor}
             unlocked={isSubSkillUnlocked(sk.id)}
+            isGM={isGM}
             canAfford={advancementPoints >= sk.advancementCost}
             onUnlockSubSkill={onUnlockSubSkill}
             onRefundSubSkill={onRefundSubSkill}
@@ -260,7 +316,7 @@ function NodeDrawer({
             activeOpacity={0.75}
           >
             <Text style={[styles.unlockBtnText, { color: zoneColor }]}>
-              {canAfford ? `UNLOCK NODE  (1 ADVANCEMENT POINT)` : 'INSUFFICIENT ADVANCEMENT POINTS'}
+              {canAfford ? `UNLOCK NODE  (1 ADVANCEMENT POINT)` : !canUnlock ? 'PREREQUISITE NOT MET' : 'INSUFFICIENT ADVANCEMENT POINTS'}
             </Text>
           </TouchableOpacity>
         )}
@@ -280,6 +336,7 @@ function ExpandableSubSkill({
   subSkill,
   zoneColor,
   unlocked,
+  isGM,
   canAfford,
   onUnlockSubSkill,
   onRefundSubSkill,
@@ -289,6 +346,7 @@ function ExpandableSubSkill({
   subSkill: SubSkill;
   zoneColor: string;
   unlocked: boolean;
+  isGM: boolean;
   canAfford: boolean;
   onUnlockSubSkill: (nodeId: string, subSkillId: string, cost: number) => void;
   onRefundSubSkill: (subSkillId: string, refund: number) => void;
@@ -302,11 +360,12 @@ function ExpandableSubSkill({
     setOpen((v) => !v);
   }, [open, animHeight]);
 
-  const maxHeight = animHeight.interpolate({ inputRange: [0, 1], outputRange: [0, 180] });
+  const maxHeight = animHeight.interpolate({ inputRange: [0, 1], outputRange: [0, 320] });
+  // No refunds on who you become: only the GM can reverse a purchase.
   const toggleLabel = unlocked
-    ? `REFUND SUB-SKILL (+${subSkill.advancementCost} CAP)`
-    : `UNLOCK SUB-SKILL (-${subSkill.advancementCost} CAP)`;
-  const disabled = !nodeUnlocked || (!unlocked && !canAfford);
+    ? (isGM ? `GM: REVERSE PURCHASE (+${subSkill.advancementCost} AP)` : '✓ UNLOCKED')
+    : `UNLOCK SUB-SKILL (-${subSkill.advancementCost} ADVANCEMENT POINT)`;
+  const disabled = !nodeUnlocked || (unlocked ? !isGM : !canAfford);
 
   return (
     <View style={styles.subSkillAccordion}>
@@ -314,12 +373,13 @@ function ExpandableSubSkill({
         <Text style={[styles.subSkillChevron, { color: zoneColor }]}>{open ? '▾' : '▸'}</Text>
         <Text style={[styles.subSkillName, { color: zoneColor }]}>{subSkill.name}</Text>
         <View style={styles.costStack}>
-          <Text style={[styles.costBadge, { color: zoneColor, borderColor: zoneColor }]}>{subSkill.apCost} AP</Text>
-          <Text style={[styles.costBadge, { color: Colors.amber, borderColor: Colors.amber }]}>{subSkill.creditCost} CR</Text>
+          <Text style={[styles.costBadge, { color: zoneColor, borderColor: zoneColor }]}>{subSkill.apCost ? `${subSkill.apCost} AP` : 'PASSIVE'}</Text>
         </View>
       </TouchableOpacity>
       <Animated.View style={[styles.subSkillBody, { maxHeight, overflow: 'hidden' }]}>
+        <Text style={styles.subSkillMeta}>USE: {subSkill.use.toUpperCase()}</Text>
         <Text style={styles.subSkillDesc}>{subSkill.description}</Text>
+        {subSkill.note ? <Text style={styles.subSkillNote}>RULES NOTE: {subSkill.note}</Text> : null}
         {subSkill.prerequisites ? (
           <Text style={styles.subSkillMeta}>PREREQ: {subSkill.prerequisites}</Text>
         ) : null}
@@ -347,6 +407,67 @@ function ExpandableSubSkill({
 
 // ── Styles ──────────────────────────────────────────────────
 const styles = StyleSheet.create({
+  costLine: {
+    ...Typography.mono,
+    fontSize: 10,
+    color: Colors.textSecondary,
+    marginTop: Spacing.sm,
+    lineHeight: 15,
+  },
+  trainCard: {
+    borderWidth: 1,
+    borderColor: Colors.borderDefault,
+    borderRadius: Radius.sm,
+    padding: Spacing.md,
+    marginBottom: Spacing.lg,
+    backgroundColor: Colors.bgCard,
+  },
+  trainTitle: {
+    ...Typography.mono,
+    fontSize: 11,
+    color: Colors.cyan,
+    letterSpacing: 1.5,
+    marginBottom: Spacing.sm,
+    marginTop: Spacing.xs,
+  },
+  trainGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: Spacing.xs,
+    marginBottom: Spacing.sm,
+  },
+  trainChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    borderWidth: 1,
+    borderColor: Colors.cyan,
+    borderRadius: Radius.sm,
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: 6,
+    minHeight: 36,
+  },
+  trainChipOff: {
+    borderColor: Colors.borderDefault,
+    opacity: 0.7,
+  },
+  trainName: {
+    ...Typography.mono,
+    fontSize: 10,
+    color: Colors.textSecondary,
+  },
+  trainValue: {
+    ...Typography.mono,
+    fontSize: 12,
+    color: Colors.textPrimary,
+  },
+  subSkillNote: {
+    ...Typography.mono,
+    fontSize: 10,
+    color: Colors.amber,
+    marginTop: Spacing.xs,
+    lineHeight: 15,
+  },
   content: {
     padding: Spacing.lg,
     paddingBottom: Spacing.xxl,

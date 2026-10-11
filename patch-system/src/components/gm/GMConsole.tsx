@@ -67,6 +67,7 @@ export default function GMConsole() {
     setSectorDifficulty,
     sponsorDrop,
     awardFragments,
+    awardAdvancement,
   } = useCharacter();
 
   const selectedCharacter = useMemo(
@@ -171,6 +172,11 @@ export default function GMConsole() {
                 <MiniButton label="HW -1" onPress={() => applyDamageHardware(1)} danger />
                 <MiniButton label="HW -3" onPress={() => applyDamageHardware(3)} danger />
               </View>
+              <Text style={styles.adReadTargetMeta}>ADVANCEMENT POINTS {selectedCharacter.advancementPoints} · +1 PER DEPLOYMENT SURVIVED</Text>
+              <View style={styles.mobActionRow}>
+                <MiniButton label="+1 ADV POINT" onPress={() => awardAdvancement(selectedCharacter.id, 1)} />
+                <MiniButton label="-1 ADV POINT" onPress={() => awardAdvancement(selectedCharacter.id, -1)} danger />
+              </View>
             </View>
           )}
 
@@ -232,7 +238,7 @@ export default function GMConsole() {
         {encounter ? (
           <View style={[CardStyles.base, styles.sectionSpacing]}>
             <Text style={styles.sectionTitle}>ACTIVE ENCOUNTER</Text>
-            <Text style={styles.encounterMeta}>SPECTACLE {encounter.spectacleScore} • {encounter.bracketLabel.toUpperCase()}</Text>
+            <Text style={styles.encounterMeta}>SPECTACLE {encounter.spectacleScore} • {encounter.bracketLabel.toUpperCase()} • THREAT {encounter.mobs.reduce((sum, mob) => sum + (mob.threat ?? 0), 0)} (BUDGET 4 PER OPERATOR)</Text>
             {encounter.modifiers.map((modifier) => (
               <Text key={modifier} style={styles.modifierText}>{modifier.toUpperCase()}</Text>
             ))}
@@ -241,8 +247,8 @@ export default function GMConsole() {
                 <View style={styles.mobHeader}>
                   <View style={styles.mobIdentity}>
                     <View style={{ flex: 1 }}>
-                      <Text style={styles.mobName}>{mob.name.toUpperCase()}</Text>
-                      <Text style={styles.mobRole}>{mob.role}</Text>
+                      <Text style={styles.mobName}>{(mob.displayName ?? mob.name).toUpperCase()}</Text>
+                      <Text style={styles.mobRole}>{mob.role} · {mob.tier}</Text>
                     </View>
                   </View>
                   <TouchableOpacity onPress={() => removeMob(mob.id)}>
@@ -250,6 +256,7 @@ export default function GMConsole() {
                   </TouchableOpacity>
                 </View>
                 <Text style={styles.mobStats}>INTEGRITY {mob.currentIntegrity}/{mob.maxIntegrity} • AP {mob.currentAP}/{mob.maxAP}</Text>
+                <Text style={styles.mobStats}>DEF {mob.defense} • ATK {mob.attack} • DMG {mob.damage}{encounter.modifiers.some((m) => m.toLowerCase().includes('double')) ? ' ×2' : ''} • SAVE {mob.saveTarget} • INIT {mob.init}</Text>
                 <Text style={styles.mobDesc}>{mob.description}</Text>
                 <View style={styles.mobActionRow}>
                   <MiniButton label="-1 HP" onPress={() => damageMob(mob.id, 1)} danger />
