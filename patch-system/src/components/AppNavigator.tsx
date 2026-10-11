@@ -54,6 +54,7 @@ export default function AppNavigator() {
       return;
     }
 
+    setCreatingCharacter(false);
     if (session.role === 'gm') {
       setActiveTab('GM');
       return;
@@ -62,8 +63,8 @@ export default function AppNavigator() {
     setActiveTab('HUD');
   }, [session.role]);
 
-  if (creatingCharacter) {
-    return <CharacterCreationTerminal />;
+  if (creatingCharacter && session.role === 'guest') {
+    return <CharacterCreationTerminal onCancel={() => setCreatingCharacter(false)} />;
   }
 
   if (session.role === 'guest') {

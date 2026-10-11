@@ -45,7 +45,7 @@ const MAX_ATTRIBUTE = 4;
 const STEPS = ['name', 'origin', 'background', 'attributes', 'skills', 'confirm'] as const;
 type Step = typeof STEPS[number];
 
-export default function CharacterCreationTerminal() {
+export default function CharacterCreationTerminal({ onCancel }: { onCancel?: () => void } = {}) {
   const { createNewCharacter, loginAsPlayer, party } = useCharacter();
   const [step, setStep] = useState<Step>('name');
   const [characterName, setCharacterName] = useState('');
@@ -155,13 +155,20 @@ export default function CharacterCreationTerminal() {
        <Text style={styles.hint}>
          {characterName.length}/32 characters
        </Text>
-       <TouchableOpacity
-         style={[styles.button, !canProceedName && styles.buttonDisabled]}
-         onPress={() => setStep('origin')}
-         disabled={!canProceedName}
-       >
-         <Text style={styles.buttonText}>CONTINUE →</Text>
-       </TouchableOpacity>
+       <View style={styles.buttonRow}>
+         {onCancel && (
+           <TouchableOpacity style={[styles.button, styles.buttonSecondary]} onPress={onCancel}>
+             <Text style={styles.buttonText}>← LOGIN</Text>
+           </TouchableOpacity>
+         )}
+         <TouchableOpacity
+           style={[styles.button, !canProceedName && styles.buttonDisabled]}
+           onPress={() => setStep('origin')}
+           disabled={!canProceedName}
+         >
+           <Text style={styles.buttonText}>CONTINUE →</Text>
+         </TouchableOpacity>
+       </View>
      </View>
    );
 
