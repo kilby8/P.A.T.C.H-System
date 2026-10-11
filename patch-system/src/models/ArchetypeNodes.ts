@@ -24,31 +24,146 @@ export interface SubSkill {
   id: string;
   name: string;
   description: string;
+  /** How it's used at the table: "Passive", "Action 2 AP", "Reaction 1 AP · once per round"... */
+  use: string;
+  /** AP it costs to use (0 for passive and free sub-skills). */
   apCost: number;
-  creditCost: number;
   advancementCost: number;
+  /** Clarifying rules note for the table, when the description needs one. */
+  note?: string;
   prerequisites?: string;
 }
 
 interface RawSubSkill {
   name: string;
   description: string;
-  apCost?: number;
-  creditCost?: number;
   advancementCost?: number;
   prerequisites?: string;
+}
+
+/** Table usage for every sub-skill, keyed by node id and 1-based index. */
+export const SUB_SKILL_USE: Record<string, string> = {
+  'B1-1': "Passive",
+  'B1-2': "Passive",
+  'B2-1': "+1 AP on a melee attack",
+  'B2-2': "Action 2 AP · HARDWARE save 15",
+  'B3-1': "Free · once per encounter",
+  'B3-2': "Action 1 AP",
+  'B4-1': "Reaction 1 AP",
+  'B4-2': "Passive",
+  'B5-1': "Passive",
+  'B5-2': "Passive",
+  'B6-1': "Action 2 AP · POWER save 15",
+  'B6-2': "Passive",
+  'B7-1': "Free · once per encounter",
+  'B7-2': "Free · once per encounter",
+  'B8-1': "Passive",
+  'B8-2': "Passive",
+  'B9-1': "Passive (if you haven’t moved this turn)",
+  'B9-2': "Passive",
+  'B10-1': "Passive",
+  'B10-2': "Passive",
+  'G1-1': "Action 1 AP · PING save 15",
+  'G1-2': "Action 1 AP",
+  'G2-1': "Reaction 1 AP · once per round",
+  'G2-2': "Passive",
+  'G3-1': "Passive",
+  'G3-2': "Passive",
+  'G4-1': "Reaction 1 AP",
+  'G4-2': "Passive",
+  'G5-1': "Reaction 2 AP",
+  'G5-2': "+1 AP after Blink: untargetable until your next turn",
+  'G6-1': "Action 2 AP",
+  'G6-2': "Passive (with Static Burst)",
+  'G7-1': "Passive",
+  'G7-2': "Passive",
+  'G8-1': "Passive",
+  'G8-2': "Passive",
+  'G9-1': "Passive",
+  'G9-2': "Reaction 2 AP",
+  'G10-1': "Passive",
+  'G10-2': "Passive",
+  'S1-1': "Passive",
+  'S1-2': "Action 1 AP",
+  'S2-1': "Action 2 AP",
+  'S2-2': "Passive (with EMP Pulse)",
+  'S3-1': "Action 1 AP",
+  'S3-2': "Action 1 AP · CLOUT save 15",
+  'S4-1': "Passive",
+  'S4-2': "Action 1 AP",
+  'S5-1': "Action 1 AP · once per session",
+  'S5-2': "Passive",
+  'S6-1': "Action 2 AP",
+  'S6-2': "Passive",
+  'S7-1': "Action 2 AP",
+  'S7-2': "Action 3 AP",
+  'S8-1': "Passive (GM adjudicates)",
+  'S8-2': "Passive · once per session",
+  'S9-1': "Free · start of a scene",
+  'S9-2': "Passive",
+  'S10-1': "Action 3 AP · once per encounter",
+  'S10-2': "Passive",
+  'BG1-1': "Passive",
+  'BG1-2': "Passive",
+  'BG2-1': "Passive",
+  'BG2-2': "Passive",
+  'BG3-1': "Passive",
+  'BG3-2': "Passive",
+  'BS1-1': "Passive",
+  'BS1-2': "Passive",
+  'BS2-1': "Free · after you defeat an enemy",
+  'BS2-2': "Action 2 AP",
+  'BS3-1': "Action 1 AP · CLOUT save 18",
+  'BS3-2': "Passive",
+  'GS1-1': "Passive",
+  'GS1-2': "Passive",
+  'GS2-1': "Action 1 AP",
+  'GS2-2': "Passive",
+  'GS3-1': "Passive",
+  'GS3-2': "Action 2 AP",
+};
+
+export const SUB_SKILL_NOTES: Record<string, string> = {
+  'B8-1': "War Engine switches on for the rest of the encounter once you make a melee attack. Attacks already cost 1 AP, so Combat Flow cuts melee abilities that cost 2+ AP (Ground Pound, Shockwave) and makes Power Strike’s extra AP free.",
+  'B10-2': "An execution is a finishing blow that triggers Execution.",
+  'G5-2': "Spend 1 more AP right after Blink: you stay untargetable until your next turn starts.",
+  'G10-1': "Heat is the scene’s alert level (Calm, Alert, Lockdown); the GM raises it when security notices you.",
+  'S4-1': "Live Feed covers every enemy within 50 m that you or an ally can see.",
+  'S5-1': "A cache holds one of: 1d6+2 Hardware repair, a full Overshield, or one extra use of a once-per-encounter feature.",
+  'S6-1': "Arena scoring is Engagement: during the jam, nobody gains or loses Engagement.",
+  'S6-2': "Undo all Engagement changes from the jammed rounds.",
+  'S8-1': "The GM calls an audience vote at a highlight; operators with 10+ flair that round win it.",
+  'S8-2': "Temporary attribute boosts can push an attribute above 5.",
+  'BS1-1': "Cameras are active unless a Media Blackout or a dark scene is in effect.",
+  'BS3-2': "Morale penalty: -1 to save totals.",
+  'GS1-1': "Threat-level is the scene’s heat (see G10).",
+  'GS2-2': "NPC attitudes run Hostile, Neutral, Friendly; Neutral NPCs talk before they shoot.",
+};
+
+/** AP a usage label costs: "Action 2 AP" -> 2, "+1 AP ..." -> 1, passive/free -> 0. */
+export function getUseApCost(use: string): number {
+  const match = use.match(/(\d+) AP/);
+  return match ? Number(match[1]) : 0;
+}
+
+/** Save target an operator's ability imposes on enemies. */
+export function getAbilitySaveTarget(tier: 1 | 2 | 3): number {
+  return tier === 3 ? 18 : 15;
 }
 
 interface RawArchetypeNode extends Omit<ArchetypeNode, 'subSkills'> {
   subSkills: RawSubSkill[];
 }
 
-function createSubSkill(nodeId: string, tier: 1 | 2 | 3, index: number, subSkill: RawSubSkill): SubSkill {
+function createSubSkill(nodeId: string, _tier: 1 | 2 | 3, index: number, subSkill: RawSubSkill): SubSkill {
+  const key = `${nodeId}-${index + 1}`;
+  const use = SUB_SKILL_USE[key] ?? 'Passive';
   return {
     id: `${nodeId}-SUB-${index + 1}`,
-    apCost: subSkill.apCost ?? tier + index,
-    creditCost: subSkill.creditCost ?? tier * 250 + index * 150,
+    use,
+    apCost: getUseApCost(use),
     advancementCost: subSkill.advancementCost ?? 1,
+    note: SUB_SKILL_NOTES[key],
     ...subSkill,
   };
 }
@@ -57,7 +172,7 @@ const RAW_ARCHETYPE_NODES: RawArchetypeNode[] = [
   // ── BRUTE (PWR / HDW) — 10 nodes ──────────────────────────
   { id: 'B1', name: 'Iron Frame', zone: 'BRUTE', tier: 1, description: 'Reinforce biological chassis for increased trauma resistance.', subSkills: [
     { name: 'Plated Dermis', description: 'Sub-dermal alloy weave reduces all incoming physical damage by 1.' },
-    { name: 'Stress Hardening', description: 'Each hit suffered this encounter grants +1 damage resistance until end of round.' },
+    { name: 'Stress Hardening', description: 'Each hit you take gives you +1 damage resistance against later hits until the end of the round.' },
   ]},
   { id: 'B2', name: 'Kinetic Driver', zone: 'BRUTE', tier: 1, description: 'Hydraulic limb enhancement boosts melee output.', subSkills: [
     { name: 'Power Strike', description: 'Spend 1 extra AP on a melee attack to double its base damage die.' },
@@ -92,7 +207,7 @@ const RAW_ARCHETYPE_NODES: RawArchetypeNode[] = [
     { name: 'Turret Stance', description: 'Gain an extra reaction each round, usable only for defensive counters.' },
   ]},
   { id: 'B10', name: 'Apex Predator', zone: 'BRUTE', tier: 3, description: 'Execute weakened targets for immediate AP refund.', subSkills: [
-    { name: 'Execution', description: 'Finishing blow on a target at or below 25% HW refunds 2 AP immediately.' },
+    { name: 'Execution', description: 'A finishing blow on a target at or below 25% of its Integrity (or Hardware) refunds 2 AP immediately.' },
     { name: 'Trophy Kill', description: 'Each execution this encounter grants +1 to all POWER checks until end of session.' },
   ]},
 
@@ -102,7 +217,7 @@ const RAW_ARCHETYPE_NODES: RawArchetypeNode[] = [
     { name: 'Ping Mask', description: 'Suppress all active radio and sonar pings emanating from your gear for 2 rounds.' },
   ]},
   { id: 'G2', name: 'Neural Reflex', zone: 'GHOST', tier: 1, description: 'Enhanced reaction time provides bonus dodge window.', subSkills: [
-    { name: 'Reflex Dodge', description: 'Once per round, spend 1 AP as a free reaction to halve incoming ranged damage.' },
+    { name: 'Reflex Dodge', description: 'Once per round, as a reaction costing 1 AP, halve the damage of an incoming ranged attack.' },
     { name: 'Counter-Frame', description: 'After a successful dodge, your next melee attack gains +2 dice.' },
   ]},
   { id: 'G3', name: 'Ghost Walk', zone: 'GHOST', tier: 1, description: 'Silent movement system nullifies footstep detection.', subSkills: [
@@ -152,7 +267,7 @@ const RAW_ARCHETYPE_NODES: RawArchetypeNode[] = [
     { name: 'Corporate Bypass', description: 'Invoke a false corp identity to pause a hostile NPC for 1 round.' },
   ]},
   { id: 'S4', name: 'Tactical Upload', zone: 'SPECIALIST', tier: 2, description: 'Share targeting data with allies to boost hit accuracy.', subSkills: [
-    { name: 'Shared Targeting', description: 'All allies gain +2 on attack rolls against any target you have Live Feed on.' },
+    { name: 'Shared Targeting', description: 'Each round, designate one enemy you have Live Feed on: all allies gain +2 on attack rolls against it until your next turn.' },
     { name: 'Marked Threat', description: 'Designate one enemy as Priority Target; all damage against them is increased by 1 die.' },
   ]},
   { id: 'S5', name: 'Black Market Cache', zone: 'SPECIALIST', tier: 2, description: 'Access hidden gear drops from pre-planted stashes.', subSkills: [
@@ -227,3 +342,41 @@ export const ARCHETYPE_NODES: ArchetypeNode[] = RAW_ARCHETYPE_NODES.map((node) =
   ...node,
   subSkills: node.subSkills.map((subSkill, index) => createSubSkill(node.id, node.tier, index, subSkill)),
 }));
+
+const nodeMap = new Map(ARCHETYPE_NODES.map((node) => [node.id, node]));
+
+export function getArchetypeNode(nodeId: string): ArchetypeNode | undefined {
+  return nodeMap.get(nodeId);
+}
+
+export const ZONE_PARENTS: Partial<Record<ArchetypeZone, [ArchetypeZone, ArchetypeZone]>> = {
+  BRUTE_GHOST: ['BRUTE', 'GHOST'],
+  BRUTE_SPECIALIST: ['BRUTE', 'SPECIALIST'],
+  GHOST_SPECIALIST: ['GHOST', 'SPECIALIST'],
+};
+
+/** Plain-language prerequisite for unlocking a node. */
+export function getNodePrerequisiteText(node: ArchetypeNode): string {
+  const parents = ZONE_PARENTS[node.zone];
+  if (parents) {
+    return node.tier === 2
+      ? `Needs a node in both ${parents[0]} and ${parents[1]}.`
+      : `Needs a tier-2 ${node.zone.replace('_', ' ∩ ')} node.`;
+  }
+  if (node.tier === 1) return 'Open to anyone.';
+  return `Needs a tier-${node.tier - 1} ${node.zone} node.`;
+}
+
+/** Tier 1 open; tier 2 needs a tier 1 in the zone; tier 3 needs a tier 2; overlaps need both parents. */
+export function canUnlockNode(nodeId: string, unlockedNodes: string[]): boolean {
+  const node = nodeMap.get(nodeId);
+  if (!node) return false;
+  const owned = unlockedNodes.map((id) => nodeMap.get(id)).filter((n): n is ArchetypeNode => !!n);
+  const parents = ZONE_PARENTS[node.zone];
+  if (parents) {
+    if (node.tier === 2) return parents.every((zone) => owned.some((n) => n.zone === zone));
+    return owned.some((n) => n.zone === node.zone && n.tier === 2);
+  }
+  if (node.tier === 1) return true;
+  return owned.some((n) => n.zone === node.zone && n.tier === node.tier - 1);
+}

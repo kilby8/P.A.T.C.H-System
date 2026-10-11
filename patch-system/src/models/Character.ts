@@ -10,8 +10,15 @@ import {
   GEAR_CATEGORIES,
   getBlueprintById,
   getGearItemById,
+  getGearRules,
 } from './Gear';
-import { BackgroundId, getBackgroundById } from './Backgrounds';
+import { BackgroundId, OriginId, getBackgroundById } from './Backgrounds';
+import {
+  BACKGROUND_SKILL_RANK,
+  SkillRanks,
+  sanitizeSkillRanks,
+} from './Skills';
+import { ConditionId, CrashSaves, sanitizeConditions, sanitizeCrashSaves } from './Conditions';
 
 /** The six CPU Attributes of a PATCH character. */
 export interface CpuAttributes {
@@ -99,34 +106,66 @@ export interface Character {
 
   /** Roster identity package containing passives/proficiencies/starter narrative. */
   backgroundId: BackgroundId;
+
+  /** Where the program pulled the operator from; sets the shared trait. */
+  origin: OriginId;
+
+  /** Skill ranks (0-5). Pool = attribute + rank. */
+  skills: SkillRanks;
+
+  /** Active conditions (Fried, Pinned, Stunned...). */
+  conditions: ConditionId[];
+
+  /** Crash saves while Flatlined (0 Hardware Integrity). */
+  crashSaves: CrashSaves;
 }
 
 const BASE_STARTING_FRAGMENTS = 120;
 const MAX_ENGAGEMENT = 100;
+/** Advancement Points a new operator starts with. */
+export const STARTING_ADVANCEMENT_POINTS = 2;
+/** Hardened (Inmate Block): extra maximum Hardware Integrity. */
+export const HARDENED_BONUS = 5;
+/** Banked AP can never exceed the turn's AP + this. */
+export const AP_BANK_BONUS = 1;
 
-function hasGlitcherAnomalyTrait(backgroundId: BackgroundId): boolean {
-  return getBackgroundById(backgroundId)?.category === 'glitcher';
+/** The operator's origin; older saves fall back to the background's category. */
+export function resolveOrigin(backgroundId: BackgroundId, origin?: OriginId): OriginId {
+  if (origin === 'offworlder' || origin === 'inmate' || origin === 'volunteer' || origin === 'glitcher') return origin;
+  return getBackgroundById(backgroundId)?.category ?? 'inmate';
 }
 
-function getStartingDataFragments(backgroundId: BackgroundId): number {
-  const category = getBackgroundById(backgroundId)?.category;
-  if (category === 'volunteer') {
+function hasGlitcherAnomalyTrait(origin: OriginId): boolean {
+  return origin === 'glitcher';
+}
+
+function getStartingDataFragments(origin: OriginId): number {
+  if (origin === 'volunteer') {
     return Math.floor(BASE_STARTING_FRAGMENTS * 1.15);
   }
   return BASE_STARTING_FRAGMENTS;
 }
 
-function getStartingEngagement(attributes: CpuAttributes, backgroundId: BackgroundId): number {
+export function getStartingEngagement(attributes: CpuAttributes, origin: OriginId): number {
   const base = 25 + getAttributeBonus(attributes.CLOUT) * 8;
-  const category = getBackgroundById(backgroundId)?.category;
-  const categoryBonus = category === 'volunteer' ? 8 : category === 'glitcher' ? 5 : 0;
+  const categoryBonus = origin === 'volunteer' ? 8 : origin === 'glitcher' ? 5 : 0;
   return Math.max(10, Math.min(MAX_ENGAGEMENT, base + categoryBonus));
 }
 
-function getStartingViewerCount(attributes: CpuAttributes, backgroundId: BackgroundId): number {
-  const category = getBackgroundById(backgroundId)?.category;
-  const categoryBonus = category === 'volunteer' ? 180 : category === 'glitcher' ? 90 : 0;
+export function getStartingViewerCount(attributes: CpuAttributes, origin: OriginId): number {
+  const categoryBonus = origin === 'volunteer' ? 180 : origin === 'glitcher' ? 90 : 0;
   return Math.max(80, 120 + normalizeAttribute(attributes.CLOUT) * 60 + categoryBonus);
+}
+
+/** Background skills at rank 2, plus any extra ranks the player chose. */
+export function getStartingSkills(backgroundId: BackgroundId, extra?: SkillRanks): SkillRanks {
+  const ranks: SkillRanks = {};
+  getBackgroundById(backgroundId)?.skills.forEach((id) => { ranks[id] = BACKGROUND_SKILL_RANK; });
+  Object.entries(extra ?? {}).forEach(([id, rank]) => {
+    const key = id as keyof SkillRanks;
+    ranks[key] = (ranks[key] ?? 0) + (rank ?? 0);
+  });
+  return sanitizeSkillRanks(ranks);
 }
 
 function sanitizeSponsorInbox(sponsorInbox?: string[]): string[] {
@@ -153,7 +192,7 @@ function sanitizeBackgroundId(backgroundId?: BackgroundId): BackgroundId {
   return 'enforcer';
 }
 
-function createBackgroundStarterLoadout(backgroundId: BackgroundId): GearLoadout {
+function createBackgroundStarterLoadout(backgroundId: BackgroundId, origin: OriginId = resolveOrigin(backgroundId)): GearLoadout {
   const backgroundProfile = getBackgroundById(backgroundId);
   const loadout = createStarterLoadout();
   if (!backgroundProfile) {
@@ -174,7 +213,7 @@ function createBackgroundStarterLoadout(backgroundId: BackgroundId): GearLoadout
   applyStarterItem(backgroundProfile.starterBuildPackage.primaryItemId);
   applyStarterItem(backgroundProfile.starterBuildPackage.secondaryItemId);
 
-  if (backgroundProfile.category === 'glitcher') {
+  if (origin === 'glitcher') {
     const randomUtilityItemId = getRandomTierOneUtilityItemId();
     applyStarterItem(randomUtilityItemId);
   }
@@ -228,8 +267,8 @@ function sanitizeBlueprintTradable(
   return sanitized;
 }
 
-function sanitizeGearLoadout(loadout: GearLoadout | undefined, fallbackBackgroundId: BackgroundId): GearLoadout {
-  const fallback = createBackgroundStarterLoadout(fallbackBackgroundId);
+function sanitizeGearLoadout(loadout: GearLoadout | undefined, fallbackBackgroundId: BackgroundId, origin: OriginId): GearLoadout {
+  const fallback = createBackgroundStarterLoadout(fallbackBackgroundId, origin);
   if (!loadout) return fallback;
 
   return GEAR_CATEGORIES.reduce<GearLoadout>((acc, category) => {
@@ -307,30 +346,69 @@ export function getBaseAP(systemValue: number): number {
   return 1 + Math.floor(normalizeAttribute(systemValue) / 2);
 }
 
-export function getHardwareIntegrityMax(attributes: CpuAttributes): number {
-  return 5 + normalizeAttribute(attributes.HARDWARE) * 5;
+/** Titan Chassis sub-skills the app applies automatically. */
+export const REINFORCED_PLATING_ID = 'B5-SUB-1';
+export const REDUNDANT_SYSTEMS_ID = 'B5-SUB-2';
+
+export function getHardwareIntegrityMax(attributes: CpuAttributes, origin?: OriginId, unlockedSubSkills: string[] = []): number {
+  return 5 + normalizeAttribute(attributes.HARDWARE) * 5
+    + (origin === 'inmate' ? HARDENED_BONUS : 0)
+    + (unlockedSubSkills.includes(REINFORCED_PLATING_ID) ? 5 : 0);
+}
+
+/** Neural Shock threshold: 50%, or 35% with Redundant Systems. */
+export function getNeuralShockThreshold(unlockedSubSkills: string[] = []): number {
+  return unlockedSubSkills.includes(REDUNDANT_SYSTEMS_ID) ? 0.35 : 0.5;
 }
 
 export function getOvershieldMax(attributes: CpuAttributes): number {
   return 16 + normalizeAttribute(attributes.SYSTEM) * 2 + normalizeAttribute(attributes.DATA);
 }
 
-export function getStartingAP(character: Character): number {
+/** AP gained at the start of a turn: base AP, minus 1 in Neural Shock. */
+export function getStartingAP(character: Pick<Character, 'attributes' | 'neuralShock'>): number {
   const base = getBaseAP(character.attributes.SYSTEM);
   const penalty = character.neuralShock ? 1 : 0;
   return Math.max(0, base - penalty);
 }
 
+/** Most AP an operator can hold: base AP + 1. */
+export function getMaxBankedAP(character: Pick<Character, 'attributes'>): number {
+  return getBaseAP(character.attributes.SYSTEM) + AP_BANK_BONUS;
+}
+
+/** AP after the start-of-turn gain: bank + gain, capped. Stunned/Surprised gain nothing; Staggered gains 1 less. */
+export function getAPAfterTurnStart(character: Character): number {
+  const blocked = character.conditions.includes('stunned') || character.conditions.includes('surprised');
+  const staggered = character.conditions.includes('staggered') ? 1 : 0;
+  const gain = blocked ? 0 : Math.max(0, getStartingAP(character) - staggered);
+  return Math.min(getMaxBankedAP(character), character.currentAP + gain);
+}
+
+/** Defense = 10 + PING + armor bonus. */
+export function getDefense(character: Pick<Character, 'attributes' | 'gearLoadout'>): number {
+  const armorId = character.gearLoadout.defensive?.itemId;
+  const bonus = armorId ? getGearRules(armorId).defenseBonus ?? 0 : 0;
+  return 10 + normalizeAttribute(character.attributes.PING) + bonus;
+}
+
+/** Flatlined at 0 Hardware Integrity. */
+export function isFlatlined(character: Pick<Character, 'hardwareIntegrity'>): boolean {
+  return character.hardwareIntegrity.current <= 0;
+}
+
 // ── Neural Shock check ───────────────────────────────────────
-export function checkNeuralShock(hi: VitalLayer): boolean {
+export function checkNeuralShock(hi: VitalLayer, threshold = 0.5): boolean {
   if (hi.max === 0) return false;
-  return hi.current / hi.max < 0.5;
+  return hi.current / hi.max < threshold;
 }
 
 export function hydrateCharacter(character: Character): Character {
   const sanitizedBackgroundId = sanitizeBackgroundId(character.backgroundId);
+  const origin = resolveOrigin(sanitizedBackgroundId, character.origin);
   const attributes = sanitizeAttributes(character.attributes);
-  const hardwareIntegrityMax = getHardwareIntegrityMax(attributes);
+  const unlockedSubSkills = character.unlockedSubSkills ?? [];
+  const hardwareIntegrityMax = getHardwareIntegrityMax(attributes, origin, unlockedSubSkills);
   const overshieldMax = getOvershieldMax(attributes);
   const hardwareIntegrity: VitalLayer = {
     max: hardwareIntegrityMax,
@@ -340,7 +418,7 @@ export function hydrateCharacter(character: Character): Character {
     max: overshieldMax,
     current: Math.min(overshieldMax, Math.max(0, character.overshield.current)),
   };
-  const neuralShock = checkNeuralShock(hardwareIntegrity);
+  const neuralShock = checkNeuralShock(hardwareIntegrity, getNeuralShockThreshold(unlockedSubSkills));
   const hydrated = {
     ...character,
     attributes,
@@ -348,7 +426,7 @@ export function hydrateCharacter(character: Character): Character {
     overshield,
     neuralShock,
   };
-  const maxAP = getStartingAP(hydrated);
+  const maxAP = getMaxBankedAP(hydrated);
 
   const blueprintInventory = sanitizeBlueprintInventory(character.blueprintInventory, sanitizedBackgroundId);
 
@@ -357,30 +435,43 @@ export function hydrateCharacter(character: Character): Character {
     currentAP: Math.min(Math.max(0, character.currentAP), maxAP),
     unlockedNodes: character.unlockedNodes ?? [],
     unlockedSubSkills: character.unlockedSubSkills ?? [],
-    gearLoadout: sanitizeGearLoadout(character.gearLoadout, sanitizedBackgroundId),
+    gearLoadout: sanitizeGearLoadout(character.gearLoadout, sanitizedBackgroundId, origin),
     blueprintInventory,
     blueprintTradable: sanitizeBlueprintTradable(character.blueprintTradable, blueprintInventory),
     dataFragments: Math.max(0, Math.floor(character.dataFragments ?? 0)),
-    engagement: Math.max(0, Math.min(MAX_ENGAGEMENT, Math.floor(character.engagement ?? getStartingEngagement(attributes, sanitizedBackgroundId)))),
-    viewerCount: Math.max(0, Math.floor(character.viewerCount ?? getStartingViewerCount(attributes, sanitizedBackgroundId))),
+    engagement: Math.max(0, Math.min(MAX_ENGAGEMENT, Math.floor(character.engagement ?? getStartingEngagement(attributes, origin)))),
+    viewerCount: Math.max(0, Math.floor(character.viewerCount ?? getStartingViewerCount(attributes, origin))),
     sponsorInbox: sanitizeSponsorInbox(character.sponsorInbox),
-    aiPriorityMarked: character.aiPriorityMarked ?? hasGlitcherAnomalyTrait(sanitizedBackgroundId),
+    aiPriorityMarked: character.aiPriorityMarked ?? hasGlitcherAnomalyTrait(origin),
     backgroundId: sanitizedBackgroundId,
+    origin,
+    skills: character.skills ? sanitizeSkillRanks(character.skills) : getStartingSkills(sanitizedBackgroundId),
+    conditions: sanitizeConditions(character.conditions),
+    crashSaves: hardwareIntegrity.current > 0 ? { successes: 0, failures: 0 } : sanitizeCrashSaves(character.crashSaves),
   };
 }
 
 // ── Factory ─────────────────────────────────────────────────
+export interface CreateCharacterOptions {
+  /** Defaults to the background's origin; 'offworlder' may use any background. */
+  origin?: OriginId;
+  /** Extra creation ranks on top of the background's two rank-2 skills. */
+  extraSkillRanks?: SkillRanks;
+}
+
 export function createCharacter(
   id: string,
   name: string,
   rawAttributes: CpuAttributes,
-  advancementPoints = 0,
+  advancementPoints = STARTING_ADVANCEMENT_POINTS,
   backgroundId: BackgroundId = 'enforcer',
+  options: CreateCharacterOptions = {},
 ): Character {
   const sanitizedBackgroundId = sanitizeBackgroundId(backgroundId);
+  const origin = resolveOrigin(sanitizedBackgroundId, options.origin);
   const attributes = sanitizeAttributes(rawAttributes);
   const starterBlueprintInventory = createBackgroundStarterBlueprintInventory(sanitizedBackgroundId);
-  const hardwareIntegrityMax = getHardwareIntegrityMax(attributes);
+  const hardwareIntegrityMax = getHardwareIntegrityMax(attributes, origin);
   const overshieldMax = getOvershieldMax(attributes);
   const hi: VitalLayer = { max: hardwareIntegrityMax, current: hardwareIntegrityMax };
   const os: VitalLayer = { max: overshieldMax, current: overshieldMax };
@@ -399,14 +490,18 @@ export function createCharacter(
     advancementPoints,
     unlockedNodes: [],
     unlockedSubSkills: [],
-    gearLoadout: createBackgroundStarterLoadout(sanitizedBackgroundId),
+    gearLoadout: createBackgroundStarterLoadout(sanitizedBackgroundId, origin),
     blueprintInventory: starterBlueprintInventory,
     blueprintTradable: sanitizeBlueprintTradable(undefined, starterBlueprintInventory),
-    dataFragments: getStartingDataFragments(sanitizedBackgroundId),
-    engagement: getStartingEngagement(attributes, sanitizedBackgroundId),
-    viewerCount: getStartingViewerCount(attributes, sanitizedBackgroundId),
+    dataFragments: getStartingDataFragments(origin),
+    engagement: getStartingEngagement(attributes, origin),
+    viewerCount: getStartingViewerCount(attributes, origin),
     sponsorInbox: [],
-    aiPriorityMarked: hasGlitcherAnomalyTrait(sanitizedBackgroundId),
+    aiPriorityMarked: hasGlitcherAnomalyTrait(origin),
     backgroundId: sanitizedBackgroundId,
+    origin,
+    skills: getStartingSkills(sanitizedBackgroundId, options.extraSkillRanks),
+    conditions: [],
+    crashSaves: { successes: 0, failures: 0 },
   };
 }
