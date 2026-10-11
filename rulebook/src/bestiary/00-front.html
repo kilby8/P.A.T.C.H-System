@@ -1,0 +1,55 @@
+<section class="bleed cover">
+  <div class="grid"></div><div class="scan"></div>
+  <svg class="mark" viewBox="0 0 200 200" fill="none" stroke="#00ffe7" stroke-width="1.4">
+    <rect x="50" y="50" width="100" height="100" opacity="0.55" transform="rotate(12 100 100)"/>
+    <rect x="62" y="62" width="76" height="76" opacity="0.35" transform="rotate(-8 100 100)"/>
+    <circle cx="100" cy="100" r="16" stroke="#ff3b3b" opacity="0.9"/><circle cx="100" cy="100" r="5" fill="#ff3b3b" stroke="none"/>
+    <path d="M20 170 L60 130 M180 170 L140 130 M20 30 L60 70 M180 30 L140 70" opacity="0.4"/>
+  </svg>
+  <div class="inner">
+    <div class="eyebrow">Core Rulebook 03 // Hostile Entity Index</div>
+    <h1>P<span class="dot">.</span>A<span class="dot">.</span>T<span class="dot">.</span>C<span class="dot">.</span>H<span class="dot">.</span></h1>
+    <div class="expand">Program for Accelerated<br>Tactical Combat Hazards</div>
+    <div class="title">Arena<br>Bestiary</div>
+    <div class="sub">Fifty app entries, 47 stat blocks: the auditors, ad-drones, data-wraiths and the System-Overlord that live, render and glitch in the arena.</div>
+    <div class="foot"><span>GM reference</span><span>Playtest edition 0.3</span></div>
+  </div>
+</section>
+
+<div class="flow one">
+<div class="toc">
+  <h2 class="notoc" id="contents">Contents</h2>
+  {{TOC}}
+</div>
+</div>
+
+<section class="bleed opener"><div class="grid"></div><div class="scan"></div><div class="inner">
+  <div class="eyebrow">Section 01</div><div class="num">01</div>
+  <h1 data-num="01" id="ch-using">Using the Bestiary</h1>
+  <p class="lede">Every entity here is content. Some of it is content that wants to delete your build.</p>
+  <div class="contents"><b>In this section</b><br>Reading a stat block · Threat tiers · Entity index</div>
+</div></section>
+
+<div class="flow">
+<h2 id="reading-stat-block">Reading a Stat Block</h2>
+<ul>
+  <li><b>Header:</b> name and template number (the app's encounter ID).</li>
+  <li><b>Role · tier · kind:</b> the app's role keyword, its threat tier, and what it is. "Machine" and "network entity" count as <b>hostile AI</b> (they target Glitchers first) and are valid Field Radio targets.</li>
+  <li><b>Integrity / AP:</b> exactly what the app spawns.</li>
+  <li><b>Defense:</b> operators' target to hit it. <b>Init:</b> its fixed initiative. <b>Threat:</b> its cost in the encounter budget.</li>
+  <li><b>Attack:</b> roll the dice plus the bonus against an operator's Defense. <b>Saves</b> is the pool it rolls to resist operator abilities; its own effects use the listed <b>save target</b>.</li>
+  <li><b>Abilities</b> cost AP when they say so; otherwise they're always on.</li>
+</ul>
+<div class="box"><div class="bt">Playtest numbers</div><p>Integrity, AP, roles and descriptions come straight from the companion app. Defense, attack, damage, Init, threat and abilities are <span class="draft-tag">PLAYTEST</span> values built from the threat-tier table, modeled on fifth-edition stat blocks and tuned to the d6 pool.</p></div>
+
+<h2 id="tier-table">Threat Tiers</h2>
+<table>
+  <thead><tr><th>Tier</th><th class="n">Int.</th><th class="n">Def</th><th class="n">Attack</th><th class="n">Dmg</th><th class="n">Save</th><th class="n">Threat</th></tr></thead>
+  <tbody>{{TIERS_SHORT}}</tbody>
+</table>
+<p>The companion app's list has 50 entries, but three (#24, #42, #43) duplicate another entry, so this book has <b>47 stat blocks</b>. Same-name variants are labeled, as in "Mainframe-Guardian (Monolith)". A few entities break their tier template (the Pixel-Hound has 2 AP); the stat block wins. "AC" in a role name means <b>Arena Credits</b>, the broadcast's word for Data Fragments.</p>
+<p>Budget <b>4 threat per operator</b> for a solid fight (Game Master's Guide, Chapter 3). <b>Promote</b> any entity one tier for a named rival or a finale: +8 Integrity, +1 AP, +1 attack die, +2 Defense, +2 threat.</p>
+
+<h2 id="entity-index" class="span">Entity Index</h2>
+<div class="bx-index"><table><thead><tr><th class="n">#</th><th>Entity</th><th>Tier</th><th class="n">Thr.</th><th class="n">Pg</th></tr></thead><tbody>{{BEASTINDEX0}}</tbody></table><table><thead><tr><th class="n">#</th><th>Entity</th><th>Tier</th><th class="n">Thr.</th><th class="n">Pg</th></tr></thead><tbody>{{BEASTINDEX1}}</tbody></table></div>
+</div>

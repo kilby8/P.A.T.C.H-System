@@ -1,0 +1,85 @@
+<section class="bleed opener"><div class="grid"></div><div class="scan"></div><div class="inner">
+  <div class="eyebrow">Chapter 06</div><div class="num">06</div>
+  <h1 data-num="06" id="ch-gear">Gear &amp; Blueprints</h1>
+  <p class="lede">Every schematic you merge is gone the moment it takes. That is the deal, and it is the whole game: you are what you were willing to burn.</p>
+  <div class="contents"><b>In this chapter</b><br>The loadout · Gear tiers &amp; hardpoints · Weapons · Armor · Support gear · Blueprints · Destructive installation · The market</div>
+</div></section>
+
+<div class="flow">
+<h2 id="loadout">The Loadout</h2>
+<p>An operator carries <b>three gear slots</b>: one <b>offensive</b> item, one <b>defensive</b> item and one <b>support</b> item. An empty slot is filled with the default Weighted Club, Thick Hide Tunic or Multi-Tool.</p>
+<p>Gear comes in three tiers, and the tier sets how many <b>hardpoints</b> (blueprint sockets) an item has:</p>
+<table class="wide">
+  <thead><tr><th>Tier</th><th class="n">Hardpoints</th><th>Offensive</th><th>Defensive</th><th>Support</th></tr></thead>
+  <tbody>
+    <tr><td class="hl">Foundation</td><td class="n">1</td><td>Weighted Club, Iron Spear, Recurve Bow</td><td>Thick Hide Tunic</td><td>Multi-Tool</td></tr>
+    <tr><td class="hl">Tactical</td><td class="n">2</td><td>Tactical Carbine</td><td>Kevlar Vest</td><td>Field Radio</td></tr>
+    <tr><td class="hl">Apex</td><td class="n">3</td><td>Hard-Light Lance</td><td>Kinetic Shielding</td><td>Signal Jammer</td></tr>
+  </tbody>
+</table>
+<p>An Apex item is three permanent installs, a small build inside your build. That makes getting one the biggest moment in an operator's economy.</p>
+<p><b>New items</b> come from the GM: sector rewards, sponsor deals and story. The terminal market sells blueprints, not items.<span class="draft-tag">PLAYTEST</span> You swap items during the Condo Phase. A swapped-out item goes to your locker with its blueprints still installed, and you can swap it back later.<span class="draft-tag">PLAYTEST</span></p>
+
+<h2 id="gear-items">Weapons</h2>
+<table class="wide">
+  <thead><tr><th>Weapon</th><th>Tier</th><th>Attack</th><th>Damage</th><th>Range</th><th>Notes</th></tr></thead>
+  <tbody>{{WEAPONS}}</tbody>
+</table>
+<p class="small">"+ POWER" means the attribute's bonus (−2 to +2). Attacks cost 1 AP whatever the weapon's tier. Weapon notes are playtest rules.<span class="draft-tag">PLAYTEST</span></p>
+
+<h2 id="armor">Armor</h2>
+<table class="wide">
+  <thead><tr><th>Armor</th><th>Tier</th><th class="n">Defense</th><th>Counter</th><th>Special</th></tr></thead>
+  <tbody>{{ARMOR}}</tbody>
+</table>
+<p class="small">Counter is the armor reaction (1 AP) when a melee attack misses you; see <a class="ref" href="#reactions">Reactions</a>.<span class="draft-tag">PLAYTEST</span></p>
+
+<h2 id="support-gear">Support Gear</h2>
+<table class="wide">
+  <thead><tr><th>Item</th><th>Tier</th><th>Attack</th><th>Feature</th></tr></thead>
+  <tbody>{{SUPPORT}}</tbody>
+</table>
+<p class="small">Support features are <span class="draft-tag">PLAYTEST</span> rules; the attack dice match the companion app's HUD.</p>
+
+<h2 id="blueprints">Blueprints</h2>
+<p>A <b>blueprint</b> is an R&amp;D schematic that installs into a hardpoint. Each blueprint fits one gear slot type (offensive, defensive or support) and has a tier. A blueprint of any tier fits any item of the right type.</p>
+<table class="wide">
+  <caption>Standard blueprints (market price in fragments)</caption>
+  <thead><tr><th>Blueprint</th><th>Fits</th><th>Tier · Price</th><th>Effect once installed</th></tr></thead>
+  <tbody>{{BP_STANDARD}}</tbody>
+</table>
+<table class="wide">
+  <caption>Named &amp; legendary blueprints (loot only, sector-locked)</caption>
+  <thead><tr><th>Blueprint</th><th>Fits</th><th>Tier · Sector</th><th>Effect</th></tr></thead>
+  <tbody>{{BP_NAMED}}</tbody>
+</table>
+<table class="wide">
+  <caption>Sponsor-grade blueprints (sponsor drops only)</caption>
+  <thead><tr><th>Blueprint</th><th>Fits</th><th>Tier</th><th>Effect</th><th>Stream trait</th></tr></thead>
+  <tbody>{{BP_SPONSOR}}</tbody>
+</table>
+
+<h2 id="installation">Destructive Installation</h2>
+<div class="box"><div class="bt">The x-factor</div><p>Installing a blueprint <b>consumes it</b>. Once merged, it can't be removed, salvaged or reclaimed.</p></div>
+<ul>
+  <li>Install during the <b>Condo Phase</b>, at your terminal.<span class="draft-tag">PLAYTEST</span></li>
+  <li>The blueprint must fit the item's slot type, and its tier must be <b>unlocked</b> (the Apex tier starts locked; see the market).</li>
+  <li>Each install uses <b>one copy</b> from your stockpile.</li>
+  <li>Installing into an <b>occupied hardpoint</b> overwrites it, and the old blueprint is destroyed.</li>
+  <li>Installs are good television: +5 Engagement and +80 viewers, or +14 and +320 for a sponsor-grade blueprint.</li>
+</ul>
+
+<h2 id="market">The Terminal Market</h2>
+<p>During the Condo Phase you can buy blueprints with <b>Data Fragments</b>.</p>
+<table>
+  <thead><tr><th>Tier</th><th class="n">Price</th><th class="n">Stock</th><th class="n">Engagement needed</th><th>Open?</th></tr></thead>
+  <tbody>
+    <tr><td>Foundation</td><td class="n">40</td><td class="n">12</td><td class="n">0</td><td>Yes</td></tr>
+    <tr><td>Tactical</td><td class="n">90</td><td class="n">6</td><td class="n">35</td><td>Yes</td></tr>
+    <tr><td>Apex</td><td class="n">180</td><td class="n">2</td><td class="n">65</td><td>Locked until the GM opens it</td></tr>
+  </tbody>
+</table>
+<p>Stock is per blueprint and shared by the whole squad. Named, legendary and sponsor-grade blueprints are never sold. Each blueprint you gain, bought or looted, adds +3 Engagement and +60 viewers.</p>
+<h3>Trading</h3>
+<p>Blueprint stacks are <b>tradable</b> unless marked otherwise. Squadmates can hand tradable copies to each other freely between deployments.</p>
+</div>

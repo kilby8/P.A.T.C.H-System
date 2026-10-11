@@ -1,0 +1,104 @@
+<section class="bleed opener"><div class="grid"></div><div class="scan"></div><div class="inner">
+  <div class="eyebrow">Chapter 05</div><div class="num">05</div>
+  <h1 data-num="05" id="ch-combat">Combat</h1>
+  <p class="lede">The crowd paid for violence. Spend your AP well, keep your Overshield up, and remember: every point of damage you take is great television.</p>
+  <div class="contents"><b>In this chapter</b><br>Encounter flow · Initiative · Your turn &amp; AP · Actions · Reactions · Attacks · Damage &amp; vitals · Neural Shock · Flatlined · Stealth &amp; cover</div>
+</div></section>
+
+<div class="flow">
+<h2 id="encounter-flow">Encounter Flow</h2>
+<ol class="steps">
+  <li><b>Surprise.</b> If one side is sneaking up on the other, the ambushers make a group <b>PING + Stealth</b> check; compare each ambusher's total to the defenders' best <b>SYSTEM + Perception</b>. If at least half the ambushers beat it, every defender who didn't notice them is <b>Surprised</b>: no AP on their first turn.<span class="draft-tag">PLAYTEST</span></li>
+  <li><b>Initiative.</b> Everyone's place in the turn order.</li>
+  <li><b>Rounds.</b> Each round, everyone takes a turn in initiative order. A round is about six seconds of arena time.</li>
+  <li><b>End.</b> When one side is defeated, flees or achieves the scenario goal.</li>
+  <li><b>Payout.</b> Overshields reset to full, the GM resolves loot and fragments, and the feed reacts (<a class="ref" href="#ch-broadcast">Ch. 7</a>).</li>
+</ol>
+
+<h2 id="initiative">Initiative <span class="draft-tag">PLAYTEST</span></h2>
+<p>Each operator rolls their <b>PING</b> dice (no skill) and records the total. Each enemy group acts on the <b>Init</b> value in its stat block. Highest goes first; operators win ties. The order holds for the whole encounter.</p>
+
+<h2 id="your-turn">Your Turn &amp; AP</h2>
+<p>At the start of your turn you <b>gain AP equal to your maximum</b> (1 + SYSTEM ÷ 2, rounded down), minus 1 if you're in <b>Neural Shock</b>. You also get <b>one free Move</b> of up to 6 meters, which you can split around your actions.</p>
+<p>Spend AP on actions in any order. <b>Unspent AP carries over</b>: it pays for reactions on other people's turns, and whatever is left when your next turn starts adds to that turn's AP. You can never hold more than <b>your maximum + 1</b>.<span class="draft-tag">PLAYTEST</span> That's how an operator with 1 AP saves up for a 2-AP action, and why holding back is a real choice: a dodge in reserve, or a bigger turn next round.</p>
+<ul>
+  <li><b>No AP turns.</b> If you're <b>Stunned</b> or <b>Surprised</b>, you gain no AP that turn, but you keep any AP you banked.</li>
+  <li><b>Bonus AP</b> from abilities (Burst Mode, Kinetic Absorb, Execution, Fan Boost) also can't take you past max + 1.</li>
+  <li><b>Staggered:</b> gain 1 less AP that turn.</li>
+</ul>
+<div class="box ex"><div class="bt">Example</div><p>Rook has 3 AP. She attacks once (1 AP) and keeps 2 for Reflex Dodge. Nobody shoots her, so at the start of her next turn she gains 3 more, capped at 4 (her max + 1).</p></div>
+
+<h2 id="actions">Actions</h2>
+<table>
+  <caption>Combat actions <span class="draft-tag">PLAYTEST</span></caption>
+  <thead><tr><th>Action</th><th class="n">AP</th><th>Effect</th></tr></thead>
+  <tbody>
+    <tr><td><b>Attack</b></td><td class="n">1</td><td>One attack with an equipped weapon or gear (below)</td></tr>
+    <tr><td><b>Dash</b></td><td class="n">1</td><td>Another Move of 6 m</td></tr>
+    <tr><td><b>Reboot Shield</b></td><td class="n">2</td><td>Regain 1d6 + SYSTEM Overshield (not above max)</td></tr>
+    <tr><td><b>Use gear</b></td><td class="n">1</td><td>Activate a support item feature, or work a complex object</td></tr>
+    <tr><td><b>Hide</b></td><td class="n">1</td><td>PING + Stealth against the best watcher's Perception; success makes you <a class="ref" href="#cond-stealthed">Stealthed</a></td></tr>
+    <tr><td><b>Grapple</b></td><td class="n">1</td><td>POWER + Athletics against an adjacent target's POWER save total. If you win, the target is <a class="ref" href="#cond-pinned">Pinned</a> while you stay adjacent, and you can drag it at half speed.<span class="draft-tag">PLAYTEST</span></td></tr>
+    <tr><td><b>Help</b></td><td class="n">1</td><td>An ally gets +1 die on their next check before your next turn</td></tr>
+    <tr><td><b>Stabilize</b></td><td class="n">1</td><td>SYSTEM + Medicine (15) on an adjacent Flatlined ally</td></tr>
+    <tr><td><b id="patch-up" data-mk data-label="Patch Up" class="notoc">Patch Up</b></td><td class="n">2</td><td>SYSTEM + Medicine (15) on yourself or an adjacent ally: heal 1d6 Hardware, +1 per full 5 flair. Once per target per encounter.<span class="draft-tag">PLAYTEST</span></td></tr>
+    <tr><td><b>Shake it off</b></td><td class="n">1</td><td>End Pinned, Glitched or Fried with the check in that condition</td></tr>
+    <tr><td><b>Ability</b></td><td class="n">*</td><td>A sub-skill or gear ability: cost as stated; passive ones cost nothing</td></tr>
+    <tr><td><b>Free</b></td><td class="n">0</td><td>Talk, drop something, glance at the feed, stand up from prone (uses your Move)</td></tr>
+  </tbody>
+</table>
+
+<h2 id="reactions">Reactions</h2>
+<p>A <b>reaction</b> is an action you take outside your turn in response to a trigger: a dodge when you're shot, a counter when a blow misses. Pay for it with saved AP. Unless an ability says otherwise, you can take <b>one reaction per round</b>.<span class="draft-tag">PLAYTEST</span></p>
+<p>Every operator has one reaction built into their armor: <b>Counter</b> (1 AP). When a melee attack against you misses, deal your armor's counter damage to the attacker without a roll: Thick Hide Tunic 1d4, Kevlar Vest 1d6, Kinetic Shielding 1d8, each + HARDWARE bonus.</p>
+
+<h2 id="attacks">Making an Attack</h2>
+<ol class="steps">
+  <li><b>Choose a weapon and a target</b> in range (weapon tables, <a class="ref" href="#gear-items">p. {{pg:gear-items}}</a>).</li>
+  <li><b>Roll the weapon's attribute + skill</b> (Club: POWER + Melee; Bow: PING + Marksmanship) against the target's <b>Defense</b>.</li>
+  <li><b>On a hit, roll damage:</b> weapon dice + the attribute's bonus, <b>+1 per full 5 flair</b>. A hit always deals at least 1.</li>
+</ol>
+<div class="box ex"><div class="bt">Example</div><p>Rook fires the Recurve Bow at a Net-Junkie (Defense 15): PING 4 + Marksmanship 2 = 6d6. She rolls 22, a hit with 7 flair. Damage is 1d8 + 1 (PING bonus) + 1 (one full 5 of flair). She rolls a 5 on the d8 for 7 damage, and the Net-Junkie's 10 Integrity drops to 3.</p></div>
+<h3>Range</h3>
+<p>Melee reaches 1 meter (the Iron Spear 2). A ranged weapon hits normally out to its range, and out to double range with <b>disadvantage</b>. A ranged attack made while an enemy is in melee with you also has disadvantage.</p>
+<h3 id="cover">Cover</h3>
+<p><b>Half cover</b> (a crate, a railing): +2 Defense. <b>Heavy cover</b> (an arrow slit, a wall corner): +5 Defense. <b>Full cover:</b> you can't be targeted directly. The Hard-Light Lance ignores non-energy cover.<span class="draft-tag">PLAYTEST</span></p>
+
+<h2 id="damage">Damage &amp; Vitals</h2>
+<p>You have two layers of health.</p>
+<p><b>Overshield</b> takes damage first. When it hits 0, the rest of that damage, and all further damage, goes to <b>Hardware Integrity</b>. Some attacks <b>bypass Overshield</b> and hit Hardware directly; they say so.</p>
+<p><b>Damage types.</b> <b>Physical</b> damage is blunt, piercing and kinetic. <b>Non-physical</b> damage is energy, heat, signal, disruption and utility. Effects that name a type affect only that type.</p>
+<p><b>Damage reduction</b> from blueprints and sub-skills ("reduce physical damage by 1") applies to each hit before the split, and can lower a hit to 0.</p>
+<h3>Recovering</h3>
+<p><b>Overshield</b> regenerates freely: use the Reboot Shield action in a fight, and it <b>resets to full at the end of every encounter</b>. <b>Hardware Integrity</b> is the hard part. It comes back only through Condo Phase recovery (25% of max per condo hour, <a class="ref" href="#ch-condo">Ch. 8</a>), the <b>Patch Up</b> action, and abilities such as Field Weld.</p>
+<div class="box"><div class="bt">The feed loves pain</div><p>Every point of Overshield damage you take is +1 Engagement, and every point of Hardware damage is +2. Taking hits on camera is how a lot of operators get famous. See <a class="ref" href="#ch-broadcast">Chapter 7</a>.</p></div>
+
+<h2 id="neural-shock">Neural Shock</h2>
+<p>When your Hardware Integrity drops <b>below 50% of its maximum</b>, you enter <b>Neural Shock</b>: you start each turn with <b>1 less AP</b> (minimum 0). It ends as soon as Hardware climbs back to 50% or more. The Titan Chassis sub-skill Redundant Systems lowers your threshold to 35%.</p>
+
+<h2 id="flatlined">Flatlined &amp; Permadeath</h2>
+<p>At <b>0 Hardware Integrity</b> you are <b>Flatlined</b>: you drop, you have no AP and you can't act. Damage beyond 0 is ignored.</p>
+<p id="crash-saves" data-mk data-label="Crash saves" class="notoc"><b>Crash saves.</b><span class="draft-tag">PLAYTEST</span> At the start of each of your turns while Flatlined, roll <b>1d6</b>: 4–6 is a success, 1–3 a failure. A 6 counts as <b>two successes</b>; a 1 counts as <b>two failures</b>.</p>
+<ul>
+  <li><b>Three successes:</b> you're stable. You stay down until the encounter ends, then get up with 1 Hardware Integrity.</li>
+  <li><b>Three failures:</b> the operator is <b>destroyed</b>.</li>
+  <li><b>Taking damage</b> while Flatlined counts as one failure.</li>
+  <li><b>Any healing</b> brings you back up with that much Hardware Integrity, and you act normally on your next turn.</li>
+  <li><b>An ally can Stabilize</b> you (1 AP, SYSTEM + Medicine against 15).</li>
+</ul>
+<div class="box"><div class="bt">What destroyed means</div><p>The person who jacked in wakes up. The <b>build does not.</b> The operator, unlocked nodes and sub-skills, installed blueprints and the blueprint stockpile are erased. Make a new operator; the program is always recruiting.</p></div>
+<h3 id="replacement">Replacement operators <span class="draft-tag">PLAYTEST</span></h3>
+<p>A new operator joining a running season uses normal creation, plus:</p>
+<ul>
+  <li><b>Advancement Points</b> equal to the lowest total any surviving squadmate has earned (minimum 2).</li>
+  <li><b>+20 Data Fragments</b> per deployment the squad has completed (maximum +200).</li>
+  <li><b>One Foundation blueprint</b> of your choice in the stockpile.</li>
+</ul>
+<p>The arena keeps your old operator's highlight reel. The new one starts at their origin's normal Engagement.</p>
+
+<h2 id="stealth">Stealth</h2>
+<p>While <b>Stealthed</b>, enemies can't target you with attacks or abilities. Your first attack from Stealth has <b>advantage</b>, and then you're revealed (some sub-skills, like Persistent Ghost, change that). Enemies can search: their Perception against your Hide total.</p>
+
+<h2 id="prime-time">Spectacle &amp; Prime Time</h2>
+<p>Every encounter has a <b>Spectacle Score</b> from 1 to 6 that tells the GM how big the broadcast wants it. At the top of the scale, a <b>Prime-Time Surge</b>, <b>enemy damage is doubled</b>, and the fragment payout is the biggest a fight can pay. You'll usually hear the crowd before you see it.</p>
+</div>

@@ -29,10 +29,9 @@ import { canUnlockNode } from '../models/ArchetypeNodes';
 import { getMobProfile, getMobBaseIntegrity, getMobBaseAP, ThreatTier } from '../models/ArenaBestiary';
 import { SkillId, MAX_SKILL_RANK, getSkillRank } from '../models/Skills';
 import { ConditionId, applyCrashSaveRoll } from '../models/Conditions';
+import { SKILL_RANK_COST, ATTRIBUTE_COST } from '../models/Character';
 
-/** Advancement costs (Operator's Handbook, Chapter 9). */
-export const SKILL_RANK_COST = 2;
-export const ATTRIBUTE_COST = 4;
+export { SKILL_RANK_COST, ATTRIBUTE_COST };
 import {
   BlueprintMarket,
   BlueprintTradeLogEntry,

@@ -126,6 +126,9 @@ const MAX_ENGAGEMENT = 100;
 export const STARTING_ADVANCEMENT_POINTS = 2;
 /** Hardened (Inmate Block): extra maximum Hardware Integrity. */
 export const HARDENED_BONUS = 5;
+/** Advancement costs (Operator's Handbook, Chapter 9). Nodes and sub-skills cost 1. */
+export const SKILL_RANK_COST = 2;
+export const ATTRIBUTE_COST = 4;
 /** Banked AP can never exceed the turn's AP + this. */
 export const AP_BANK_BONUS = 1;
 
