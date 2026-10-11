@@ -14,8 +14,17 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCharacter } from '../../store/CharacterContext';
 import { Colors, Typography, Spacing, GlobalStyles } from '../../theme/theme';
-import { BACKGROUND_PROFILES, BACKGROUND_CATEGORY_LABELS, CoreAttribute } from '../../models/Backgrounds';
-import { ATTRIBUTE_MIN, createCharacter, CpuAttributes } from '../../models/Character';
+import { BACKGROUND_PROFILES, CoreAttribute, ORIGIN_PROFILES, OriginId, getOriginProfile } from '../../models/Backgrounds';
+import { ATTRIBUTE_MIN, createCharacter, CpuAttributes, getDefense, getBaseAP, STARTING_ADVANCEMENT_POINTS } from '../../models/Character';
+import { GEAR_ITEM_DEFS } from '../../models/Gear';
+import {
+  SKILL_DEFS,
+  SkillId,
+  SkillRanks,
+  BACKGROUND_SKILL_RANK,
+  CREATION_MAX_SKILL_RANK,
+  FREE_CREATION_SKILL_RANKS,
+} from '../../models/Skills';
 
 interface AttributeAllocation {
   POWER: number;
@@ -34,11 +43,16 @@ const TOTAL_ATTRIBUTE_POINTS = 12; // 6 attributes averaging 3
 const MIN_ATTRIBUTE = ATTRIBUTE_MIN;
 const MAX_ATTRIBUTE = 4;
 
-export default function CharacterCreationTerminal() {
+const STEPS = ['name', 'origin', 'background', 'attributes', 'skills', 'confirm'] as const;
+type Step = typeof STEPS[number];
+
+export default function CharacterCreationTerminal({ onCancel }: { onCancel?: () => void } = {}) {
   const { createNewCharacter, loginAsPlayer, party } = useCharacter();
-  const [step, setStep] = useState<'name' | 'background' | 'attributes' | 'confirm'>('name');
+  const [step, setStep] = useState<Step>('name');
   const [characterName, setCharacterName] = useState('');
+  const [origin, setOrigin] = useState<OriginId>('inmate');
   const [selectedBackgroundId, setSelectedBackgroundId] = useState(BACKGROUND_PROFILES[0]?.id);
+  const [extraRanks, setExtraRanks] = useState<SkillRanks>({});
   const [attributes, setAttributes] = useState<AttributeAllocation>({
     POWER: BASE_ATTRIBUTE,
     PING: BASE_ATTRIBUTE,
@@ -58,7 +72,36 @@ export default function CharacterCreationTerminal() {
   const canProceedAttributes = remainingPoints === 0;
 
   const selectedBackground = BACKGROUND_PROFILES.find((bg) => bg.id === selectedBackgroundId);
-  const categoryLabel = selectedBackground ? BACKGROUND_CATEGORY_LABELS[selectedBackground.category] : '';
+  const originProfile = getOriginProfile(origin);
+  const categoryLabel = originProfile.label;
+  const backgroundsForOrigin = origin === 'offworlder' ? BACKGROUND_PROFILES : BACKGROUND_PROFILES.filter((bg) => bg.category === origin);
+  const backgroundSkills: SkillId[] = selectedBackground?.skills ?? [];
+  const freeRanks = FREE_CREATION_SKILL_RANKS + (origin === 'offworlder' ? 1 : 0);
+  const spentRanks = Object.values(extraRanks).reduce((sum, value) => sum + (value ?? 0), 0);
+  const remainingRanks = freeRanks - spentRanks;
+  const rankOf = (id: SkillId) => (backgroundSkills.includes(id) ? BACKGROUND_SKILL_RANK : 0) + (extraRanks[id] ?? 0);
+  const changeRank = (id: SkillId, delta: number) => {
+    const next = (extraRanks[id] ?? 0) + delta;
+    if (next < 0 || rankOf(id) + delta > CREATION_MAX_SKILL_RANK) return;
+    if (delta > 0 && remainingRanks <= 0) return;
+    setExtraRanks({ ...extraRanks, [id]: next });
+  };
+  const chooseOrigin = (next: OriginId) => {
+    setOrigin(next);
+    setExtraRanks({});
+    const first = next === 'offworlder' ? BACKGROUND_PROFILES[0] : BACKGROUND_PROFILES.find((bg) => bg.category === next);
+    if (first) setSelectedBackgroundId(first.id);
+  };
+  const kitFor = (backgroundId: typeof BACKGROUND_PROFILES[number]['id']) => {
+    const sample = createCharacter('kit', 'kit', attributes as CpuAttributes, STARTING_ADVANCEMENT_POINTS, backgroundId, { origin });
+    return (['offensive', 'defensive', 'support'] as const)
+      .map((slot) => (origin === 'glitcher' && slot === 'support' ? 'rolled support item' : GEAR_ITEM_DEFS.find((item) => item.id === sample.gearLoadout[slot]?.itemId)?.name))
+      .filter(Boolean)
+      .join(', ');
+  };
+  const preview = selectedBackground
+    ? createCharacter('preview', characterName || 'preview', attributes as CpuAttributes, STARTING_ADVANCEMENT_POINTS, selectedBackground.id, { origin, extraSkillRanks: extraRanks })
+    : null;
 
   const handleAttributeChange = (attr: CoreAttribute, delta: number) => {
     const newValue = attributes[attr] + delta;
@@ -81,8 +124,9 @@ export default function CharacterCreationTerminal() {
        `char-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
        characterName.trim(),
        attributes as CpuAttributes,
-       0,
+       STARTING_ADVANCEMENT_POINTS,
        selectedBackgroundId,
+       { origin, extraSkillRanks: extraRanks },
      );
 
      createNewCharacter(newCharacter);
@@ -91,6 +135,8 @@ export default function CharacterCreationTerminal() {
 
   const handleReset = () => {
     setCharacterName('');
+    setOrigin('inmate');
+    setExtraRanks({});
     setSelectedBackgroundId(BACKGROUND_PROFILES[0]?.id);
     setAttributes({
       POWER: BASE_ATTRIBUTE,
@@ -117,40 +163,75 @@ export default function CharacterCreationTerminal() {
        <Text style={styles.hint}>
          {characterName.length}/32 characters
        </Text>
-       <TouchableOpacity
-         style={[styles.button, !canProceedName && styles.buttonDisabled]}
-         onPress={() => setStep('background')}
-         disabled={!canProceedName}
-       >
-         <Text style={styles.buttonText}>CONTINUE →</Text>
-       </TouchableOpacity>
+       <View style={styles.buttonRow}>
+         {onCancel && (
+           <TouchableOpacity style={[styles.button, styles.buttonSecondary]} onPress={onCancel}>
+             <Text style={styles.buttonText}>← LOGIN</Text>
+           </TouchableOpacity>
+         )}
+         <TouchableOpacity
+           style={[styles.button, !canProceedName && styles.buttonDisabled]}
+           onPress={() => setStep('origin')}
+           disabled={!canProceedName}
+         >
+           <Text style={styles.buttonText}>CONTINUE →</Text>
+         </TouchableOpacity>
+       </View>
      </View>
    );
 
+  const renderOriginStep = () => (
+    <View style={styles.stepContainer}>
+      <Text style={styles.stepTitle}>02 :: SELECT ORIGIN</Text>
+      <ScrollView style={styles.backgroundList}>
+        {ORIGIN_PROFILES.map((profile) => (
+          <TouchableOpacity
+            key={profile.id}
+            style={[styles.backgroundItem, origin === profile.id && styles.backgroundItemActive]}
+            onPress={() => chooseOrigin(profile.id)}
+          >
+            <Text style={styles.backgroundName}>{profile.label}</Text>
+            <Text style={styles.backgroundCategory}>TRAIT: {profile.trait.toUpperCase()}{profile.id === 'offworlder' ? '  ·  PLAYTEST' : ''}</Text>
+            <Text style={styles.backgroundTrait}>{profile.traitText}</Text>
+            <Text style={styles.backgroundFocus}>{profile.story}</Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+      <View style={styles.buttonRow}>
+        <TouchableOpacity style={[styles.button, styles.buttonSecondary]} onPress={() => setStep('name')}>
+          <Text style={styles.buttonText}>← BACK</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={() => setStep('background')}>
+          <Text style={styles.buttonText}>CONTINUE →</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+
   const renderBackgroundStep = () => (
     <View style={styles.stepContainer}>
-      <Text style={styles.stepTitle}>02 :: SELECT BACKGROUND</Text>
+      <Text style={styles.stepTitle}>03 :: SELECT BACKGROUND</Text>
       <ScrollView style={styles.backgroundList}>
-        {BACKGROUND_PROFILES.map((bg) => (
+        {backgroundsForOrigin.map((bg) => (
           <TouchableOpacity
             key={bg.id}
             style={[
               styles.backgroundItem,
               selectedBackgroundId === bg.id && styles.backgroundItemActive,
             ]}
-            onPress={() => setSelectedBackgroundId(bg.id)}
+            onPress={() => { setSelectedBackgroundId(bg.id); setExtraRanks({}); }}
           >
             <Text style={styles.backgroundName}>{bg.name}</Text>
-            <Text style={styles.backgroundCategory}>{BACKGROUND_CATEGORY_LABELS[bg.category]}</Text>
-            <Text style={styles.backgroundTrait}>{bg.sharedCoreTrait}</Text>
-            <Text style={styles.backgroundFocus}>Build: {bg.buildFocus}</Text>
+            <Text style={styles.backgroundCategory}>FOCUS {bg.buildFocus}  ·  SKILLS {bg.skills.map((id) => SKILL_DEFS.find((sk) => sk.id === id)?.name).join(', ').toUpperCase()}</Text>
+            <Text style={styles.backgroundTrait}>{bg.flavor}</Text>
+            <Text style={styles.backgroundFocus}>Kit: {kitFor(bg.id)}</Text>
           </TouchableOpacity>
         ))}
       </ScrollView>
       <View style={styles.buttonRow}>
         <TouchableOpacity
           style={[styles.button, styles.buttonSecondary]}
-          onPress={() => setStep('name')}
+          onPress={() => setStep('origin')}
         >
           <Text style={styles.buttonText}>← BACK</Text>
         </TouchableOpacity>
@@ -167,7 +248,7 @@ export default function CharacterCreationTerminal() {
 
   const renderAttributesStep = () => (
     <View style={styles.stepContainer}>
-      <Text style={styles.stepTitle}>03 :: ALLOCATE ATTRIBUTES</Text>
+      <Text style={styles.stepTitle}>04 :: ALLOCATE ATTRIBUTES</Text>
       <Text style={styles.hint}>Distribute {TOTAL_ATTRIBUTE_POINTS} points. Attributes run 1–5 and start at {BASE_ATTRIBUTE}; {MAX_ATTRIBUTE} is the cap at creation.</Text>
        <View style={styles.attributesSummary}>
          <Text style={[styles.hint, { color: remainingPoints === 0 ? Colors.green : Colors.amber }]}>
@@ -209,7 +290,7 @@ export default function CharacterCreationTerminal() {
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.button, !canProceedAttributes && styles.buttonDisabled]}
-          onPress={() => setStep('confirm')}
+          onPress={() => setStep('skills')}
           disabled={!canProceedAttributes}
         >
           <Text style={styles.buttonText}>CONTINUE →</Text>
@@ -218,9 +299,47 @@ export default function CharacterCreationTerminal() {
     </View>
   );
 
+  const renderSkillsStep = () => (
+    <View style={styles.stepContainer}>
+      <Text style={styles.stepTitle}>05 :: TRAIN SKILLS</Text>
+      <Text style={styles.hint}>
+        Your background skills start at rank {BACKGROUND_SKILL_RANK}. Add {freeRanks} more rank{freeRanks === 1 ? '' : 's'}{origin === 'offworlder' ? ' (Unregistered +1)' : ''}; max rank {CREATION_MAX_SKILL_RANK} at creation.
+      </Text>
+      <Text style={[styles.hint, { color: remainingRanks === 0 ? Colors.green : Colors.amber }]}>Remaining: {remainingRanks}</Text>
+      <ScrollView style={styles.attributesList}>
+        {SKILL_DEFS.map((skill) => {
+          const rank = rankOf(skill.id);
+          const locked = backgroundSkills.includes(skill.id);
+          return (
+            <View key={skill.id} style={styles.attributeControl}>
+              <Text style={styles.attributeName}>{skill.name.toUpperCase()} <Text style={styles.skillAttr}>{skill.attribute}{locked ? ' · BACKGROUND' : ''}</Text></Text>
+              <View style={styles.attributeAdjust}>
+                <TouchableOpacity style={styles.adjustButton} onPress={() => changeRank(skill.id, -1)} disabled={(extraRanks[skill.id] ?? 0) <= 0} accessibilityLabel={`Lower ${skill.name}`}>
+                  <Text style={styles.adjustButtonText}>−</Text>
+                </TouchableOpacity>
+                <Text style={styles.attributeValue}>{rank}</Text>
+                <TouchableOpacity style={styles.adjustButton} onPress={() => changeRank(skill.id, 1)} disabled={rank >= CREATION_MAX_SKILL_RANK || remainingRanks <= 0} accessibilityLabel={`Raise ${skill.name}`}>
+                  <Text style={styles.adjustButtonText}>+</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          );
+        })}
+      </ScrollView>
+      <View style={styles.buttonRow}>
+        <TouchableOpacity style={[styles.button, styles.buttonSecondary]} onPress={() => setStep('attributes')}>
+          <Text style={styles.buttonText}>← BACK</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={[styles.button, remainingRanks !== 0 && styles.buttonDisabled]} onPress={() => setStep('confirm')} disabled={remainingRanks !== 0}>
+          <Text style={styles.buttonText}>CONTINUE →</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+
   const renderConfirmStep = () => (
     <View style={styles.stepContainer}>
-      <Text style={styles.stepTitle}>04 :: CONFIRM OPERATOR</Text>
+      <Text style={styles.stepTitle}>06 :: CONFIRM OPERATOR</Text>
       <View style={styles.confirmSummary}>
         <View style={styles.summaryRow}>
           <Text style={styles.summaryLabel}>NAME:</Text>
@@ -231,9 +350,33 @@ export default function CharacterCreationTerminal() {
           <Text style={styles.summaryValue}>{selectedBackground?.name}</Text>
         </View>
         <View style={styles.summaryRow}>
-          <Text style={styles.summaryLabel}>CATEGORY:</Text>
+          <Text style={styles.summaryLabel}>ORIGIN:</Text>
           <Text style={styles.summaryValue}>{categoryLabel}</Text>
         </View>
+        {preview && (
+          <>
+            <View style={styles.summaryRow}>
+              <Text style={styles.summaryLabel}>HW / OS / AP / DEF:</Text>
+              <Text style={styles.summaryValue}>
+                {preview.hardwareIntegrity.max} / {preview.overshield.max} / {getBaseAP(preview.attributes.SYSTEM)} / {getDefense(preview)}
+              </Text>
+            </View>
+            <View style={styles.summaryRow}>
+              <Text style={styles.summaryLabel}>FRAGMENTS · ENG · VIEWERS:</Text>
+              <Text style={styles.summaryValue}>{preview.dataFragments} · {preview.engagement} · {preview.viewerCount}</Text>
+            </View>
+            <View style={styles.summaryRow}>
+              <Text style={styles.summaryLabel}>SKILLS:</Text>
+              <Text style={styles.summaryValue}>
+                {SKILL_DEFS.filter((sk) => (preview.skills[sk.id] ?? 0) > 0).map((sk) => `${sk.name} ${preview.skills[sk.id]}`).join(', ')}
+              </Text>
+            </View>
+            <View style={styles.summaryRow}>
+              <Text style={styles.summaryLabel}>ADVANCEMENT POINTS:</Text>
+              <Text style={styles.summaryValue}>{STARTING_ADVANCEMENT_POINTS} (spend in the Archetype Matrix)</Text>
+            </View>
+          </>
+        )}
         <View style={styles.divider} />
         {ATTRIBUTES.map((attr) => (
           <View key={attr} style={styles.summaryRow}>
@@ -246,7 +389,7 @@ export default function CharacterCreationTerminal() {
       <View style={styles.buttonRow}>
         <TouchableOpacity
           style={[styles.button, styles.buttonSecondary]}
-          onPress={() => setStep('attributes')}
+          onPress={() => setStep('skills')}
         >
           <Text style={styles.buttonText}>← BACK</Text>
         </TouchableOpacity>
@@ -273,12 +416,14 @@ export default function CharacterCreationTerminal() {
         <Text style={styles.header}>OPERATOR TERMINAL :: CREATE NEW</Text>
 
         {step === 'name' && renderNameStep()}
+        {step === 'origin' && renderOriginStep()}
         {step === 'background' && renderBackgroundStep()}
         {step === 'attributes' && renderAttributesStep()}
+        {step === 'skills' && renderSkillsStep()}
         {step === 'confirm' && renderConfirmStep()}
 
         <View style={styles.progress}>
-          <Text style={styles.progressText}>Step {['name', 'background', 'attributes', 'confirm'].indexOf(step) + 1} / 4</Text>
+          <Text style={styles.progressText}>Step {STEPS.indexOf(step) + 1} / {STEPS.length}</Text>
         </View>
       </View>
     </SafeAreaView>
@@ -286,6 +431,11 @@ export default function CharacterCreationTerminal() {
 }
 
 const styles = StyleSheet.create({
+  skillAttr: {
+    ...Typography.mono,
+    fontSize: 10,
+    color: Colors.textSecondary,
+  },
   container: {
     flex: 1,
     backgroundColor: Colors.bgVoid,

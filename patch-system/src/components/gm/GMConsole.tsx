@@ -1,7 +1,7 @@
 // ============================================================
 // P.A.T.C.H. SYSTEM — GM Console
 // ============================================================
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -67,6 +67,9 @@ export default function GMConsole() {
     setSectorDifficulty,
     sponsorDrop,
     awardFragments,
+    awardAdvancement,
+    adjustEngagement,
+    adjustFragments,
   } = useCharacter();
 
   const selectedCharacter = useMemo(
@@ -74,6 +77,8 @@ export default function GMConsole() {
     [party, selectedCharacterId],
   );
   const sponsorPoolSize = getSponsorBlueprints().length;
+  // An ad read pays the fee OR the sponsor shield, never both.
+  const [airedAdReads, setAiredAdReads] = useState<Record<string, 'fee' | 'shield'>>({});
 
   return (
     <View style={GlobalStyles.safeArea}>
@@ -171,6 +176,22 @@ export default function GMConsole() {
                 <MiniButton label="HW -1" onPress={() => applyDamageHardware(1)} danger />
                 <MiniButton label="HW -3" onPress={() => applyDamageHardware(3)} danger />
               </View>
+              <Text style={styles.adReadTargetMeta}>ADVANCEMENT POINTS {selectedCharacter.advancementPoints} · +1 PER DEPLOYMENT SURVIVED</Text>
+              <View style={styles.mobActionRow}>
+                <MiniButton label="+1 ADV POINT" onPress={() => awardAdvancement(selectedCharacter.id, 1)} />
+                <MiniButton label="-1 ADV POINT" onPress={() => awardAdvancement(selectedCharacter.id, -1)} danger />
+              </View>
+              <Text style={styles.adReadTargetMeta}>ENGAGEMENT: HIGHLIGHTS, GOING DARK, STORY SWINGS · FRAGMENTS: MOB THEFT, LOOT, AUDITS</Text>
+              <View style={styles.mobActionRow}>
+                <MiniButton label="ENG +1" onPress={() => adjustEngagement(selectedCharacter.id, 1)} />
+                <MiniButton label="ENG -1" onPress={() => adjustEngagement(selectedCharacter.id, -1)} danger />
+                <MiniButton label="ENG -5" onPress={() => adjustEngagement(selectedCharacter.id, -5)} danger />
+              </View>
+              <View style={styles.mobActionRow}>
+                <MiniButton label="DF +5" onPress={() => adjustFragments(selectedCharacter.id, 5, 'gm: fragments found')} />
+                <MiniButton label="DF -2" onPress={() => adjustFragments(selectedCharacter.id, -2, 'gm: fragments lost')} danger />
+                <MiniButton label="DF -10" onPress={() => adjustFragments(selectedCharacter.id, -10, 'gm: fragments lost')} danger />
+              </View>
             </View>
           )}
 
@@ -191,16 +212,34 @@ export default function GMConsole() {
             <View key={adRead.title} style={styles.adReadCard}>
               <Text style={styles.adReadTitle}>{adRead.title}</Text>
               <Text style={styles.adReadCopy}>{adRead.copy.toUpperCase()}</Text>
-              <View style={styles.mobActionRow}>
-                <MiniButton
-                  label={`AIR AD-READ +${adRead.fragmentReward} DF`}
-                  onPress={() => awardFragments(selectedCharacter.id, adRead.fragmentReward, adRead.note)}
-                />
-                <MiniButton
-                  label={`SPONSOR SHIELD +${adRead.overshieldBoost}`}
-                  onPress={() => restoreOvershield(adRead.overshieldBoost)}
-                />
-              </View>
+              {(() => {
+                const key = `${selectedCharacter.id}:${adRead.title}`;
+                const aired = airedAdReads[key];
+                const choose = (choice: 'fee' | 'shield') => setAiredAdReads((prev) => ({ ...prev, [key]: choice }));
+                if (aired) {
+                  return (
+                    <View style={styles.mobActionRow}>
+                      <Text style={styles.adReadCopy}>AIRED · PAID {aired === 'fee' ? `+${adRead.fragmentReward} DF` : `SHIELD +${adRead.overshieldBoost}`}</Text>
+                      <MiniButton
+                        label="NEW AD READ"
+                        onPress={() => setAiredAdReads((prev) => { const next = { ...prev }; delete next[key]; return next; })}
+                      />
+                    </View>
+                  );
+                }
+                return (
+                  <View style={styles.mobActionRow}>
+                    <MiniButton
+                      label={`AIR AD-READ +${adRead.fragmentReward} DF`}
+                      onPress={() => { awardFragments(selectedCharacter.id, adRead.fragmentReward, adRead.note); choose('fee'); }}
+                    />
+                    <MiniButton
+                      label={`OR SPONSOR SHIELD +${adRead.overshieldBoost}`}
+                      onPress={() => { restoreOvershield(adRead.overshieldBoost); choose('shield'); }}
+                    />
+                  </View>
+                );
+              })()}
             </View>
           ))}
         </View>
@@ -232,7 +271,7 @@ export default function GMConsole() {
         {encounter ? (
           <View style={[CardStyles.base, styles.sectionSpacing]}>
             <Text style={styles.sectionTitle}>ACTIVE ENCOUNTER</Text>
-            <Text style={styles.encounterMeta}>SPECTACLE {encounter.spectacleScore} • {encounter.bracketLabel.toUpperCase()}</Text>
+            <Text style={styles.encounterMeta}>SPECTACLE {encounter.spectacleScore} • {encounter.bracketLabel.toUpperCase()} • THREAT {encounter.mobs.reduce((sum, mob) => sum + (mob.threat ?? 0), 0)} (BUDGET 4 PER OPERATOR)</Text>
             {encounter.modifiers.map((modifier) => (
               <Text key={modifier} style={styles.modifierText}>{modifier.toUpperCase()}</Text>
             ))}
@@ -241,8 +280,8 @@ export default function GMConsole() {
                 <View style={styles.mobHeader}>
                   <View style={styles.mobIdentity}>
                     <View style={{ flex: 1 }}>
-                      <Text style={styles.mobName}>{mob.name.toUpperCase()}</Text>
-                      <Text style={styles.mobRole}>{mob.role}</Text>
+                      <Text style={styles.mobName}>{(mob.displayName ?? mob.name).toUpperCase()}</Text>
+                      <Text style={styles.mobRole}>{mob.role} · {mob.tier}</Text>
                     </View>
                   </View>
                   <TouchableOpacity onPress={() => removeMob(mob.id)}>
@@ -250,6 +289,7 @@ export default function GMConsole() {
                   </TouchableOpacity>
                 </View>
                 <Text style={styles.mobStats}>INTEGRITY {mob.currentIntegrity}/{mob.maxIntegrity} • AP {mob.currentAP}/{mob.maxAP}</Text>
+                <Text style={styles.mobStats}>DEF {mob.defense} • ATK {mob.attack} • DMG {mob.damage}{encounter.modifiers.some((m) => m.toLowerCase().includes('double')) ? ' ×2' : ''} • SAVE {mob.saveTarget} • INIT {mob.init}</Text>
                 <Text style={styles.mobDesc}>{mob.description}</Text>
                 <View style={styles.mobActionRow}>
                   <MiniButton label="-1 HP" onPress={() => damageMob(mob.id, 1)} danger />

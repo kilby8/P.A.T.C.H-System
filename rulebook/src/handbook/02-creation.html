@@ -1,0 +1,81 @@
+<section class="bleed opener"><div class="grid"></div><div class="scan"></div><div class="inner">
+  <div class="eyebrow">Chapter 02</div><div class="num">02</div>
+  <h1 data-num="02" id="ch-creation">Building an Operator</h1>
+  <p class="lede">Eight steps from a name on an intake form to a contestant on the feed. Bring a pencil; the terminal will want everything in triplicate.</p>
+  <div class="contents"><b>In this chapter</b><br>Step-by-step creation · CPU attributes · Derived stats · Starting resources · Worked example</div>
+</div></section>
+
+<div class="flow">
+<h2 id="creation-steps">Creation at a Glance</h2>
+<ol class="steps">
+  <li><b>Pick an origin.</b> Inmate Block, Slum Distrikt Volunteer, Off-Grid Glitcher or (playtest) Off-Worlder. Your origin gives a shared trait and your reason for being in the arena (<a class="ref" href="#ch-origins">Ch. 3</a>).</li>
+  <li><b>Pick a background</b> from that origin. It sets your focus attribute, two trained skills and your starter loadout.</li>
+  <li><b>Assign CPU attributes.</b> Every attribute starts at 1. Distribute <b>12 points</b>; no attribute may go above <b>4</b> at creation.</li>
+  <li><b>Record skills.</b> Your two background skills start at rank <b>2</b>. Add <b>2 more ranks</b> anywhere, to a maximum of rank 2 at creation.<span class="draft-tag">PLAYTEST</span></li>
+  <li><b>Work out derived stats:</b> Hardware Integrity, Overshield, AP and Defense (table below).</li>
+  <li><b>Take your loadout and blueprints</b> from your background (<a class="ref" href="#ch-gear">Ch. 6</a>). Starting blueprints go to your <b>stockpile</b>; you may install them now, as if in a Condo Phase.</li>
+  <li><b>Note your broadcast numbers:</b> Data Fragments, Engagement and viewer count.</li>
+  <li><b>Spend 2 Advancement Points</b> on the archetype tree, usually one tier-1 node and one of its sub-skills (<a class="ref" href="#ch-advancement">Ch. 9</a>).<span class="draft-tag">PLAYTEST</span></li>
+</ol>
+<p>Finish with a name, a look and one sentence about why you're in the arena. The GM will use that sentence against you.</p>
+
+<h2 id="attributes">The Six CPU Attributes</h2>
+<p>Inside the arena your body is a processor running a combat build. Six attributes describe its specs. Each runs from <b>1 to 5</b>; <b>3 is an average operator</b>.</p>
+<table>
+  <thead><tr><th>Attribute</th><th>Covers</th><th>Feeds</th></tr></thead>
+  <tbody>
+    <tr><td class="hl">POWER</td><td>Raw force: lifting, striking, grappling, intimidating</td><td>Melee attacks &amp; damage</td></tr>
+    <tr><td class="hl">PING</td><td>Reflexes, speed, aim, stealth, fine control</td><td>Ranged attacks, Defense, initiative</td></tr>
+    <tr><td class="hl">HARDWARE</td><td>Chassis integrity, trauma resistance, stamina</td><td>Hardware Integrity, heavy &amp; energy weapons</td></tr>
+    <tr><td class="hl">DATA</td><td>Information, hacking, shields, tech</td><td>Overshield, support gear</td></tr>
+    <tr><td class="hl">SYSTEM</td><td>Mental processing, perception, composure</td><td>AP, Overshield</td></tr>
+    <tr><td class="hl">CLOUT</td><td>Presence, audience appeal, broadcast pull</td><td>Engagement, viewers</td></tr>
+  </tbody>
+</table>
+<p>Twelve points over a base of 1 gives an average of 3 in every attribute. Spreading evenly makes a generalist. Pushing two attributes to 4 makes a specialist with holes. Your background's <b>focus attribute</b> is a recommendation, not a rule, but its gear and skills are built around it.</p>
+<p>Some damage and broadcast math uses an attribute's <b>bonus</b>: the attribute minus 3, giving −2 at 1 up to +2 at 5.</p>
+
+<h2 id="derived">Derived Stats</h2>
+<table>
+  <caption>Derived stats by attribute value</caption>
+  <thead><tr><th>Value</th><th class="n">1</th><th class="n">2</th><th class="n">3</th><th class="n">4</th><th class="n">5</th></tr></thead>
+  <tbody>{{DERIVED}}</tbody>
+</table>
+<h3>Hardware Integrity</h3>
+<p><span class="kw">5 + 5 × HARDWARE</span>. Your biological chassis. Damage reaches it only after your Overshield is gone, and it heals slowly. Inmates add +5 (the Hardened trait).</p>
+<h3>Overshield</h3>
+<p><span class="kw">16 + 2 × SYSTEM + DATA</span>. Your digital defense layer, from 19 to 31. It soaks damage first and comes back fully after every encounter.</p>
+<h3>Active Processing (AP)</h3>
+<p><span class="kw">1 + SYSTEM ÷ 2, rounded down</span>. The action points you get at the start of each of your turns. Neural Shock costs you 1 of them.</p>
+<h3>Defense <span class="draft-tag">PLAYTEST</span></h3>
+<p><span class="kw">10 + PING + armor bonus</span>. The target number enemies roll against to hit you. Armor gives +1 (Thick Hide Tunic), +2 (Kevlar Vest) or +3 (Kinetic Shielding).</p>
+<h3>Speed</h3>
+<p>Every operator moves <b>6 meters</b> per Move.</p>
+
+<h2 id="starting-resources">Starting Resources</h2>
+<table>
+  <thead><tr><th>Resource</th><th>Starting value</th></tr></thead>
+  <tbody>
+    <tr><td><b>Data Fragments</b></td><td>120 (Volunteers 138, from the +15% Premium Account)</td></tr>
+    <tr><td><b>Engagement</b> (0–100)</td><td>25 + 8 × CLOUT bonus, +8 Volunteer, +5 Glitcher; minimum 10</td></tr>
+    <tr><td><b>Viewers</b></td><td>120 + 60 × CLOUT, +180 Volunteer, +90 Glitcher</td></tr>
+    <tr><td><b>Advancement Points</b></td><td>2, spent at step 8<span class="draft-tag">PLAYTEST</span></td></tr>
+  </tbody>
+</table>
+<table>
+  <caption>Starting Engagement / viewers by CLOUT</caption>
+  <thead><tr><th>CLOUT</th><th class="n">1</th><th class="n">2</th><th class="n">3</th><th class="n">4</th><th class="n">5</th></tr></thead>
+  <tbody>{{BROADCAST}}</tbody>
+</table>
+
+<h2 id="worked-example">Worked Example: Rook</h2>
+<div class="box ex"><div class="bt">Building Rook, step by step</div>
+<p><b>1–2.</b> Origin <b>Slum Distrikt Volunteer</b>, background <b>The Neon Runner</b> (focus PING; skills Acrobatics and Survival).</p>
+<p><b>3.</b> Base 1 everywhere, then 12 points: POWER +1, PING +3, HARDWARE +2, DATA +1, SYSTEM +3, CLOUT +2. Final: <b>POWER 2, PING 4, HARDWARE 3, DATA 2, SYSTEM 4, CLOUT 3</b>.</p>
+<p><b>4.</b> Acrobatics 2, Survival 2, and both free ranks into Marksmanship (rank 2).</p>
+<p><b>5.</b> Hardware Integrity 5 + 15 = <b>20</b>. Overshield 16 + 8 + 2 = <b>26</b>. AP 1 + 2 = <b>3</b>. Defense 10 + 4 + 1 (Thick Hide Tunic) = <b>15</b>.</p>
+<p><b>6.</b> Recurve Bow, Field Radio, plus the default Thick Hide Tunic in the empty defensive slot. Blueprints: Precision Sight, Signal Booster, both kept in the stockpile while Rook holds out for a better weapon.</p>
+<p><b>7.</b> 138 Data Fragments. Engagement 25 + 0 + 8 = <b>33</b>. Viewers 120 + 180 + 180 = <b>480</b>.</p>
+<p><b>8.</b> Unlocks <b>G2 Neural Reflex</b> (1 point) and its sub-skill <b>Reflex Dodge</b> (1 point).</p>
+<p>Rook's bow attack rolls PING 4 + Marksmanship 2 = <b>6d6</b> and deals <b>1d8+1</b> kinetic damage.</p></div>
+</div>

@@ -1,0 +1,212 @@
+<style>
+.qr { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.14in; font: 400 8.25pt/1.36 var(--sans); }
+.qr .card { background: #fffdf8; border: 1px solid var(--rule); border-top: 3px solid var(--teal); padding: 0.08in 0.1in; break-inside: avoid; }
+.qr .card.amber { border-top-color: var(--amber); }
+.qr .card.dark { background: var(--void); color: #cfe9e5; border-color: #1e2535; border-top-color: var(--cyan); }
+.qr .card.dark h3 { color: var(--cyan); }
+.qr h3 { font: 800 9.6pt/1.2 var(--display); text-transform: uppercase; letter-spacing: 0.8px; color: var(--teal); margin: 0 0 3px; }
+.qr p { margin: 0 0 3px; text-align: left; }
+.qr table { font-size: 7.7pt; margin: 2px 0 3px; }
+.qr th { font-size: 7pt; padding: 3px 4px; }
+.qr td { padding: 2px 4px; }
+.qr ul { padding-left: 0.12in; margin: 0 0 2px; }
+.qr li { margin: 0 0 1px; }
+.qr .s2 { grid-column: span 2; }
+.qr .s3 { grid-column: span 3; }
+.qhead { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 3px solid var(--ink); margin-bottom: 0.1in; padding-bottom: 3px; }
+.qhead .t { font: 900 20pt/1 var(--display); letter-spacing: 2px; text-transform: uppercase; }
+.qhead .s { font: 600 7.5pt var(--mono); letter-spacing: 2px; color: var(--teal); text-transform: uppercase; }
+/* record sheet */
+.rs { display: grid; grid-template-columns: repeat(12, 1fr); gap: 0.08in; font: 400 7.6pt/1.3 var(--sans); }
+.f { border: 1.2px solid var(--ink); background: #fffdf8; padding: 4px 6px; min-height: 0.5in; position: relative; break-inside: avoid; }
+.f .l { font: 700 6.2pt/1.1 var(--mono); letter-spacing: 1.2px; text-transform: uppercase; color: var(--ink-3); }
+.f .h { color: var(--ink-3); font-size: 6.4pt; position: absolute; right: 5px; bottom: 3px; font-family: var(--mono); }
+.c2{grid-column:span 2}.c3{grid-column:span 3}.c4{grid-column:span 4}.c5{grid-column:span 5}.c6{grid-column:span 6}.c7{grid-column:span 7}.c8{grid-column:span 8}.c12{grid-column:span 12}
+.attr { text-align: center; min-height: 1.0in; }
+.attr .l { font-size: 7.4pt; color: var(--teal); }
+.attr .box1 { width: 0.55in; height: 0.5in; border: 1.2px solid var(--ink); margin: 4px auto 2px; border-radius: 3px; }
+.attr .bn { font: 600 6pt var(--mono); color: var(--ink-3); }
+.lines { background-image: repeating-linear-gradient(transparent 0 15px, var(--rule) 15px 16px); }
+.sk { display: grid; grid-template-columns: 1fr auto; gap: 1px 4px; font-size: 8.4pt; margin-top: 3px; }
+.sk span:nth-child(odd) { border-bottom: 1px dotted var(--rule); }
+.sk .dots { letter-spacing: 1.5px; color: var(--ink-3); }
+.sk .grp { grid-column: span 2; font: 700 6.2pt var(--mono); color: var(--teal); letter-spacing: 1px; margin-top: 3px; border: 0 !important; }
+.vbar { display: flex; gap: 2px; flex-wrap: wrap; margin-top: 4px; }
+.vbar i { width: 0.13in; height: 0.13in; border: 1px solid var(--ink-3); display: inline-block; }
+.hp3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-top: 3px; }
+.hp3 div { border: 1px solid var(--ink-3); height: 0.32in; font: 600 6pt var(--mono); color: var(--ink-3); padding: 1px 3px; }
+.rs-title { display: flex; justify-content: space-between; align-items: end; margin-bottom: 0.08in; }
+.rs-title .t { font: 900 22pt/1 var(--display); letter-spacing: 3px; }
+.rs-title .t span { color: var(--teal); }
+.rs-title .s { font: 600 7pt var(--mono); letter-spacing: 2px; color: var(--ink-3); text-transform: uppercase; text-align: right; }
+</style>
+
+<section class="bleed cover">
+  <div class="grid"></div><div class="scan"></div>
+  <div class="inner">
+    <div class="eyebrow">Core Rulebook 04 // Field Kit</div>
+    <h1>P<span class="dot">.</span>A<span class="dot">.</span>T<span class="dot">.</span>C<span class="dot">.</span>H<span class="dot">.</span></h1>
+    <div class="expand">Program for Accelerated<br>Tactical Combat Hazards</div>
+    <div class="title">Quick Reference<br>&amp; Operator Record</div>
+    <div class="sub">A first-session guide, two pages of rules at a glance, and a two-page character sheet.</div>
+    <div class="foot"><span>Pages 3–4 and 5–6 print as two double-sided sheets</span><span>Playtest edition 0.3</span></div>
+  </div>
+</section>
+
+<div class="flow one">
+<div class="qhead" data-mk data-label="First session"><span class="t">First Session</span><span class="s">Zero to first roll in 20 minutes</span></div>
+<div class="qr">
+  <div class="card s2"><h3>Players: build an operator</h3>
+    <ol>
+      <li>Pick an <b>origin</b> and a <b>background</b> (Handbook Ch. 3).</li>
+      <li>Every attribute starts at 1; spend <b>12 points</b>, max 4 each.</li>
+      <li>Background skills at rank 2, plus 2 free ranks (max 2).</li>
+      <li>Derived stats: HW 5 + 5×HDW · OS 16 + 2×SYS + DATA · AP 1 + SYS÷2 · Def 10 + PING + armor.</li>
+      <li>Loadout and blueprints from your background; blueprints go to your stockpile.</li>
+      <li>Fragments 120 (Volunteer 138); Engagement and viewers from the CLOUT table.</li>
+      <li>Spend 2 AdvP: one tier-1 node + one of its sub-skills.</li>
+      <li>One sentence: <b>why are you in the arena?</b></li>
+    </ol></div>
+  <div class="card dark"><h3>Pre-gen: Rook</h3>
+    <p>Neon Runner (Volunteer). POW 2 · PING 4 · HDW 3 · DATA 2 · SYS 4 · CLT 3.</p>
+    <p>HW 20 · OS 26 · AP 3 · Def 15. Acrobatics 2, Survival 2, Marksmanship 2.</p>
+    <p>Recurve Bow 6d6, 1d8+1 · Field Radio · Thick Hide Tunic. Node G2 · Reflex Dodge.</p></div>
+  <div class="card"><h3>GM: before the table</h3>
+    <ul><li>Open the app's GM tab; create a session code.</li><li>Pick a sector-1 deployment with 2 encounters.</li><li>Budget 4 threat per operator, or roll a Spectacle preset.</li><li>Print one Operator Record per player.</li></ul></div>
+  <div class="card"><h3>First scene</h3>
+    <ul><li>Read the induction memo aloud.</li><li>Call one easy check (target 10) per player before the first fight.</li><li>Call one highlight on camera.</li></ul></div>
+  <div class="card amber"><h3>Session shape</h3>
+    <p>Cold open → deployment (2–3 fights) → <b>15-minute table break = Condo Hours</b> → Condo Phase → stinger.</p></div>
+  <div class="card s3"><h3>What to print</h3>
+    <p>This PDF: <b>pages 3–4</b> are the Quick Reference (one double-sided sheet per player) and <b>pages 5–6</b> are the Operator Record (one double-sided sheet per operator). Keep the Arena Bestiary at the GM's side and the Operator's Handbook on the table.</p></div>
+</div>
+
+<div class="qhead page-break" data-mk data-label="Quick Reference: checks &amp; combat"><span class="t">Quick Reference</span><span class="s">Page 1 // Checks &amp; Combat</span></div>
+<div class="qr">
+  <div class="card dark s2"><h3>The core roll</h3>
+    <p><b>Roll d6 equal to attribute + skill. Sum them. Meet or beat the target.</b> Untrained: attribute only. Points over the target = <b>flair</b> (attacks: +1 damage per full 5; 10+ on camera = +1 Engagement). Points under = <b>shortfall</b> (1–2: success at a cost).</p>
+    <p><b>Advantage:</b> roll 1 extra die, drop the lowest. <b>Disadvantage:</b> roll 1 extra, drop the highest. <b>+N dice</b> stack. <b>Saves:</b> attribute + best related skill, against the save target.</p></div>
+  <div class="card"><h3>Targets</h3>
+    <table><tbody><tr><td class="n hl">10</td><td>Routine</td></tr><tr><td class="n hl">15</td><td>Tricky</td></tr><tr><td class="n hl">20</td><td>Hard</td></tr><tr><td class="n hl">25</td><td>Heroic</td></tr><tr><td class="n hl">30</td><td>Legendary</td></tr></tbody></table></div>
+
+  <div class="card s2"><h3>Odds (%) to meet the target</h3>
+    <table class="odds"><thead><tr><th>Pool</th><th class="n">10</th><th class="n">13</th><th class="n">15</th><th class="n">17</th><th class="n">18</th><th class="n">20</th><th class="n">25</th><th class="n">30</th></tr></thead><tbody>{{ODDS}}</tbody></table></div>
+  <div class="card"><h3>Your turn</h3>
+    <ul><li>Gain AP = <b>1 + SYSTEM ÷ 2</b> (−1 in Neural Shock).</li><li>Unspent AP carries over (reactions, next turn), max <b>your max + 1</b>. Stunned / Surprised: gain none, keep the bank.</li><li>One free <b>Move</b> of 6 m. 1 reaction per round.</li></ul>
+    <h3>Initiative</h3><p>Roll PING dice. Mobs use Init. Operators win ties.</p>
+    <h3>Defense</h3><p>10 + PING + armor (+1 / +2 / +3).</p></div>
+
+  <div class="card"><h3>Actions (AP)</h3>
+    <table><tbody>
+      <tr><td>Attack</td><td class="n">1</td></tr><tr><td>Dash (+6 m)</td><td class="n">1</td></tr><tr><td>Reboot Shield (1d6 + SYS)</td><td class="n">2</td></tr>
+      <tr><td>Use gear · Hide (PING + Stealth)</td><td class="n">1</td></tr><tr><td>Help (+1 die) · Shake it off</td><td class="n">1</td></tr>
+      <tr><td>Stabilize (Medicine 15)</td><td class="n">1</td></tr><tr><td>Patch Up (Medicine 15, heal 1d6 HW)</td><td class="n">2</td></tr><tr><td>Grapple (Athletics vs POWER save)</td><td class="n">1</td></tr><tr><td>Counter (reaction)</td><td class="n">1</td></tr><tr><td>Ability</td><td class="n">as listed</td></tr>
+    </tbody></table></div>
+  <div class="card"><h3>Attacking</h3>
+    <p>Weapon attribute + skill against the target's Defense. A hit deals weapon dice + attribute bonus (attr − 3) + flair bonus; minimum 1.</p>
+    <p><b>Range:</b> double range with disadvantage. Ranged attacks while in melee: disadvantage. <b>Cover:</b> half +2, heavy +5, full can't be targeted.</p></div>
+  <div class="card amber"><h3>Damage &amp; vitals</h3>
+    <p>Damage hits <b>Overshield</b> first, then <b>Hardware</b>. Overshield resets after every encounter. Hardware heals only in the Condo (25% per hour), through Patch Up (2 AP) or through abilities.</p>
+    <p><b>Neural Shock:</b> Hardware below 50% → −1 AP.</p>
+    <p><b>Flatlined</b> at 0: crash save 1d6 each turn, 4+ succeeds (6 = two successes, 1 = two failures). 3 successes: stable. 3 failures: <b>build destroyed</b>.</p></div>
+
+  <div class="card s3"><h3>Conditions</h3>
+    <table><tbody>
+      <tr><td><b>Fried</b></td><td>1d4 to Hardware each turn (bypasses OS). HDW + Endurance 15</td><td><b>Prone</b></td><td>Melee vs you: adv.; ranged beyond 2 m: disadv.; your attacks disadv. Standing uses your Move</td></tr>
+      <tr><td><b>Glitched</b></td><td>d6 before an attack or gear use; on a 1 it fails. DATA + Hacking 15</td><td><b>Staggered</b></td><td>−1 AP next turn</td></tr>
+      <tr><td><b>Lagged</b></td><td>Act last; Dash costs 2 AP</td><td><b>Stealthed</b></td><td>Can't be targeted; first attack adv., then revealed</td></tr>
+      <tr><td><b>Marked</b></td><td>Attacks vs you +1 die</td><td><b>Stunned</b></td><td>0 AP next turn, no reactions</td></tr>
+      <tr><td><b>Pinned</b></td><td>Can't move; attacks vs you adv. POW + Athletics 15</td><td><b>Surprised</b></td><td>0 AP first turn</td></tr>
+    </tbody></table></div>
+</div>
+
+<div class="qhead page-break" data-mk data-label="Quick Reference: gear, broadcast &amp; condo"><span class="t">Quick Reference</span><span class="s">Page 2 // Gear, Broadcast &amp; Condo</span></div>
+<div class="qr">
+  <div class="card s2"><h3>Weapons</h3>
+    <table><thead><tr><th>Weapon</th><th>Attack</th><th>Damage</th><th>Range</th></tr></thead><tbody>
+      <tr><td>Weighted Club (F)</td><td>POW + Melee</td><td>1d8 blunt</td><td>melee</td></tr>
+      <tr><td>Iron Spear (F)</td><td>POW + Melee</td><td>1d10 pierce</td><td>2 m</td></tr>
+      <tr><td>Recurve Bow (F)</td><td>PING + Marks.</td><td>1d8 kinetic</td><td>30 m</td></tr>
+      <tr><td>Tactical Carbine (T)</td><td>PING + Marks.</td><td>2d6 kinetic</td><td>60 m</td></tr>
+      <tr><td>Hard-Light Lance (A)</td><td>HDW + Heavy W.</td><td>2d8 energy</td><td>10 m</td></tr>
+      <tr><td>Multi-Tool / Radio / Jammer</td><td>DATA + Hacking</td><td>1d4 / 1d4 / 1d6</td><td>melee / 30 / 10</td></tr>
+    </tbody></table>
+    <p>Add the attribute bonus to damage. Armor: Tunic +1 Def (counter 1d4), Kevlar +2 (1d6), Kinetic Shielding +3 (1d8).</p></div>
+  <div class="card amber"><h3>Destructive installation</h3>
+    <p>Install in the Condo. Each install <b>consumes</b> the blueprint. Hardpoints: Foundation 1, Tactical 2, Apex 3. Installing over a hardpoint destroys the old blueprint.</p>
+    <h3>Market</h3><p>Foundation 40 · Tactical 90 (35 Eng.) · Apex 180 (65 Eng., locked until the GM opens it)</p></div>
+
+  <div class="card"><h3>Engagement (0–100)</h3>
+    <table><tbody>
+      <tr><td>Spend AP</td><td class="n">+1/AP</td></tr><tr><td>OS damage taken</td><td class="n">+1/pt</td></tr><tr><td>HW damage taken</td><td class="n">+2/pt</td></tr>
+      <tr><td>Claim payout</td><td class="n">+3×Spect.</td></tr><tr><td>Gain blueprint</td><td class="n">+3</td></tr>
+      <tr><td>Install</td><td class="n">+5</td></tr><tr><td>Sponsor blueprint</td><td class="n">+12</td></tr>
+      <tr><td>Ad read award</td><td class="n">+8</td></tr><tr><td>Highlight (10+ flair)</td><td class="n">+1</td></tr>
+    </tbody></table></div>
+  <div class="card"><h3>Payout multiplier</h3>
+    <table><tbody><tr><td>0–19</td><td class="n">×1.00</td></tr><tr><td>20–39</td><td class="n">×1.05</td></tr><tr><td>40–59</td><td class="n">×1.10</td></tr><tr><td>60–79</td><td class="n">×1.15</td></tr><tr><td>80–99</td><td class="n">×1.20</td></tr><tr><td>100</td><td class="n">×1.25</td></tr></tbody></table>
+    <p><b>60+:</b> eligible for sponsor drops.</p></div>
+  <div class="card"><h3>Condo Phase</h3>
+    <ul><li>Overshield full.</li><li>3 Condo Hours: <b>25% of max HW each</b> (5 real min each on the app timer).</li><li>Terminal: buy, trade, install, swap.</li><li>Spend AdvP.</li><li>One scene each: <b>on air</b> (CLOUT + Performance 15 for +2 Eng.) or <b>dark</b> (GM sets the cost).</li></ul></div>
+
+  <div class="card s2"><h3>Advancement</h3>
+    <p>Start with 2 AdvP; +1 per deployment survived. Node 1 · sub-skill 1 · skill rank 2 · attribute 4. No refunds; the GM can reverse a mistaken sub-skill purchase. Tier 2 needs a tier 1 in its zone; tier 3 needs a tier 2. Overlap nodes need both parent zones.</p></div>
+  <div class="card"><h3>Derived stats</h3>
+    <p><b>HW</b> 5 + 5×HDW (+5 Inmate)<br><b>OS</b> 16 + 2×SYS + DATA<br><b>AP</b> 1 + SYS÷2 ↓<br><b>Def</b> 10 + PING + armor</p></div>
+  <div class="card s3"><h3>Standard blueprints</h3>
+    <table><thead><tr><th>Blueprint</th><th>Fits</th><th>Tier</th><th>Effect</th></tr></thead><tbody>{{QR_BLUEPRINTS}}</tbody></table></div>
+</div>
+
+<div class="page-break rs-title" data-mk data-label="Operator Record: side A"><div class="t">OPERATOR <span>RECORD</span></div><div class="s">P.A.T.C.H. // Playtest 0.3<br>Side A</div></div>
+<div class="rs">
+  <div class="f c4"><div class="l">Operator name</div></div>
+  <div class="f c4"><div class="l">Player</div></div>
+  <div class="f c4"><div class="l">Origin · Background</div></div>
+  <div class="f c6"><div class="l">Why I'm in the arena</div></div>
+  <div class="f c3"><div class="l">Shared trait</div></div>
+  <div class="f c3"><div class="l">Focus attribute</div></div>
+
+  <div class="f attr c2"><div class="l">POWER</div><div class="box1"></div><div class="bn">bonus ___</div></div>
+  <div class="f attr c2"><div class="l">PING</div><div class="box1"></div><div class="bn">bonus ___</div></div>
+  <div class="f attr c2"><div class="l">HARDWARE</div><div class="box1"></div><div class="bn">bonus ___</div></div>
+  <div class="f attr c2"><div class="l">DATA</div><div class="box1"></div><div class="bn">bonus ___</div></div>
+  <div class="f attr c2"><div class="l">SYSTEM</div><div class="box1"></div><div class="bn">bonus ___</div></div>
+  <div class="f attr c2"><div class="l">CLOUT</div><div class="box1"></div><div class="bn">bonus ___</div></div>
+
+  <div class="f c4" style="min-height:1.15in"><div class="l">Overshield</div><div class="hp3"><div>MAX</div><div>CURRENT</div><div>NOTES</div></div><div class="h">16 + 2×SYS + DATA</div></div>
+  <div class="f c4" style="min-height:1.15in"><div class="l">Hardware Integrity</div><div class="hp3"><div>MAX</div><div>CURRENT</div><div>50% MARK</div></div><div class="h">5 + 5×HDW</div></div>
+  <div class="f c4" style="min-height:1.15in"><div class="l">Flatlined · crash saves</div><p style="margin-top:6px;font-size:7.4pt">Successes ☐ ☐ ☐ &nbsp; Failures ☐ ☐ ☐</p><p style="font-size:7.4pt">Neural Shock ☐ &nbsp; Conditions: ________</p></div>
+
+  <div class="f c2"><div class="l">AP / turn</div><div class="h">1 + SYS÷2</div></div>
+  <div class="f c2"><div class="l">Banked AP</div><div class="h">max + 1</div></div>
+  <div class="f c2"><div class="l">Defense</div><div class="h">10 + PING + armor</div></div>
+  <div class="f c3"><div class="l">Initiative (PING dice)</div></div>
+  <div class="f c3"><div class="l">Speed</div><p style="margin:4px 0 0;font-size:9pt"><b>6 m</b> / Move</p></div>
+
+  <div class="f c5" style="min-height:4.75in"><div class="l">Skills · ranks ●●●●●</div>
+    <div class="sk">
+      <span class="grp">POWER</span><span>Athletics</span><span class="dots">○○○○○</span><span>Intimidation</span><span class="dots">○○○○○</span><span>Melee</span><span class="dots">○○○○○</span>
+      <span class="grp">PING</span><span>Acrobatics</span><span class="dots">○○○○○</span><span>Finesse</span><span class="dots">○○○○○</span><span>Marksmanship</span><span class="dots">○○○○○</span><span>Stealth</span><span class="dots">○○○○○</span>
+      <span class="grp">HARDWARE</span><span>Endurance</span><span class="dots">○○○○○</span><span>Heavy Weapons</span><span class="dots">○○○○○</span><span>Mechanics</span><span class="dots">○○○○○</span>
+      <span class="grp">DATA</span><span>Hacking</span><span class="dots">○○○○○</span><span>Investigation</span><span class="dots">○○○○○</span><span>Salvage</span><span class="dots">○○○○○</span>
+      <span class="grp">SYSTEM</span><span>Insight</span><span class="dots">○○○○○</span><span>Medicine</span><span class="dots">○○○○○</span><span>Perception</span><span class="dots">○○○○○</span><span>Survival</span><span class="dots">○○○○○</span>
+      <span class="grp">CLOUT</span><span>Deception</span><span class="dots">○○○○○</span><span>Performance</span><span class="dots">○○○○○</span><span>Persuasion</span><span class="dots">○○○○○</span>
+    </div></div>
+  <div class="f c7 lines" style="min-height:4.75in"><div class="l" style="background:#fffdf8;display:inline-block;padding-right:4px">Attacks · weapon · pool (attr + skill) · damage · range · notes</div></div>
+</div>
+
+<div class="page-break rs-title" data-mk data-label="Operator Record: side B"><div class="t">OPERATOR <span>RECORD</span></div><div class="s">Gear · Broadcast · Advancement<br>Side B</div></div>
+<div class="rs">
+  <div class="f c4" style="min-height:1.5in"><div class="l">Offensive item · tier</div><div class="hp3"><div>HP 1</div><div>HP 2</div><div>HP 3</div></div></div>
+  <div class="f c4" style="min-height:1.5in"><div class="l">Defensive item · tier · Def bonus</div><div class="hp3"><div>HP 1</div><div>HP 2</div><div>HP 3</div></div></div>
+  <div class="f c4" style="min-height:1.5in"><div class="l">Support item · tier</div><div class="hp3"><div>HP 1</div><div>HP 2</div><div>HP 3</div></div></div>
+  <div class="f c6 lines" style="min-height:2.2in"><div class="l" style="background:#fffdf8;display:inline-block;padding-right:4px">Blueprint stockpile · count · tradable?</div></div>
+  <div class="f c6 lines" style="min-height:2.2in"><div class="l" style="background:#fffdf8;display:inline-block;padding-right:4px">Sponsor inbox · locker</div></div>
+  <div class="f c3"><div class="l">Data Fragments</div></div>
+  <div class="f c3"><div class="l">Engagement (0–100)</div></div>
+  <div class="f c3"><div class="l">Viewers</div></div>
+  <div class="f c3"><div class="l">Advancement Points</div></div>
+  <div class="f c6 lines" style="min-height:3.75in"><div class="l" style="background:#fffdf8;display:inline-block;padding-right:4px">Archetype nodes &amp; sub-skills · use · AP</div></div>
+  <div class="f c6 lines" style="min-height:3.75in"><div class="l" style="background:#fffdf8;display:inline-block;padding-right:4px">Condo · contacts · rivals · sponsors · notes</div></div>
+</div>
+</div>

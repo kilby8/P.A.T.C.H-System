@@ -2,6 +2,12 @@ export type BackgroundCategory = 'inmate' | 'volunteer' | 'glitcher';
 export type CoreAttribute = 'POWER' | 'PING' | 'HARDWARE' | 'DATA' | 'SYSTEM' | 'CLOUT';
 
 import { getBlueprintById, getGearItemById } from './Gear';
+import type { SkillId } from './Skills';
+
+/** Where the program pulled an operator from. Off-Worlders use any background's package. */
+export type OriginId = BackgroundCategory | 'offworlder';
+
+export const ORIGIN_IDS: OriginId[] = ['inmate', 'volunteer', 'glitcher', 'offworlder'];
 
 export type BackgroundId =
   | 'enforcer'
@@ -27,6 +33,8 @@ export interface BackgroundProfile {
   sharedCoreTrait: string;
   buildFocus: CoreAttribute;
   proficiency: string;
+  /** The two skills this background trains to rank 2 at creation. */
+  skills: [SkillId, SkillId];
   starterGear: string[];
   starterBuildPackage: {
     primaryItemId: string;
@@ -43,6 +51,54 @@ export const BACKGROUND_CATEGORY_LABELS: Record<BackgroundCategory, string> = {
   glitcher: 'OFF-GRID GLITCHER',
 };
 
+export const ORIGIN_LABELS: Record<OriginId, string> = {
+  ...BACKGROUND_CATEGORY_LABELS,
+  offworlder: 'OFF-WORLDER',
+};
+
+export interface OriginProfile {
+  id: OriginId;
+  label: string;
+  trait: string;
+  traitText: string;
+  story: string;
+}
+
+export const ORIGIN_PROFILES: OriginProfile[] = [
+  {
+    id: 'inmate',
+    label: 'INMATE BLOCK',
+    trait: 'Hardened',
+    traitText: '+5 maximum Hardware Integrity, and advantage on saves against being Stunned or Pinned.',
+    story: 'Paying off a sentence one broadcast at a time. The program bought your file from the prison system.',
+  },
+  {
+    id: 'volunteer',
+    label: 'SLUM DISTRIKT VOLUNTEER',
+    trait: 'Premium Account',
+    traitText: '+15% starting Data Fragments (138), +8 starting Engagement and +180 viewers.',
+    story: 'You signed the waiver yourself: for fragments, for a sponsor, for a way out of a district the Council barely knows exists.',
+  },
+  {
+    id: 'glitcher',
+    label: 'OFF-GRID GLITCHER',
+    trait: 'Data Anomalies',
+    traitText: 'Your support slot is rolled (1-3 Multi-Tool, 4-6 Field Radio). Hostile AI prioritizes you. +5 Engagement and +90 viewers.',
+    story: 'You lived where the network breaks down, and something in your data never patched cleanly.',
+  },
+  {
+    id: 'offworlder',
+    label: 'OFF-WORLDER',
+    trait: 'Unregistered',
+    traitText: 'Use any background (a Glitcher background keeps its own support item, no roll). +1 skill rank at creation. Once per deployment, one Federation identity system finds nothing on you. 120 fragments, no Engagement bonus.',
+    story: 'Pulled from a planet outside the Federation: conscripted, or you took a deal without knowing what it was. You play to get home, or to earn citizenship.',
+  },
+];
+
+export function getOriginProfile(origin: OriginId): OriginProfile {
+  return ORIGIN_PROFILES.find((profile) => profile.id === origin) ?? ORIGIN_PROFILES[0];
+}
+
 export const BACKGROUND_PROFILES: BackgroundProfile[] = [
   {
     id: 'enforcer',
@@ -51,6 +107,7 @@ export const BACKGROUND_PROFILES: BackgroundProfile[] = [
     sharedCoreTrait: 'Hardened: +5 Max HP, Advantage against Stun/Pin.',
     buildFocus: 'POWER',
     proficiency: 'POWER (Athletics & Intimidation)',
+    skills: ['athletics', 'intimidation'],
     starterGear: [
       'Weighted Club',
       'Thick Hide Tunic',
@@ -70,6 +127,7 @@ export const BACKGROUND_PROFILES: BackgroundProfile[] = [
     sharedCoreTrait: 'Hardened: +5 Max HP, Advantage against Stun/Pin.',
     buildFocus: 'PING',
     proficiency: 'PING (Stealth & Sleight of Hand)',
+    skills: ['stealth', 'finesse'],
     starterGear: [
       'Recurve Bow',
       'Field Radio',
@@ -89,6 +147,7 @@ export const BACKGROUND_PROFILES: BackgroundProfile[] = [
     sharedCoreTrait: 'Hardened: +5 Max HP, Advantage against Stun/Pin.',
     buildFocus: 'DATA',
     proficiency: 'Data (System Override & Security Cracking)',
+    skills: ['hacking', 'investigation'],
     starterGear: [
       'Multi-Tool',
       'Field Radio',
@@ -108,6 +167,7 @@ export const BACKGROUND_PROFILES: BackgroundProfile[] = [
     sharedCoreTrait: 'Hardened: +5 Max HP, Advantage against Stun/Pin.',
     buildFocus: 'HARDWARE',
     proficiency: 'HARDWARE (Endurance & Heavy Weapons)',
+    skills: ['endurance', 'heavyWeapons'],
     starterGear: [
       'Iron Spear',
       'Kevlar Vest',
@@ -127,6 +187,7 @@ export const BACKGROUND_PROFILES: BackgroundProfile[] = [
     sharedCoreTrait: 'Hardened: +5 Max HP, Advantage against Stun/Pin.',
     buildFocus: 'SYSTEM',
     proficiency: 'SYSTEM (Perception & Environmental Resistance)',
+    skills: ['perception', 'survival'],
     starterGear: [
       'Recurve Bow',
       'Thick Hide Tunic',
@@ -146,6 +207,7 @@ export const BACKGROUND_PROFILES: BackgroundProfile[] = [
     sharedCoreTrait: 'Premium Account: +15% starting Arena Credits.',
     buildFocus: 'DATA',
     proficiency: 'DATA (Tech Scavenging & Fabrication)',
+    skills: ['salvage', 'mechanics'],
     starterGear: [
       'Multi-Tool',
       'Recurve Bow',
@@ -165,6 +227,7 @@ export const BACKGROUND_PROFILES: BackgroundProfile[] = [
     sharedCoreTrait: 'Premium Account: +15% starting Arena Credits.',
     buildFocus: 'CLOUT',
     proficiency: 'CLOUT (Crowd Appeal & Deception)',
+    skills: ['performance', 'deception'],
     starterGear: [
       'Tactical Carbine',
       'Field Radio',
@@ -184,6 +247,7 @@ export const BACKGROUND_PROFILES: BackgroundProfile[] = [
     sharedCoreTrait: 'Premium Account: +15% starting Arena Credits.',
     buildFocus: 'DATA',
     proficiency: 'DATA (Investigation & Corporate Intel)',
+    skills: ['investigation', 'insight'],
     starterGear: [
       'Tactical Carbine',
       'Multi-Tool',
@@ -203,6 +267,7 @@ export const BACKGROUND_PROFILES: BackgroundProfile[] = [
     sharedCoreTrait: 'Premium Account: +15% starting Arena Credits.',
     buildFocus: 'SYSTEM',
     proficiency: 'SYSTEM (Biometrics & Medicine)',
+    skills: ['medicine', 'perception'],
     starterGear: [
       'Multi-Tool',
       'Kevlar Vest',
@@ -222,6 +287,7 @@ export const BACKGROUND_PROFILES: BackgroundProfile[] = [
     sharedCoreTrait: 'Premium Account: +15% starting Arena Credits.',
     buildFocus: 'PING',
     proficiency: 'PING (Acrobatics & Navigation)',
+    skills: ['acrobatics', 'survival'],
     starterGear: [
       'Recurve Bow',
       'Field Radio',
@@ -241,6 +307,7 @@ export const BACKGROUND_PROFILES: BackgroundProfile[] = [
     sharedCoreTrait: 'Data Anomalies: Start with random tier-1 utility item; hostile AI prioritize you.',
     buildFocus: 'HARDWARE',
     proficiency: 'HARDWARE (Structural Integrity & Logic)',
+    skills: ['endurance', 'mechanics'],
     starterGear: [
       'Iron Spear',
       'Kevlar Vest',
@@ -260,6 +327,7 @@ export const BACKGROUND_PROFILES: BackgroundProfile[] = [
     sharedCoreTrait: 'Data Anomalies: Start with random tier-1 utility item; hostile AI prioritize you.',
     buildFocus: 'SYSTEM',
     proficiency: 'SYSTEM (Aura Manipulation & Insight)',
+    skills: ['insight', 'deception'],
     starterGear: [
       'Field Radio',
       'Recurve Bow',
@@ -279,6 +347,7 @@ export const BACKGROUND_PROFILES: BackgroundProfile[] = [
     sharedCoreTrait: 'Data Anomalies: Start with random tier-1 utility item; hostile AI prioritize you.',
     buildFocus: 'PING',
     proficiency: 'PING (Tracking & Ranged Analysis)',
+    skills: ['marksmanship', 'perception'],
     starterGear: [
       'Tactical Carbine',
       'Field Radio',
@@ -298,6 +367,7 @@ export const BACKGROUND_PROFILES: BackgroundProfile[] = [
     sharedCoreTrait: 'Data Anomalies: Start with random tier-1 utility item; hostile AI prioritize you.',
     buildFocus: 'POWER',
     proficiency: 'POWER (Survival & Animal Handling/Bot Taming)',
+    skills: ['survival', 'insight'],
     starterGear: [
       'Iron Spear',
       'Thick Hide Tunic',
@@ -317,6 +387,7 @@ export const BACKGROUND_PROFILES: BackgroundProfile[] = [
     sharedCoreTrait: 'Data Anomalies: Start with random tier-1 utility item; hostile AI prioritize you.',
     buildFocus: 'CLOUT',
     proficiency: 'CLOUT (Persuasion & Forgery)',
+    skills: ['persuasion', 'deception'],
     starterGear: [
       'Field Radio',
       'Tactical Carbine',

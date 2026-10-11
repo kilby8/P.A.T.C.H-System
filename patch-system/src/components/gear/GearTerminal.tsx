@@ -48,6 +48,8 @@ export default function GearTerminal() {
     purchaseBlueprint,
     claimEncounterLoot,
     awardFragments,
+    grantItem,
+    swapItem,
   } = useCharacter();
 
   const [search, setSearch] = useState('');
@@ -108,8 +110,9 @@ export default function GearTerminal() {
     () => BLUEPRINT_DEFS.filter((blueprint) => !blueprint.sponsorGrade && (character.blueprintInventory[blueprint.id] ?? 0) > 0),
     [character.blueprintInventory],
   );
+  // The market sells standard blueprints only: named, legendary and sponsor-grade are loot/drops.
   const marketBlueprints = useMemo(
-    () => BLUEPRINT_DEFS.filter((blueprint) => !blueprint.sponsorGrade),
+    () => BLUEPRINT_DEFS.filter((blueprint) => !blueprint.sponsorGrade && blueprint.dropRule === 'standard'),
     [],
   );
   const sponsorInboxEntries = useMemo(
@@ -155,6 +158,22 @@ export default function GearTerminal() {
             </View>
           );
         })}
+
+        <Text style={[styles.sectionTitle, { marginTop: Spacing.md }]}>LOCKER</Text>
+        <Text style={styles.metaText}>NEW ITEMS ARRIVE HERE FROM THE GM. SWAP IN THE CONDO PHASE; THE OLD ITEM KEEPS ITS BLUEPRINTS.</Text>
+        {character.itemLocker.map((entry, index) => {
+          const item = getGearItemById(entry.itemId);
+          if (!item) return null;
+          const installedCount = entry.hardpoints.filter(Boolean).length;
+          return (
+            <View key={`locker-${index}-${entry.itemId}`} style={styles.inventoryRow}>
+              <Text style={styles.inventoryLabel}>{CATEGORY_LABELS[item.category]}</Text>
+              <Text style={styles.inventoryValue}>{item.name.toUpperCase()} · {THEME_LABELS[item.theme]} · {installedCount}/{item.hardpoints} INSTALLED</Text>
+              <MiniAdjust label="EQUIP" onPress={() => swapItem(index)} />
+            </View>
+          );
+        })}
+        {character.itemLocker.length === 0 && <Text style={styles.emptyText}>LOCKER EMPTY.</Text>}
       </View>
 
       <View style={CardStyles.glow}>
@@ -589,6 +608,9 @@ export default function GearTerminal() {
               {CATEGORY_LABELS[item.category]} · {THEME_LABELS[item.theme]} · {item.hardpoints} HP
             </Text>
             <Text style={styles.itemFunction}>{item.functionality.toUpperCase()}</Text>
+            {session.role === 'gm' && (
+              <MiniAdjust label={`GM: GIVE TO ${character.name.toUpperCase()}`} onPress={() => grantItem(character.id, item.id)} />
+            )}
           </View>
         ))}
       </View>

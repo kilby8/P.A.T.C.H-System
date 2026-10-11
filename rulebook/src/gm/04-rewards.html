@@ -1,0 +1,78 @@
+<section class="bleed opener"><div class="grid"></div><div class="scan"></div><div class="inner">
+  <div class="eyebrow">Chapter 04</div><div class="num">04</div>
+  <h1 data-num="04" id="ch-rewards">Rewards &amp; the Economy</h1>
+  <p class="lede">Fragments buy blueprints, blueprints become permanent power, and power makes better television. Control the faucet and you control the season.</p>
+  <div class="contents"><b>In this chapter</b><br>Fragment payouts · Sector loot · Sponsor drops · GM awards · Running the market · Advancement pacing</div>
+</div></section>
+
+<div class="flow">
+<h2 id="payout">Fragment Payouts</h2>
+<p>After each encounter, the squad claims one payout:</p>
+<div class="box"><div class="bt">Payout formula</div>
+<p><span class="kw">12 + 9 × Spectacle + 4 × mobs defeated + 15 if all defeated + variance</span></p>
+<p>Variance is −6 to +6 (the app rolls it; at the table, roll 1d12 − 6, or 2d6 − 7). Then multiply by the claiming operator's <b>Engagement multiplier</b>: ×1.00 below 20, +0.05 per full 20 Engagement, up to ×1.25 at 100. Round to the nearest whole fragment.</p></div>
+<p>Claiming also gives that operator <b>+3 × Spectacle Engagement</b> (minimum 4) and <b>+6 viewers per fragment</b>. The squad splits the fragments however it agrees; let the most-watched operator claim it, since the multiplier is theirs.</p>
+<table>
+  <caption>Typical payouts (variance 0, ×1.10)</caption>
+  <thead><tr><th>Encounter</th><th class="n">Base</th><th class="n">Paid</th></tr></thead>
+  <tbody>
+    <tr><td>Spectacle 2, 6 mobs, all down</td><td class="n">69</td><td class="n">76</td></tr>
+    <tr><td>Spectacle 4, 6 mobs, all down</td><td class="n">87</td><td class="n">96</td></tr>
+    <tr><td>Spectacle 6, 5 mobs, 4 down</td><td class="n">82</td><td class="n">90</td></tr>
+  </tbody>
+</table>
+
+<h2 id="sector-loot">Sector Loot</h2>
+<p>Once per encounter, or once per deployment for a stingier season, roll <b>d100</b> on the sector's row to pick the blueprint tier, then pick a blueprint of that tier.</p>
+<table>
+  <caption>Sector loot (d100)</caption>
+  <thead><tr><th class="n">Sector</th><th class="n">Foundation</th><th class="n">Tactical</th><th class="n">Apex</th></tr></thead>
+  <tbody>{{LOOT}}</tbody>
+</table>
+<ul>
+  <li><b>Eligible blueprints:</b> not sponsor-grade, loot enabled, tier unlocked, still in stock, and any sector lock matching. <b>Ghostline Scope</b> drops only in sector 3, <b>Bulwark Sigil</b> only in 4, and the unique <b>Crownbreaker Daemon Key</b> only in 5.</li>
+  <li><b>Weights:</b> standard ×1, named ×0.6, legendary ×0.25.</li>
+  <li><b>Fallback:</b> if nothing in the rolled tier is eligible (the Apex tier is locked, say), drop one tier and try again.</li>
+  <li>Rolled loot comes out of the <b>same stock as the market</b>: a looted copy is one fewer for sale. GM injects and loot overrides don't touch stock.</li>
+  <li>The recipient gains +3 Engagement and +60 viewers.</li>
+</ul>
+
+<h2 id="item-rewards">Gear Item Rewards <span class="draft-tag">PLAYTEST</span></h2>
+<p>The market sells blueprints, never items. New gear items are rewards. At the end of each deployment, roll <b>d100 for each operator who survived it</b>:</p>
+<table>
+  <thead><tr><th class="n">Sector</th><th class="n">Tactical item</th><th class="n">Apex item</th></tr></thead>
+  <tbody>
+    <tr><td class="n">1</td><td class="n">01–10</td><td class="n">–</td></tr>
+    <tr><td class="n">2</td><td class="n">01–20</td><td class="n">–</td></tr>
+    <tr><td class="n">3</td><td class="n">01–25</td><td class="n">26–30</td></tr>
+    <tr><td class="n">4</td><td class="n">01–25</td><td class="n">26–40</td></tr>
+    <tr><td class="n">5</td><td class="n">01–20</td><td class="n">21–50</td></tr>
+  </tbody>
+</table>
+<p>Pick the slot that fits the story, or roll d6: 1–2 offensive, 3–4 defensive, 5–6 support. Story rewards and sponsor contracts can add more. <b>What it works out to:</b> over a ten-deployment season (two in each sector), each operator averages about <b>two Tactical items and one Apex item</b>, with the first Tactical item around mid-season and the Apex item near the finale. An Apex item should feel like an event: put it on camera.</p>
+
+<h2 id="gm-sponsor-drops">Sponsor Drops</h2>
+<p>Any operator at <b>60+ Engagement</b> is eligible. When it would make great TV (a comeback, a near-death, a perfect kill), trigger a drop: a random sponsor-grade blueprint arrives in their inbox, +12 Engagement and +450 viewers. Aim for <b>about one drop per deployment</b> across the squad once they're popular. Sponsor-grade blueprints are never sold and never rolled as loot.</p>
+
+<h2 id="gm-awards">GM Awards</h2>
+<p>Pay fragments directly for objectives, side bets and <b>ad reads</b>: an operator who plugs a sponsor on camera. Every award gives +2 Engagement (+8 for an ad read) and +4 viewers per fragment. The app's ad reads also offer a <b>sponsor shield</b> (restore a few Overshield) instead of the fee; once you pick one, the other button locks until you start a new ad read. Good sizes: 10–20 for a stunt, 30–50 for an objective, 60+ for a season moment.</p>
+
+<h2 id="running-market">Running the Market</h2>
+<table>
+  <thead><tr><th>Lever</th><th>Default</th><th>Use it to…</th></tr></thead>
+  <tbody>
+    <tr><td><b>Tier gates</b></td><td>Foundation and Tactical open, Apex locked</td><td>Open Apex around sector 3–4, or as a story beat</td></tr>
+    <tr><td><b>Prices</b></td><td>40 / 90 / 180</td><td>Inflation, a sponsor sale, a corporate audit</td></tr>
+    <tr><td><b>Stock</b></td><td>12 / 6 / 2 per blueprint (unique 1)</td><td>Scarcity; rivals buying first</td></tr>
+    <tr><td><b>Engagement gates</b></td><td>Tactical 35, Apex 65</td><td>Fixed: fame is the price of admission</td></tr>
+    <tr><td><b>Loot toggles &amp; weights</b></td><td>All standard on, ×1</td><td>Seed a sector with a specific blueprint</td></tr>
+  </tbody>
+</table>
+<div class="box"><div class="bt">Why gates matter</div><p>Destructive installation only bites when blueprints are scarce enough that every install is a choice. If operators can buy everything they want, they'll never agonize over a hardpoint. Keep the Apex tier rare: one or two Apex installs per operator per season.</p></div>
+
+<h2 id="gm-replacement">Replacement Operators <span class="draft-tag">PLAYTEST</span></h2>
+<p>When an operator is destroyed, the player's new operator uses normal creation plus <b>AdvP equal to the lowest total a surviving squadmate has earned</b> (minimum 2), <b>+20 fragments per completed deployment</b> (max +200) and <b>one Foundation blueprint</b> of their choice; give them with the app's fragment award and blueprint inject. That keeps permadeath painful without making the new operator dead weight. Bring them in at the next Condo Phase, or mid-deployment as a "replacement contestant" if the story allows.</p>
+
+<h2 id="advancement-pacing">Advancement Pacing <span class="draft-tag">PLAYTEST</span></h2>
+<p>Give <b>1 AdvP per deployment survived</b>, plus 1 for a season milestone (about every three or four deployments). A ten-deployment season then takes an operator from 2 to about 14 AdvP spent: several nodes, a handful of sub-skills and a skill rank or two. That's enough to reach tier 3 in one zone or spread across two.</p>
+</div>

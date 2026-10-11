@@ -1,0 +1,84 @@
+<section class="bleed opener"><div class="grid"></div><div class="scan"></div><div class="inner">
+  <div class="eyebrow">Chapter 03</div><div class="num">03</div>
+  <h1 data-num="03" id="ch-encounters">Deployments &amp; Encounters</h1>
+  <p class="lede">Build fights the audience will remember and the operators will survive, mostly.</p>
+  <div class="contents"><b>In this chapter</b><br>Deployments · Spectacle Score · Mob threat tiers · Building an encounter · Running mobs · Hazards · Prime Time</div>
+</div></section>
+
+<div class="flow">
+<h2 id="deployments">Deployments</h2>
+<p>A <b>deployment</b> is one trip into the arena: a sector (difficulty <b>1–5</b>), a goal (survive, extract, escort, capture a node, make the highlight reel), and usually <b>two or three encounters</b> with movement, exploration and checks in between.</p>
+<table>
+  <thead><tr><th class="n">Sector</th><th>Use for</th><th>Loot leans</th></tr></thead>
+  <tbody>
+    <tr><td class="n hl">1</td><td>First deployments, rookies</td><td>Foundation</td></tr>
+    <tr><td class="n hl">2</td><td>Operators with a few installs</td><td>Foundation / Tactical</td></tr>
+    <tr><td class="n hl">3</td><td>The middle of a season</td><td>Tactical (named Ghostline Scope)</td></tr>
+    <tr><td class="n hl">4</td><td>Veterans, Apex market open</td><td>Apex (named Bulwark Sigil)</td></tr>
+    <tr><td class="n hl">5</td><td>Season finales</td><td>Apex (legendary Daemon Key)</td></tr>
+  </tbody>
+</table>
+
+<div class="spanall keep"><h2 id="spectacle">The Spectacle Score</h2>
+<p>Every encounter has a <b>Spectacle Score</b> from 1 to 6: how much the broadcast wants this fight. Roll a d6, or pick one to suit the story. It sets the preset force, any modifiers and part of the payout.</p>
+<table>
+  <caption>Preset forces (built for 3 operators)</caption>
+  <thead><tr><th>Score</th><th>Bracket</th><th>Force</th><th>Modifier</th><th class="n">Threat</th></tr></thead>
+  <tbody>{{SPECTACLE}}</tbody>
+</table>
+</div>
+<p>The companion app's GM console rolls these presets and spawns the mobs with their Integrity and AP filled in.</p>
+
+<h2 id="threat-tiers">Mob Threat Tiers <span class="draft-tag">PLAYTEST</span></h2>
+<p>Every Bestiary entity belongs to a <b>threat tier</b>. Integrity and AP come from the companion app; the combat numbers are playtest values tuned to the d6 pool.</p>
+<table class="wide">
+  <thead><tr><th>Tier</th><th class="n">Integrity</th><th class="n">AP</th><th class="n">Init</th><th class="n">Defense</th><th class="n">Attack</th><th class="n">Damage</th><th class="n">Save tgt</th><th class="n">Saves with</th><th class="n">Threat</th></tr></thead>
+  <tbody>{{TIERS_FULL}}</tbody>
+</table>
+<p class="small"><b>Save tgt</b> is the target operators roll against (attribute + best related skill) to resist the mob's abilities. A few entities differ from their tier template, such as the Pixel-Hound's 2 AP; the stat block always wins. <b>Saves with</b> is the pool a mob rolls to resist an operator's ability (15 for tier 1–2 abilities, 18 for tier 3). Mobs have no Overshield.</p>
+<h3 id="mob-odds">How often mobs hit</h3>
+<table class="odds wide">
+  <caption>Chance (%) a mob hits an operator of each Defense</caption>
+  <thead><tr><th>Tier</th><th class="n">Def 13</th><th class="n">14</th><th class="n">15</th><th class="n">16</th><th class="n">17</th><th class="n">18</th></tr></thead>
+  <tbody>{{MOBHIT}}</tbody>
+</table>
+<table class="odds wide">
+  <caption>Chance (%) an operator hits each tier</caption>
+  <thead><tr><th>Pool</th>{{OPHIT_HEAD}}</tr></thead>
+  <tbody>{{OPHIT}}</tbody>
+</table>
+
+<h2 id="building-encounters">Building an Encounter <span class="draft-tag">PLAYTEST</span></h2>
+<ol class="steps">
+  <li><b>Budget:</b> <b>4 threat per operator</b> for a solid fight. Use 3 per operator for a warm-up and 6 for a brutal one. Prime-Time doubles damage, so treat it as one step harder.</li>
+  <li><b>Spend it</b> on mobs at their threat cost: Fodder 1, Support 2, Standard 2, Tank 4, Elite 4, Boss 8.</li>
+  <li><b>Mix roles.</b> One anchor (Tank or Elite), one problem (a Support, Sapper or status effect), then bodies.</li>
+  <li><b>Add terrain:</b> cover, a hazard, a camera drone worth playing to.</li>
+  <li><b>Set the Spectacle Score</b> for the payout and any modifier.</li>
+</ol>
+<div class="box ex"><div class="bt">Example</div><p>Four operators: a budget of 16. Rent-Enforcer (Collector) #20 (Standard, 2) + Mainframe-Guardian (Monolith) #28 (Tank, 4) + System-Janitor (Support, 2) + 4 Pixel-Hounds (Fodder, 4) + 2 Ad-Drones (Standard, 4) = 16. The Janitor keeps the Guardian alive while the hounds hunt whoever is lowest. Spectacle 4.</p></div>
+<h3 id="promote">Promoting &amp; demoting</h3>
+<p><b>Promote</b> a mob one tier for a named rival or a finale: +8 Integrity, +1 AP, +1 attack die, +2 Defense, +2 threat. The Code-Executioner and Mainframe-Guardian make excellent promoted bosses. <b>Demote</b> for swarms: half Integrity, threat 1.</p>
+
+<h2 id="running-mobs">Running Mobs</h2>
+<ul>
+  <li>Mobs act on their <b>Init</b>; run identical mobs as one group.</li>
+  <li>Each turn a mob refills its <b>AP</b> and spends it like an operator: 1 to attack, ability costs as listed, 6 m Move free.</li>
+  <li>Mobs never get Neural Shock. At <b>0 Integrity</b> they're defeated.</li>
+  <li><b>Machines and network entities target Glitchers first</b> when the choice is otherwise even.</li>
+  <li>Play to the role: Swarmers flank, Harassers kite, Supports hide behind Tanks, Low-HP Hunters chase the bleeding.</li>
+</ul>
+
+<h2 id="hazards">Hazards <span class="draft-tag">PLAYTEST</span></h2>
+<table>
+  <thead><tr><th>Hazard</th><th>Effect</th></tr></thead>
+  <tbody>
+    <tr><td><b>Fall</b></td><td>1d6 per full 3 m fallen (Acrobatics 15 halves it)</td></tr>
+    <tr><td><b>Burning floor</b></td><td>Entering or starting a turn there: HARDWARE save 15 or Fried</td></tr>
+    <tr><td><b>Live cable</b></td><td>1d6, and HARDWARE save 15 or Stunned</td></tr>
+    <tr><td><b>Pixel-rot</b></td><td>DATA save 15 or Glitched</td></tr>
+    <tr><td><b>Lag field</b></td><td>SYSTEM save 15 or Lagged</td></tr>
+    <tr><td><b>Collapsing render</b></td><td>PING + Acrobatics 15 or fall to the level below</td></tr>
+  </tbody>
+</table>
+</div>

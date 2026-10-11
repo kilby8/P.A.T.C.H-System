@@ -1,0 +1,76 @@
+<section class="bleed opener"><div class="grid"></div><div class="scan"></div><div class="inner">
+  <div class="eyebrow">Chapter 04</div><div class="num">04</div>
+  <h1 data-num="04" id="ch-checks">Skills &amp; Checks</h1>
+  <p class="lede">Sum the pool, beat the number, and give the audience something to remember. The targets never move. You do.</p>
+  <div class="contents"><b>In this chapter</b><br>Making a check · Targets &amp; flair · Skills · Advantage · Saves · Contests · Group checks · The odds</div>
+</div></section>
+
+<div class="flow">
+<h2 id="making-a-check">Making a Check</h2>
+<p>When the outcome of an action is uncertain and interesting, the GM calls for a <b>check</b>:</p>
+<ol class="steps">
+  <li><b>The GM names the attribute, the skill and the target.</b> "PING + Stealth, target 15."</li>
+  <li><b>Build your pool:</b> one d6 per point of the attribute, plus one per rank of the skill. Untrained? Roll the attribute alone.</li>
+  <li><b>Apply modifiers:</b> advantage or disadvantage, extra dice from abilities, flat bonuses.</li>
+  <li><b>Roll and total the dice.</b> Meet or beat the target and you succeed.</li>
+  <li><b>Count the flair</b> (total minus target) on a success. Count the <b>shortfall</b> on a failure.</li>
+</ol>
+<div class="box ex"><div class="bt">Example</div><p>Kade, a Cyber-Syndicate Tech with DATA 4 and Hacking 2, cracks a sponsor vault: DATA + Hacking against <span class="tgt">20</span>. Kade rolls 6d6 for 23: success with 3 flair. The vault opens, but the GM says the alarm trips a beat late; it's clean, not spectacular.</p></div>
+
+<h2 id="targets">Targets</h2>
+<table>
+  <caption>The difficulty ladder</caption>
+  <thead><tr><th>Target</th><th>Tier</th><th>Feels like</th></tr></thead>
+  <tbody>
+    <tr><td class="n hl">10</td><td><b>Routine</b></td><td>Anyone with average specs usually makes it</td></tr>
+    <tr><td class="n hl">15</td><td><b>Tricky</b></td><td>A trained operator's bread and butter</td></tr>
+    <tr><td class="n hl">20</td><td><b>Hard</b></td><td>A real challenge, even for a specialist</td></tr>
+    <tr><td class="n hl">25</td><td><b>Heroic</b></td><td>Highlight-reel stuff; needs a big pool</td></tr>
+    <tr><td class="n hl">30</td><td><b>Legendary</b></td><td>Maximum pizzazz; the replay runs for a week</td></tr>
+  </tbody>
+</table>
+<p>Targets are <b>fixed</b>. They don't scale with your pool, your level or the sector. That's the point: a bigger pool is a reliably better operator. The ladder is a playtest starting point and may be retuned after real sessions.</p>
+
+<h2 id="flair">Flair</h2>
+<p>Every point you roll over the target is <b>flair</b>. Flair is how good the success <i>looks</i>. The GM uses it to color the narration, and some rules spend it:</p>
+<ul>
+  <li><b>Attacks:</b> +1 damage for every full 5 flair.<span class="draft-tag">PLAYTEST</span></li>
+  <li><b>Highlight:</b> 10 or more flair on a check the cameras can see earns <b>+1 Engagement</b>, at the GM's call.<span class="draft-tag">PLAYTEST</span></li>
+</ul>
+<p>Failure has a <b>shortfall</b>: miss by 1 or 2 and the GM may offer success at a cost; miss by 10 and it goes wrong on camera.</p>
+
+<h2 id="skills">Skills</h2>
+<p>Skills have <b>ranks</b> from 0 (untrained) to 5. Each skill has a usual attribute, but the GM may pair a skill with a different attribute when the fiction calls for it: POWER + Intimidation to loom, CLOUT + Intimidation to threaten on air.<span class="draft-tag">PLAYTEST</span></p>
+<table>
+  <caption>The twenty skills</caption>
+  <thead><tr><th>Skill</th><th>Attr.</th><th>Use it to…</th></tr></thead>
+  <tbody>{{SKILLS_TABLE}}</tbody>
+</table>
+
+<h2 id="advantage">Advantage &amp; Disadvantage <span class="draft-tag">PLAYTEST</span></h2>
+<p><b>Advantage:</b> roll one extra die, then drop the lowest die. <b>Disadvantage:</b> roll one extra die, then drop the highest. They don't stack; if you have both, they cancel. Advantage can't turn a sure failure into success, but it lifts your odds noticeably.</p>
+<p><b>Extra dice</b> ("+1 die", "+2 dice") add to your pool and do stack. <b>Flat bonuses</b> ("+2 on attack rolls", "+1 to POWER checks") add to the total.</p>
+
+<h2 id="saves">Saves</h2>
+<p>A <b>save</b> resists something done to you: a shockwave, a stun pulse, an intimidating warlord. Roll the named attribute <b>plus your best related skill</b> against the save target the effect lists.<span class="draft-tag">PLAYTEST</span> "Make a POWER save (13)" means roll POWER + Athletics, say, and hit 13.</p>
+<table>
+  <thead><tr><th>Save</th><th>Usual skills</th></tr></thead>
+  <tbody>{{SAVE_SKILLS}}</tbody>
+</table>
+<p>Enemy save targets run from 11 (fodder) to 17 (bosses); see the Arena Bestiary.</p>
+<p>When an operator's ability forces an enemy to save, the target is <span class="tgt">15</span> for tier 1 and 2 abilities and <span class="tgt">18</span> for tier 3. Enemies roll their attack dice (without the flat bonus) to save.<span class="draft-tag">PLAYTEST</span></p>
+
+<h2 id="contests">Contested Checks</h2>
+<p>When two characters act against each other (a sneak against a sentry, a grapple against a brute), both roll and the higher total wins. On a tie, the status quo holds: the sentry doesn't notice yet, the grapple doesn't break.</p>
+
+<h2 id="group-checks">Helping &amp; Group Checks</h2>
+<p><b>Helping:</b> if you can plausibly assist, the helper gives the roller <b>+1 die</b>. Only one helper counts.<span class="draft-tag">PLAYTEST</span> <b>Group checks:</b> when the whole squad sneaks or climbs, everyone rolls; the group succeeds if at least half succeed.</p>
+
+<h2 id="odds">The Odds</h2>
+<p>Chance (%) to meet or beat each target with a given pool. Use it to judge a target; operators use it to judge a risk.</p>
+<table class="odds wide">
+  <thead><tr><th>Pool</th><th class="n">10</th><th class="n">13</th><th class="n">15</th><th class="n">17</th><th class="n">18</th><th class="n">20</th><th class="n">25</th><th class="n">30</th></tr></thead>
+  <tbody>{{ODDS}}</tbody>
+</table>
+<p class="small muted">Average roll: 3.5 per die. 3d6 averages 10.5, 5d6 averages 17.5 and 8d6 averages 28.</p>
+</div>
