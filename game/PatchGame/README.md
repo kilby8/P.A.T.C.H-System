@@ -1,6 +1,6 @@
 # P.A.T.C.H. — Unreal Engine game
 
-Real-time third-person squad shooter built on the P.A.T.C.H. System tabletop rules (`../../rulebook`).
+Real-time first-person squad shooter built on the P.A.T.C.H. System tabletop rules (`../../rulebook`).
 Unreal Engine **5.8**, C++, Gameplay Ability System. Everything here is code and config: no binary
 assets are needed to play, so placeholder shapes stand in for characters until art exists.
 

@@ -11,7 +11,6 @@
 #include "Engine/LocalPlayer.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerController.h"
-#include "GameFramework/SpringArmComponent.h"
 #include "InputAction.h"
 #include "InputMappingContext.h"
 #include "InputModifiers.h"
@@ -33,17 +32,16 @@ APatchPlayerCharacter::APatchPlayerCharacter()
 	Move->MaxWalkSpeed = 550.f;
 	Move->BrakingDecelerationWalking = 2000.f;
 
-	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
-	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->TargetArmLength = 320.f;
-	CameraBoom->SocketOffset = FVector(0.f, 70.f, 70.f);
-	CameraBoom->bUsePawnControlRotation = true;
-	CameraBoom->bEnableCameraLag = true;
-	CameraBoom->CameraLagSpeed = 18.f;
+	// First person: camera at eye height, pitching with the controller.
+	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
+	FollowCamera->SetupAttachment(RootComponent);
+	FollowCamera->SetRelativeLocation(FVector(-10.f, 0.f, 64.f));
+	FollowCamera->bUsePawnControlRotation = true;
+	FollowCamera->SetFieldOfView(90.f);
 
-	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
-	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
-	FollowCamera->bUsePawnControlRotation = false;
+	// Hide our own placeholder body from our camera; other players still see it.
+	BodyMesh->SetOwnerNoSee(true);
+	VisorMesh->SetOwnerNoSee(true);
 
 	WeaponClass = APatchWeapon::StaticClass();
 
@@ -100,8 +98,8 @@ void APatchPlayerCharacter::BeginPlay()
 		Weapon = GetWorld()->SpawnActor<APatchWeapon>(WeaponClass, GetActorTransform(), Params);
 		if (Weapon)
 		{
-			Weapon->AttachToComponent(GetCapsuleComponent(), FAttachmentTransformRules::KeepRelativeTransform);
-			Weapon->SetActorRelativeLocation(FVector(45.f, 32.f, 25.f));
+			Weapon->AttachToComponent(FollowCamera, FAttachmentTransformRules::KeepRelativeTransform);
+			Weapon->SetActorRelativeLocation(FVector(40.f, 18.f, -16.f));
 		}
 	}
 	ApplyBuild();

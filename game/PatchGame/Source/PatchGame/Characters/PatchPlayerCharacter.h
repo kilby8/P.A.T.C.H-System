@@ -9,7 +9,6 @@ class APatchWeapon;
 class UCameraComponent;
 class UInputAction;
 class UInputMappingContext;
-class USpringArmComponent;
 
 /** Arena builds, mapped from archetype zones: GHOST light, SPECIALIST medium, BRUTE heavy. */
 UENUM(BlueprintType)
@@ -38,7 +37,7 @@ struct FPatchBuildProfile
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Build") FLinearColor Color = FLinearColor::White;
 };
 
-/** The operator: over-the-shoulder camera, Enhanced Input, a rules-driven weapon and a GAS ability kit. */
+/** The operator: first-person camera, Enhanced Input, a rules-driven weapon and a GAS ability kit. */
 UCLASS()
 class PATCHGAME_API APatchPlayerCharacter : public APatchCharacterBase
 {
@@ -95,9 +94,6 @@ protected:
 	void ServerSetSprinting(bool bNewSprinting);
 
 	void UpdateMoveSpeed();
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PATCH")
-	TObjectPtr<USpringArmComponent> CameraBoom;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PATCH")
 	TObjectPtr<UCameraComponent> FollowCamera;
