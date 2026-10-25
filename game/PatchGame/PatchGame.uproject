@@ -1,6 +1,6 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "5.5",
+	"EngineAssociation": "5.8",
 	"Category": "",
 	"Description": "P.A.T.C.H. - real-time third-person squad shooter built on the P.A.T.C.H. System rules.",
 	"Modules": [
@@ -23,6 +23,14 @@
 		{
 			"Name": "EnhancedInput",
 			"Enabled": true
+		},
+		{
+			"Name": "UE_MCP_Bridge",
+			"Enabled": true,
+			"Optional": true,
+			"TargetAllowList": [
+				"Editor"
+			]
 		}
 	]
 }

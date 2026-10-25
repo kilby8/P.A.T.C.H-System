@@ -1,16 +1,16 @@
 # P.A.T.C.H. — Unreal Engine game
 
 Real-time third-person squad shooter built on the P.A.T.C.H. System tabletop rules (`../../rulebook`).
-Unreal Engine **5.5**, C++, Gameplay Ability System. Everything here is code and config: no binary
+Unreal Engine **5.8**, C++, Gameplay Ability System. Everything here is code and config: no binary
 assets are needed to play, so placeholder shapes stand in for characters until art exists.
 
 ## Play it
 
-1. Install **Unreal Engine 5.5** (Epic Games Launcher) and **Visual Studio 2022** with the
+1. Install **Unreal Engine 5.8** (Epic Games Launcher) and **Visual Studio 2022** with the
    "Game development with C++" workload.
 2. Right-click `PatchGame.uproject` → **Generate Visual Studio project files**, then double-click
    `PatchGame.uproject`. Say **Yes** when it asks to build the `PatchGame` module.
-   (If your engine is newer than 5.5, accept the prompt to switch engine version.)
+   (Other 5.x versions should work: right-click the .uproject → Switch Unreal Engine version.)
 3. In the editor: **File → New Level → Basic**, then **File → Save Current Level As…**
    `Content/Maps/L_Arena_Test`. This is the startup map the config points at.
 4. Optional: drop a **Nav Mesh Bounds Volume** over the arena so enemies path around cover.
@@ -74,3 +74,8 @@ can be switched on later without a rewrite.
 Real character art and animation, weapon VFX/SFX, destructible environments, the broadcast/game-show
 presentation, more weapons and abilities from the archetype tree, Behavior Trees per bestiary tactics,
 the Condo screen, and the actual Sector 1 "Data Heist" map.
+
+## Editor MCP bridge (optional)
+
+To drive the editor from Claude, copy the `ue_mcp_bridge` plugin folder into `Plugins/` (it is
+gitignored). The project lists it as optional, so machines without it still open fine.

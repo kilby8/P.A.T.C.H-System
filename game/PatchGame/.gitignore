@@ -12,3 +12,6 @@ DerivedDataCache/
 *.sdf
 *.VC.db
 *.VC.opendb
+
+# Local editor tooling (copied per machine, not part of the game)
+Plugins/ue_mcp_bridge/
