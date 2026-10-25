@@ -1,0 +1,3818 @@
+{
+ "constants": {
+  "startingAdvancementPoints": 2,
+  "hardenedBonus": 5,
+  "apBankBonus": 1,
+  "skillRankCost": 2,
+  "attributeCost": 4,
+  "overshieldRange": [
+   19,
+   31
+  ],
+  "ladder": [
+   {
+    "label": "ROUTINE",
+    "target": 10
+   },
+   {
+    "label": "TRICKY",
+    "target": 15
+   },
+   {
+    "label": "HARD",
+    "target": 20
+   },
+   {
+    "label": "HEROIC",
+    "target": 25
+   },
+   {
+    "label": "LEGENDARY",
+    "target": 30
+   }
+  ],
+  "engagementGates": {
+   "tactical": 35,
+   "apex": 65
+  }
+ },
+ "skills": [
+  {
+   "id": "athletics",
+   "name": "Athletics",
+   "attribute": "POWER",
+   "use": "Climb, jump, swim, grapple, shove, break"
+  },
+  {
+   "id": "intimidation",
+   "name": "Intimidation",
+   "attribute": "POWER",
+   "use": "Scare, coerce, dominate a room"
+  },
+  {
+   "id": "melee",
+   "name": "Melee",
+   "attribute": "POWER",
+   "use": "Attack with clubs, spears and fists"
+  },
+  {
+   "id": "acrobatics",
+   "name": "Acrobatics",
+   "attribute": "PING",
+   "use": "Balance, tumble, vault, parkour"
+  },
+  {
+   "id": "finesse",
+   "name": "Finesse",
+   "attribute": "PING",
+   "use": "Pick pockets, palm objects, delicate manual work"
+  },
+  {
+   "id": "marksmanship",
+   "name": "Marksmanship",
+   "attribute": "PING",
+   "use": "Attack with bows and firearms"
+  },
+  {
+   "id": "stealth",
+   "name": "Stealth",
+   "attribute": "PING",
+   "use": "Hide, sneak, move unseen"
+  },
+  {
+   "id": "endurance",
+   "name": "Endurance",
+   "attribute": "HARDWARE",
+   "use": "Push through pain, hazards, exhaustion"
+  },
+  {
+   "id": "heavyWeapons",
+   "name": "Heavy Weapons",
+   "attribute": "HARDWARE",
+   "use": "Attack with energy and heavy weapons"
+  },
+  {
+   "id": "mechanics",
+   "name": "Mechanics",
+   "attribute": "HARDWARE",
+   "use": "Repair, fabricate, judge structural integrity"
+  },
+  {
+   "id": "hacking",
+   "name": "Hacking",
+   "attribute": "DATA",
+   "use": "System override, security cracking, attacks with support gear"
+  },
+  {
+   "id": "investigation",
+   "name": "Investigation",
+   "attribute": "DATA",
+   "use": "Research, deduce, dig up corporate intel"
+  },
+  {
+   "id": "salvage",
+   "name": "Salvage",
+   "attribute": "DATA",
+   "use": "Scavenge tech, strip parts, identify blueprints"
+  },
+  {
+   "id": "insight",
+   "name": "Insight",
+   "attribute": "SYSTEM",
+   "use": "Read people, bots and animals; spot lies"
+  },
+  {
+   "id": "medicine",
+   "name": "Medicine",
+   "attribute": "SYSTEM",
+   "use": "Biometrics, first aid, stabilizing the Flatlined"
+  },
+  {
+   "id": "perception",
+   "name": "Perception",
+   "attribute": "SYSTEM",
+   "use": "Notice, search, track, spot the hidden"
+  },
+  {
+   "id": "survival",
+   "name": "Survival",
+   "attribute": "SYSTEM",
+   "use": "Navigate, endure environments, find routes"
+  },
+  {
+   "id": "deception",
+   "name": "Deception",
+   "attribute": "CLOUT",
+   "use": "Lie, disguise, forge, misdirect"
+  },
+  {
+   "id": "performance",
+   "name": "Performance",
+   "attribute": "CLOUT",
+   "use": "Crowd appeal, stunts, playing to the cameras"
+  },
+  {
+   "id": "persuasion",
+   "name": "Persuasion",
+   "attribute": "CLOUT",
+   "use": "Negotiate, charm, cut a deal with a sponsor"
+  }
+ ],
+ "saveSkills": {
+  "POWER": [
+   "athletics"
+  ],
+  "PING": [
+   "acrobatics"
+  ],
+  "HARDWARE": [
+   "endurance"
+  ],
+  "DATA": [
+   "hacking"
+  ],
+  "SYSTEM": [
+   "insight",
+   "perception"
+  ],
+  "CLOUT": [
+   "performance",
+   "persuasion"
+  ]
+ },
+ "origins": [
+  {
+   "id": "inmate",
+   "label": "INMATE BLOCK",
+   "trait": "Hardened",
+   "traitText": "+5 maximum Hardware Integrity, and advantage on saves against being Stunned or Pinned.",
+   "story": "Paying off a sentence one broadcast at a time. The program bought your file from the prison system."
+  },
+  {
+   "id": "volunteer",
+   "label": "SLUM DISTRIKT VOLUNTEER",
+   "trait": "Premium Account",
+   "traitText": "+15% starting Data Fragments (138), +8 starting Engagement and +180 viewers.",
+   "story": "You signed the waiver yourself: for fragments, for a sponsor, for a way out of a district the Council barely knows exists."
+  },
+  {
+   "id": "glitcher",
+   "label": "OFF-GRID GLITCHER",
+   "trait": "Data Anomalies",
+   "traitText": "Your support slot is rolled (1-3 Multi-Tool, 4-6 Field Radio). Hostile AI prioritizes you. +5 Engagement and +90 viewers.",
+   "story": "You lived where the network breaks down, and something in your data never patched cleanly."
+  },
+  {
+   "id": "offworlder",
+   "label": "OFF-WORLDER",
+   "trait": "Unregistered",
+   "traitText": "Use any background (a Glitcher background keeps its own support item, no roll). +1 skill rank at creation. Once per deployment, one Federation identity system finds nothing on you. 120 fragments, no Engagement bonus.",
+   "story": "Pulled from a planet outside the Federation: conscripted, or you took a deal without knowing what it was. You play to get home, or to earn citizenship."
+  }
+ ],
+ "backgrounds": [
+  {
+   "id": "enforcer",
+   "name": "The Enforcer",
+   "category": "inmate",
+   "focus": "POWER",
+   "skills": [
+    "athletics",
+    "intimidation"
+   ],
+   "flavor": "Cartel muscle and pit fighters who survived by crushing competition.",
+   "notes": [
+    "Frontline bruiser package tuned for close pressure and durability."
+   ],
+   "loadout": [
+    "Weighted Club",
+    "Thick Hide Tunic",
+    "Multi-Tool"
+   ],
+   "blueprints": [
+    "Weighted/Reinforced Frame",
+    "Padding/Reinforcement"
+   ],
+   "fragments": 120
+  },
+  {
+   "id": "infiltrator",
+   "name": "The Infiltrator",
+   "category": "inmate",
+   "focus": "PING",
+   "skills": [
+    "stealth",
+    "finesse"
+   ],
+   "flavor": "Corporate thieves and ghost agents specialized in bypassing high-security sectors.",
+   "notes": [
+    "Skirmish and scouting profile with tactical intel support."
+   ],
+   "loadout": [
+    "Recurve Bow",
+    "Thick Hide Tunic",
+    "Field Radio"
+   ],
+   "blueprints": [
+    "Precision Sight",
+    "Signal Booster"
+   ],
+   "fragments": 120
+  },
+  {
+   "id": "cyber-syndicate-tech",
+   "name": "The Cyber-Syndicate Tech",
+   "category": "inmate",
+   "focus": "DATA",
+   "skills": [
+    "hacking",
+    "investigation"
+   ],
+   "flavor": "Digital vault raiders convicted for trying to drain megacorp credit reserves.",
+   "notes": [
+    "Control-and-intrusion package focused on support infrastructure."
+   ],
+   "loadout": [
+    "Weighted Club",
+    "Thick Hide Tunic",
+    "Field Radio"
+   ],
+   "blueprints": [
+    "Extended Battery/Capacity",
+    "Signal Booster"
+   ],
+   "fragments": 120
+  },
+  {
+   "id": "riot-breaker",
+   "name": "The Riot-Breaker",
+   "category": "inmate",
+   "focus": "HARDWARE",
+   "skills": [
+    "endurance",
+    "heavyWeapons"
+   ],
+   "flavor": "A corrupt max-security guard or rebel riot leader forged in prison block warfare.",
+   "notes": [
+    "Durable breach profile with defensive mitigation baseline."
+   ],
+   "loadout": [
+    "Iron Spear",
+    "Kevlar Vest",
+    "Multi-Tool"
+   ],
+   "blueprints": [
+    "Kinetic Plating",
+    "Padding/Reinforcement"
+   ],
+   "fragments": 120
+  },
+  {
+   "id": "solitary-drifter",
+   "name": "The Solitary Drifter",
+   "category": "inmate",
+   "focus": "SYSTEM",
+   "skills": [
+    "perception",
+    "survival"
+   ],
+   "flavor": "Years in isolation tuned your senses to server-hum and environmental signal drift.",
+   "notes": [
+    "Survival package optimized for attrition and hazard routes."
+   ],
+   "loadout": [
+    "Recurve Bow",
+    "Thick Hide Tunic",
+    "Multi-Tool"
+   ],
+   "blueprints": [
+    "Padding/Reinforcement"
+   ],
+   "fragments": 120
+  },
+  {
+   "id": "scrap-scavver",
+   "name": "The Scrap-Scavver",
+   "category": "volunteer",
+   "focus": "DATA",
+   "skills": [
+    "salvage",
+    "mechanics"
+   ],
+   "flavor": "Yard engineers who survive by extracting chips, copper, and code from urban wreckage.",
+   "notes": [
+    "Economy-efficient build with fabrication and salvage pressure."
+   ],
+   "loadout": [
+    "Recurve Bow",
+    "Thick Hide Tunic",
+    "Multi-Tool"
+   ],
+   "blueprints": [
+    "Extended Battery/Capacity",
+    "Weighted/Reinforced Frame"
+   ],
+   "fragments": 138
+  },
+  {
+   "id": "media-star",
+   "name": "The Media Star",
+   "category": "volunteer",
+   "focus": "CLOUT",
+   "skills": [
+    "performance",
+    "deception"
+   ],
+   "flavor": "Arena influencers and stunt icons who play for viewers as much as victory.",
+   "notes": [
+    "Showmanship package focused on range control and comm advantage."
+   ],
+   "loadout": [
+    "Tactical Carbine",
+    "Thick Hide Tunic",
+    "Field Radio"
+   ],
+   "blueprints": [
+    "Precision Sight",
+    "Signal Booster"
+   ],
+   "fragments": 138
+  },
+  {
+   "id": "corporate-dropout",
+   "name": "The Corporate Dropout",
+   "category": "volunteer",
+   "focus": "DATA",
+   "skills": [
+    "investigation",
+    "insight"
+   ],
+   "flavor": "Former analysts and accountants who entered the arena to escape debt and silence.",
+   "notes": [
+    "Intel analyst package with tactical offense and utility throughput."
+   ],
+   "loadout": [
+    "Tactical Carbine",
+    "Thick Hide Tunic",
+    "Multi-Tool"
+   ],
+   "blueprints": [
+    "Precision Sight",
+    "Extended Battery/Capacity"
+   ],
+   "fragments": 138
+  },
+  {
+   "id": "street-medic",
+   "name": "The Street Medic",
+   "category": "volunteer",
+   "focus": "SYSTEM",
+   "skills": [
+    "medicine",
+    "perception"
+   ],
+   "flavor": "Back-alley cyber-docs who volunteered to repay stolen supply chains.",
+   "notes": [
+    "Support-healer baseline with improved sustain and protection."
+   ],
+   "loadout": [
+    "Weighted Club",
+    "Kevlar Vest",
+    "Multi-Tool"
+   ],
+   "blueprints": [
+    "Extended Battery/Capacity",
+    "Padding/Reinforcement"
+   ],
+   "fragments": 138
+  },
+  {
+   "id": "neon-runner",
+   "name": "The Neon Runner",
+   "category": "volunteer",
+   "focus": "PING",
+   "skills": [
+    "acrobatics",
+    "survival"
+   ],
+   "flavor": "Rooftop data couriers hardened by high-speed traversal through hostile city grids.",
+   "notes": [
+    "High-mobility scout package for objective routing and kiting."
+   ],
+   "loadout": [
+    "Recurve Bow",
+    "Thick Hide Tunic",
+    "Field Radio"
+   ],
+   "blueprints": [
+    "Precision Sight",
+    "Signal Booster"
+   ],
+   "fragments": 138
+  },
+  {
+   "id": "severed-synth",
+   "name": "The Severed Synth",
+   "category": "glitcher",
+   "focus": "HARDWARE",
+   "skills": [
+    "endurance",
+    "mechanics"
+   ],
+   "flavor": "Escaped android labor units hiding in arena traffic after severing corporate control.",
+   "notes": [
+    "Glitcher bruiser profile with defensive core and anomaly aggro pressure."
+   ],
+   "loadout": [
+    "Iron Spear",
+    "Kevlar Vest",
+    "Multi-Tool"
+   ],
+   "blueprints": [
+    "Padding/Reinforcement"
+   ],
+   "fragments": 120
+  },
+  {
+   "id": "glitched-ghost",
+   "name": "The Glitched Ghost",
+   "category": "glitcher",
+   "focus": "SYSTEM",
+   "skills": [
+    "insight",
+    "deception"
+   ],
+   "flavor": "Server crash fragments left your avatar unstable, trailing artifacts and phantom echoes.",
+   "notes": [
+    "Evasive anomaly package with recon and displacement style play."
+   ],
+   "loadout": [
+    "Recurve Bow",
+    "Thick Hide Tunic",
+    "Multi-Tool"
+   ],
+   "blueprints": [
+    "Signal Booster"
+   ],
+   "fragments": 120
+  },
+  {
+   "id": "code-hunter",
+   "name": "The Code Hunter",
+   "category": "glitcher",
+   "focus": "PING",
+   "skills": [
+    "marksmanship",
+    "perception"
+   ],
+   "flavor": "Rogue bounty operatives who track glitched entities in unmonitored sectors.",
+   "notes": [
+    "Bounty-tracker package for target acquisition and ranged pressure."
+   ],
+   "loadout": [
+    "Tactical Carbine",
+    "Thick Hide Tunic",
+    "Multi-Tool"
+   ],
+   "blueprints": [
+    "Precision Sight"
+   ],
+   "fragments": 120
+  },
+  {
+   "id": "system-drift-nomad",
+   "name": "The System-Drift Nomad",
+   "category": "glitcher",
+   "focus": "POWER",
+   "skills": [
+    "survival",
+    "insight"
+   ],
+   "flavor": "Dead-zone wanderers adapted to regions where AI resource allocation collapses.",
+   "notes": [
+    "Wasteland skirmisher package for close-range survival engagements."
+   ],
+   "loadout": [
+    "Iron Spear",
+    "Thick Hide Tunic",
+    "Multi-Tool"
+   ],
+   "blueprints": [
+    "Weighted/Reinforced Frame"
+   ],
+   "fragments": 120
+  },
+  {
+   "id": "memory-broker",
+   "name": "The Memory Broker",
+   "category": "glitcher",
+   "focus": "CLOUT",
+   "skills": [
+    "persuasion",
+    "deception"
+   ],
+   "flavor": "Smugglers of deleted memory packets and unpatched code sold to the highest bidder.",
+   "notes": [
+    "Social-controller package balancing comm leverage and ranged threat."
+   ],
+   "loadout": [
+    "Tactical Carbine",
+    "Thick Hide Tunic",
+    "Multi-Tool"
+   ],
+   "blueprints": [
+    "Signal Booster",
+    "Precision Sight"
+   ],
+   "fragments": 120
+  }
+ ],
+ "derived": [
+  {
+   "value": 1,
+   "bonus": -2,
+   "hardware": 10,
+   "hardwareInmate": 15,
+   "ap": 1
+  },
+  {
+   "value": 2,
+   "bonus": -1,
+   "hardware": 15,
+   "hardwareInmate": 20,
+   "ap": 2
+  },
+  {
+   "value": 3,
+   "bonus": 0,
+   "hardware": 20,
+   "hardwareInmate": 25,
+   "ap": 2
+  },
+  {
+   "value": 4,
+   "bonus": 1,
+   "hardware": 25,
+   "hardwareInmate": 30,
+   "ap": 3
+  },
+  {
+   "value": 5,
+   "bonus": 2,
+   "hardware": 30,
+   "hardwareInmate": 35,
+   "ap": 3
+  }
+ ],
+ "broadcast": [
+  {
+   "origin": "inmate",
+   "byClout": [
+    {
+     "engagement": 10,
+     "viewers": 180
+    },
+    {
+     "engagement": 17,
+     "viewers": 240
+    },
+    {
+     "engagement": 25,
+     "viewers": 300
+    },
+    {
+     "engagement": 33,
+     "viewers": 360
+    },
+    {
+     "engagement": 41,
+     "viewers": 420
+    }
+   ]
+  },
+  {
+   "origin": "volunteer",
+   "byClout": [
+    {
+     "engagement": 17,
+     "viewers": 360
+    },
+    {
+     "engagement": 25,
+     "viewers": 420
+    },
+    {
+     "engagement": 33,
+     "viewers": 480
+    },
+    {
+     "engagement": 41,
+     "viewers": 540
+    },
+    {
+     "engagement": 49,
+     "viewers": 600
+    }
+   ]
+  },
+  {
+   "origin": "glitcher",
+   "byClout": [
+    {
+     "engagement": 14,
+     "viewers": 270
+    },
+    {
+     "engagement": 22,
+     "viewers": 330
+    },
+    {
+     "engagement": 30,
+     "viewers": 390
+    },
+    {
+     "engagement": 38,
+     "viewers": 450
+    },
+    {
+     "engagement": 46,
+     "viewers": 510
+    }
+   ]
+  },
+  {
+   "origin": "offworlder",
+   "byClout": [
+    {
+     "engagement": 10,
+     "viewers": 180
+    },
+    {
+     "engagement": 17,
+     "viewers": 240
+    },
+    {
+     "engagement": 25,
+     "viewers": 300
+    },
+    {
+     "engagement": 33,
+     "viewers": 360
+    },
+    {
+     "engagement": 41,
+     "viewers": 420
+    }
+   ]
+  }
+ ],
+ "rook": {
+  "hardware": 20,
+  "overshield": 26,
+  "ap": 3,
+  "defense": 15,
+  "engagement": 33,
+  "viewers": 480,
+  "fragments": 138,
+  "skills": {
+   "acrobatics": 2,
+   "survival": 2,
+   "marksmanship": 2
+  }
+ },
+ "gear": [
+  {
+   "id": "i-weighted-club",
+   "name": "Weighted Club",
+   "category": "offensive",
+   "theme": "foundation",
+   "hardpoints": 1,
+   "functionality": "Blunt force with high durability.",
+   "rules": {
+    "attribute": "POWER",
+    "skill": "melee",
+    "damage": "1d8",
+    "damageType": "blunt",
+    "range": "Melee",
+    "feature": "High durability: immune to item-loss effects."
+   }
+  },
+  {
+   "id": "i-iron-spear",
+   "name": "Iron Spear",
+   "category": "offensive",
+   "theme": "foundation",
+   "hardpoints": 1,
+   "functionality": "Reach advantage and piercing damage.",
+   "rules": {
+    "attribute": "POWER",
+    "skill": "melee",
+    "damage": "1d10",
+    "damageType": "piercing",
+    "range": "Reach 2 m",
+    "feature": "Reach."
+   }
+  },
+  {
+   "id": "i-recurve-bow",
+   "name": "Recurve Bow",
+   "category": "offensive",
+   "theme": "foundation",
+   "hardpoints": 1,
+   "functionality": "Mid-range kinetic damage delivery.",
+   "rules": {
+    "attribute": "PING",
+    "skill": "marksmanship",
+    "damage": "1d8",
+    "damageType": "kinetic",
+    "range": "30 m",
+    "feature": "Mid-range kinetic."
+   }
+  },
+  {
+   "id": "i-tactical-carbine",
+   "name": "Tactical Carbine",
+   "category": "offensive",
+   "theme": "tactical",
+   "hardpoints": 2,
+   "functionality": "Versatile platform that accepts sights and suppressors.",
+   "rules": {
+    "attribute": "PING",
+    "skill": "marksmanship",
+    "damage": "2d6",
+    "damageType": "kinetic",
+    "range": "60 m",
+    "feature": "Platform for sights and suppressors."
+   }
+  },
+  {
+   "id": "i-hard-light-lance",
+   "name": "Hard-Light Lance",
+   "category": "offensive",
+   "theme": "apex",
+   "hardpoints": 3,
+   "functionality": "Energy-based strikes that ignore non-energy cover.",
+   "rules": {
+    "attribute": "HARDWARE",
+    "skill": "heavyWeapons",
+    "damage": "2d8",
+    "damageType": "energy",
+    "range": "10 m",
+    "feature": "Ignores non-energy cover."
+   }
+  },
+  {
+   "id": "i-thick-hide-tunic",
+   "name": "Thick Hide Tunic",
+   "category": "defensive",
+   "theme": "foundation",
+   "hardpoints": 1,
+   "functionality": "Basic protection from environmental hazards.",
+   "rules": {
+    "attribute": "HARDWARE",
+    "skill": "endurance",
+    "damage": "1d4",
+    "damageType": "counter",
+    "range": "Melee",
+    "defenseBonus": 1,
+    "counter": "1d4",
+    "feature": "Advantage on saves against environmental hazards."
+   }
+  },
+  {
+   "id": "i-kevlar-vest",
+   "name": "Kevlar Vest",
+   "category": "defensive",
+   "theme": "tactical",
+   "hardpoints": 2,
+   "functionality": "Mitigation against kinetic damage.",
+   "rules": {
+    "attribute": "HARDWARE",
+    "skill": "endurance",
+    "damage": "1d6",
+    "damageType": "counter",
+    "range": "Melee",
+    "defenseBonus": 2,
+    "counter": "1d6",
+    "feature": "Kinetic mitigation (the Defense bonus)."
+   }
+  },
+  {
+   "id": "i-kinetic-shielding",
+   "name": "Kinetic Shielding",
+   "category": "defensive",
+   "theme": "apex",
+   "hardpoints": 3,
+   "functionality": "Repels high-velocity projectiles.",
+   "rules": {
+    "attribute": "HARDWARE",
+    "skill": "endurance",
+    "damage": "1d8",
+    "damageType": "counter",
+    "range": "Melee",
+    "defenseBonus": 3,
+    "counter": "1d8",
+    "feature": "Ranged kinetic attacks from beyond 10 m have disadvantage."
+   }
+  },
+  {
+   "id": "i-multi-tool",
+   "name": "Multi-Tool",
+   "category": "support",
+   "theme": "foundation",
+   "hardpoints": 1,
+   "functionality": "Essential for basic repairs and scavenging.",
+   "rules": {
+    "attribute": "DATA",
+    "skill": "hacking",
+    "damage": "1d4",
+    "damageType": "utility",
+    "range": "Melee",
+    "feature": "+1 die on Mechanics and Salvage checks; field repairs and scavenging."
+   }
+  },
+  {
+   "id": "i-field-radio",
+   "name": "Field Radio",
+   "category": "support",
+   "theme": "tactical",
+   "hardpoints": 2,
+   "functionality": "Secure team communication.",
+   "rules": {
+    "attribute": "DATA",
+    "skill": "hacking",
+    "damage": "1d4",
+    "damageType": "signal",
+    "range": "30 m (machines and network entities only)",
+    "feature": "Callout (1 AP): an ally who can hear you gets +1 die on their next attack this round."
+   }
+  },
+  {
+   "id": "i-signal-jammer",
+   "name": "Signal Jammer",
+   "category": "support",
+   "theme": "apex",
+   "hardpoints": 3,
+   "functionality": "Disables local electronic communication.",
+   "rules": {
+    "attribute": "DATA",
+    "skill": "hacking",
+    "damage": "1d6",
+    "damageType": "disruption",
+    "range": "10 m",
+    "feature": "Jam (2 AP): until your next turn, machines and network entities within 10 m save (18) or lose 1 AP, and nobody in range can call reinforcements."
+   }
+  }
+ ],
+ "blueprints": [
+  {
+   "id": "bp-weighted-reinforced-frame",
+   "name": "Weighted/Reinforced Frame",
+   "theme": "foundation",
+   "compatibleCategories": [
+    "offensive"
+   ],
+   "effect": "Increases durability of Foundation-tier weapons.",
+   "dropRule": "standard",
+   "rules": "Durability: weapon deals +1 damage and can't be broken or disarmed.",
+   "price": 40,
+   "stock": 12
+  },
+  {
+   "id": "bp-precision-sight",
+   "name": "Precision Sight",
+   "theme": "tactical",
+   "compatibleCategories": [
+    "offensive"
+   ],
+   "effect": "Adds +1 accuracy and range to Tactical offensive items.",
+   "dropRule": "standard",
+   "rules": "+1 die on attacks with this weapon; range x1.5.",
+   "price": 90,
+   "stock": 6
+  },
+  {
+   "id": "bp-essence-capacitor",
+   "name": "Essence-Capacitor",
+   "theme": "apex",
+   "compatibleCategories": [
+    "offensive"
+   ],
+   "effect": "Allows weapons to store and release high-energy bursts.",
+   "dropRule": "standard",
+   "rules": "Charge (1 AP): your next hit with this weapon releases +2d6 energy damage.",
+   "price": 180,
+   "stock": 2
+  },
+  {
+   "id": "bp-padding-reinforcement",
+   "name": "Padding/Reinforcement",
+   "theme": "foundation",
+   "compatibleCategories": [
+    "defensive"
+   ],
+   "effect": "Increases mitigation for hide or textile armor.",
+   "dropRule": "standard",
+   "rules": "Reduce physical damage from each hit by 1.",
+   "price": 40,
+   "stock": 12
+  },
+  {
+   "id": "bp-kinetic-plating",
+   "name": "Kinetic Plating",
+   "theme": "tactical",
+   "compatibleCategories": [
+    "defensive"
+   ],
+   "effect": "Adds resistance to bullet and impact damage.",
+   "dropRule": "standard",
+   "rules": "Reduce kinetic, piercing and blunt damage from each hit by 2.",
+   "price": 90,
+   "stock": 6
+  },
+  {
+   "id": "bp-phase-shifter",
+   "name": "Phase-Shifter",
+   "theme": "apex",
+   "compatibleCategories": [
+    "defensive"
+   ],
+   "effect": "Grants a chance to negate incoming energy damage entirely.",
+   "dropRule": "standard",
+   "rules": "When an energy attack hits you, roll 1d6: on 5-6 it is negated entirely.",
+   "price": 180,
+   "stock": 2
+  },
+  {
+   "id": "bp-extended-battery-capacity",
+   "name": "Extended Battery/Capacity",
+   "theme": "foundation",
+   "compatibleCategories": [
+    "support"
+   ],
+   "effect": "Increases usage duration of support items.",
+   "dropRule": "standard",
+   "rules": "Support effects with a duration last 1 round longer; once-per-encounter features gain one extra use.",
+   "price": 40,
+   "stock": 12
+  },
+  {
+   "id": "bp-signal-booster",
+   "name": "Signal Booster",
+   "theme": "tactical",
+   "compatibleCategories": [
+    "support"
+   ],
+   "effect": "Increases communication and scanning range.",
+   "dropRule": "standard",
+   "rules": "Double comms and scanning range; +1 die on Perception checks made through sensors.",
+   "price": 90,
+   "stock": 6
+  },
+  {
+   "id": "bp-hacking-suite",
+   "name": "Hacking Suite",
+   "theme": "apex",
+   "compatibleCategories": [
+    "support"
+   ],
+   "effect": "Allows remote override of hostile turrets or terminals.",
+   "dropRule": "standard",
+   "rules": "Override (2 AP): DATA + Hacking against a turret, terminal or drone's Defense; on a success you control it until the end of your next turn.",
+   "price": 180,
+   "stock": 2
+  },
+  {
+   "id": "bp-ghostline-scope",
+   "name": "Ghostline Scope",
+   "theme": "tactical",
+   "compatibleCategories": [
+    "offensive"
+   ],
+   "effect": "Named optic package that grants precision through dense obscurants.",
+   "dropRule": "named",
+   "sectorLocks": [
+    3
+   ],
+   "rules": "+1 die on attacks with this weapon; ignore smoke, fog and other obscurants.",
+   "price": 90,
+   "stock": 6
+  },
+  {
+   "id": "bp-bulwark-sigil",
+   "name": "Bulwark Sigil",
+   "theme": "apex",
+   "compatibleCategories": [
+    "defensive"
+   ],
+   "effect": "Named ward lattice that redirects a burst of incoming force.",
+   "dropRule": "named",
+   "sectorLocks": [
+    4
+   ],
+   "rules": "Once per encounter, reaction (1 AP): redirect one hit's damage to an enemy within 2 m.",
+   "price": 180,
+   "stock": 2
+  },
+  {
+   "id": "bp-crownbreaker-daemon-key",
+   "name": "Crownbreaker Daemon Key",
+   "theme": "apex",
+   "compatibleCategories": [
+    "support"
+   ],
+   "effect": "Legendary intrusion key enabling one controlled hostile subsystem breach.",
+   "dropRule": "legendary",
+   "sectorLocks": [
+    5
+   ],
+   "uniqueDrop": true,
+   "rules": "Once per session: seize one hostile subsystem (a boss ability, a Security-Node network, a turret grid) for the rest of the scene.",
+   "price": 180,
+   "stock": 1
+  },
+  {
+   "id": "bp-neon-tracer",
+   "name": "Neon Tracer",
+   "theme": "tactical",
+   "compatibleCategories": [
+    "offensive"
+   ],
+   "effect": "Enhances projectile visibility for stylized shot tracking.",
+   "dropRule": "standard",
+   "sponsorGrade": true,
+   "streamTrait": "+10% engagement gain when offensive pressure is maintained.",
+   "rules": "+1 die on attacks against a target you attacked last turn.",
+   "price": 0,
+   "stock": 0
+  },
+  {
+   "id": "bp-kill-feed-display",
+   "name": "Kill-Feed Display",
+   "theme": "tactical",
+   "compatibleCategories": [
+    "support"
+   ],
+   "effect": "Projects real-time combat telemetry overlays into the public feed.",
+   "dropRule": "standard",
+   "sponsorGrade": true,
+   "streamTrait": "+5% fragment payout from sponsored appearances.",
+   "rules": "Allies get +1 to attack totals against targets you hit this round.",
+   "price": 0,
+   "stock": 0
+  },
+  {
+   "id": "bp-holographic-cloak",
+   "name": "Holographic Cloak",
+   "theme": "apex",
+   "compatibleCategories": [
+    "defensive"
+   ],
+   "effect": "Generates visual decoys and distortion around the operator silhouette.",
+   "dropRule": "standard",
+   "sponsorGrade": true,
+   "streamTrait": "+20% engagement spike after a close-call evade.",
+   "rules": "Reaction (1 AP): an attack against you has disadvantage.",
+   "price": 0,
+   "stock": 0
+  },
+  {
+   "id": "bp-signature-finisher",
+   "name": "Signature Finisher",
+   "theme": "apex",
+   "compatibleCategories": [
+    "offensive"
+   ],
+   "effect": "Unlocks a branded execution sequence with custom camera priority.",
+   "dropRule": "standard",
+   "sponsorGrade": true,
+   "streamTrait": "Massive viewer spike when closing an encounter on-camera.",
+   "rules": "Branded execution: dropping an enemy to 0 with this weapon is a guaranteed highlight (+1 Engagement).",
+   "price": 0,
+   "stock": 0
+  }
+ ],
+ "themeGates": {
+  "foundation": true,
+  "tactical": true,
+  "apex": false
+ },
+ "nodes": [
+  {
+   "id": "B1",
+   "name": "Iron Frame",
+   "zone": "BRUTE",
+   "tier": 1,
+   "description": "Reinforce biological chassis for increased trauma resistance.",
+   "subSkills": [
+    {
+     "id": "B1-SUB-1",
+     "use": "Passive",
+     "apCost": 0,
+     "advancementCost": 1,
+     "name": "Plated Dermis",
+     "description": "Sub-dermal alloy weave reduces all incoming physical damage by 1."
+    },
+    {
+     "id": "B1-SUB-2",
+     "use": "Passive",
+     "apCost": 0,
+     "advancementCost": 1,
+     "name": "Stress Hardening",
+     "description": "Each hit you take gives you +1 damage resistance against later hits until the end of the round."
+    }
+   ],
+   "prerequisite": "Open to anyone."
+  },
+  {
+   "id": "B2",
+   "name": "Kinetic Driver",
+   "zone": "BRUTE",
+   "tier": 1,
+   "description": "Hydraulic limb enhancement boosts melee output.",
+   "subSkills": [
+    {
+     "id": "B2-SUB-1",
+     "use": "+1 AP on a melee attack",
+     "apCost": 1,
+     "advancementCost": 1,
+     "name": "Power Strike",
+     "description": "Spend 1 extra AP on a melee attack to double its base damage die."
+    },
+    {
+     "id": "B2-SUB-2",
+     "use": "Action 2 AP · HARDWARE save 15",
+     "apCost": 2,
+     "advancementCost": 1,
+     "name": "Ground Pound",
+     "description": "Slam attack forces all adjacent targets to pass a HARDWARE check or fall prone."
+    }
+   ],
+   "prerequisite": "Open to anyone."
+  },
+  {
+   "id": "B3",
+   "name": "Overclock Shell",
+   "zone": "BRUTE",
+   "tier": 1,
+   "description": "Short-burst physical overclock at cost of heat buildup.",
+   "subSkills": [
+    {
+     "id": "B3-SUB-1",
+     "use": "Free · once per encounter",
+     "apCost": 0,
+     "advancementCost": 1,
+     "name": "Burst Mode",
+     "description": "Gain +2 AP this turn. Next turn start with -1 AP due to thermal cooldown."
+    },
+    {
+     "id": "B3-SUB-2",
+     "use": "Action 1 AP",
+     "apCost": 1,
+     "advancementCost": 1,
+     "name": "Heat Vent",
+     "description": "Release stored heat as a cone of scorching exhaust, dealing 1d4 to adjacent enemies."
+    }
+   ],
+   "prerequisite": "Open to anyone."
+  },
+  {
+   "id": "B4",
+   "name": "Bulwark Protocol",
+   "zone": "BRUTE",
+   "tier": 2,
+   "description": "Active defensive stance that absorbs frontal damage.",
+   "subSkills": [
+    {
+     "id": "B4-SUB-1",
+     "use": "Reaction 1 AP",
+     "apCost": 1,
+     "advancementCost": 1,
+     "name": "Shield Wall",
+     "description": "Spend 1 AP to halve all incoming damage from a single frontal source this round."
+    },
+    {
+     "id": "B4-SUB-2",
+     "use": "Passive",
+     "apCost": 0,
+     "advancementCost": 1,
+     "name": "Absorb and Counter",
+     "description": "When damage is halved by Shield Wall, immediately deal 1d6 back to the attacker."
+    }
+   ],
+   "prerequisite": "Needs a tier-1 BRUTE node."
+  },
+  {
+   "id": "B5",
+   "name": "Titan Chassis",
+   "zone": "BRUTE",
+   "tier": 2,
+   "description": "Maximum Hardware Integrity cap increase.",
+   "subSkills": [
+    {
+     "id": "B5-SUB-1",
+     "use": "Passive",
+     "apCost": 0,
+     "advancementCost": 1,
+     "name": "Reinforced Plating",
+     "description": "Permanently increase maximum Hardware Integrity by 5."
+    },
+    {
+     "id": "B5-SUB-2",
+     "use": "Passive",
+     "apCost": 0,
+     "advancementCost": 1,
+     "name": "Redundant Systems",
+     "description": "Neural Shock threshold drops to 35% — you survive longer before throttling."
+    }
+   ],
+   "prerequisite": "Needs a tier-1 BRUTE node."
+  },
+  {
+   "id": "B6",
+   "name": "Seismic Slam",
+   "zone": "BRUTE",
+   "tier": 2,
+   "description": "Area-of-effect ground strike disrupts enemy positioning.",
+   "subSkills": [
+    {
+     "id": "B6-SUB-1",
+     "use": "Action 2 AP · POWER save 15",
+     "apCost": 2,
+     "advancementCost": 1,
+     "name": "Shockwave",
+     "description": "Ground slam radiates 2m; enemies in range make a POWER save or lose 1 AP next turn."
+    },
+    {
+     "id": "B6-SUB-2",
+     "use": "Passive",
+     "apCost": 0,
+     "advancementCost": 1,
+     "name": "Tremor Pulse",
+     "description": "Shockwave also disables vehicle and drone movement for 1 round in the radius."
+    }
+   ],
+   "prerequisite": "Needs a tier-1 BRUTE node."
+  },
+  {
+   "id": "B7",
+   "name": "Neural Anchor",
+   "zone": "BRUTE",
+   "tier": 3,
+   "description": "Resist Neural Shock triggers at extreme damage thresholds.",
+   "subSkills": [
+    {
+     "id": "B7-SUB-1",
+     "use": "Free · once per encounter",
+     "apCost": 0,
+     "advancementCost": 1,
+     "name": "Shock Suppressor",
+     "description": "Once per encounter, ignore a Neural Shock trigger entirely."
+    },
+    {
+     "id": "B7-SUB-2",
+     "use": "Free · once per encounter",
+     "apCost": 0,
+     "advancementCost": 1,
+     "name": "Pain Nullifier",
+     "description": "While in Neural Shock, the -1 AP penalty is negated for 2 rounds."
+    }
+   ],
+   "prerequisite": "Needs a tier-2 BRUTE node."
+  },
+  {
+   "id": "B8",
+   "name": "War Engine",
+   "zone": "BRUTE",
+   "tier": 3,
+   "description": "Sustained combat mode — reduced AP cost for physical actions.",
+   "subSkills": [
+    {
+     "id": "B8-SUB-1",
+     "use": "Passive",
+     "apCost": 0,
+     "advancementCost": 1,
+     "note": "War Engine switches on for the rest of the encounter once you make a melee attack. Attacks already cost 1 AP, so Combat Flow cuts melee abilities that cost 2+ AP (Ground Pound, Shockwave) and makes Power Strike’s extra AP free.",
+     "name": "Combat Flow",
+     "description": "All melee attacks cost 1 less AP (minimum 1) while War Engine is active."
+    },
+    {
+     "id": "B8-SUB-2",
+     "use": "Passive",
+     "apCost": 0,
+     "advancementCost": 1,
+     "name": "Momentum",
+     "description": "Each consecutive melee hit in a turn grants +1 damage on the next."
+    }
+   ],
+   "prerequisite": "Needs a tier-2 BRUTE node."
+  },
+  {
+   "id": "B9",
+   "name": "Fortress Mode",
+   "zone": "BRUTE",
+   "tier": 3,
+   "description": "Locks movement in exchange for massive defense.",
+   "subSkills": [
+    {
+     "id": "B9-SUB-1",
+     "use": "Passive (if you haven’t moved this turn)",
+     "apCost": 0,
+     "advancementCost": 1,
+     "name": "Static Defense",
+     "description": "While stationary, reduce all incoming damage by 3."
+    },
+    {
+     "id": "B9-SUB-2",
+     "use": "Passive",
+     "apCost": 0,
+     "advancementCost": 1,
+     "name": "Turret Stance",
+     "description": "Gain an extra reaction each round, usable only for defensive counters."
+    }
+   ],
+   "prerequisite": "Needs a tier-2 BRUTE node."
+  },
+  {
+   "id": "B10",
+   "name": "Apex Predator",
+   "zone": "BRUTE",
+   "tier": 3,
+   "description": "Execute weakened targets for immediate AP refund.",
+   "subSkills": [
+    {
+     "id": "B10-SUB-1",
+     "use": "Passive",
+     "apCost": 0,
+     "advancementCost": 1,
+     "name": "Execution",
+     "description": "A finishing blow on a target at or below 25% of its Integrity (or Hardware) refunds 2 AP immediately."
+    },
+    {
+     "id": "B10-SUB-2",
+     "use": "Passive",
+     "apCost": 0,
+     "advancementCost": 1,
+     "note": "An execution is a finishing blow that triggers Execution.",
+     "name": "Trophy Kill",
+     "description": "Each execution this encounter grants +1 to all POWER checks until end of session."
+    }
+   ],
+   "prerequisite": "Needs a tier-2 BRUTE node."
+  },
+  {
+   "id": "G1",
+   "name": "Stealth Protocol",
+   "zone": "GHOST",
+   "tier": 1,
+   "description": "Reduce electronic and optical detection signature.",
+   "subSkills": [
+    {
+     "id": "G1-SUB-1",
+     "use": "Action 1 AP · PING save 15",
+     "apCost": 1,
+     "advancementCost": 1,
+     "name": "Optical Cloak",
+     "description": "Bend light around your chassis for 1 round; enemies must pass a PING check to target you."
+    },
+    {
+     "id": "G1-SUB-2",
+     "use": "Action 1 AP",
+     "apCost": 1,
+     "advancementCost": 1,
+     "name": "Ping Mask",
+     "description": "Suppress all active radio and sonar pings emanating from your gear for 2 rounds."
+    }
+   ],
+   "prerequisite": "Open to anyone."
+  },
+  {
+   "id": "G2",
+   "name": "Neural Reflex",
+   "zone": "GHOST",
+   "tier": 1,
+   "description": "Enhanced reaction time provides bonus dodge window.",
+   "subSkills": [
+    {
+     "id": "G2-SUB-1",
+     "use": "Reaction 1 AP · once per round",
+     "apCost": 1,
+     "advancementCost": 1,
+     "name": "Reflex Dodge",
+     "description": "Once per round, as a reaction costing 1 AP, halve the damage of an incoming ranged attack."
+    },
+    {
+     "id": "G2-SUB-2",
+     "use": "Passive",
+     "apCost": 0,
+     "advancementCost": 1,
+     "name": "Counter-Frame",
+     "description": "After a successful dodge, your next melee attack gains +2 dice."
+    }
+   ],
+   "prerequisite": "Open to anyone."
+  },
+  {
+   "id": "G3",
+   "name": "Ghost Walk",
+   "zone": "GHOST",
+   "tier": 1,
+   "description": "Silent movement system nullifies footstep detection.",
+   "subSkills": [
+    {
+     "id": "G3-SUB-1",
+     "use": "Passive",
+     "apCost": 0,
+     "advancementCost": 1,
+     "name": "Featherfall",
+     "description": "Landing from any height produces zero acoustic signature."
+    },
+    {
+     "id": "G3-SUB-2",
+     "use": "Passive",
+     "apCost": 0,
+     "advancementCost": 1,
+     "name": "No Signature",
+     "description": "Movement through sensor zones does not trigger proximity alerts."
+    }
+   ],
+   "prerequisite": "Open to anyone."
+  },
+  {
+   "id": "G4",
+   "name": "Firewall Veil",
+   "zone": "GHOST",
+   "tier": 2,
+   "description": "Instant reactive Overshield on trigger for 1 AP.",
+   "subSkills": [
+    {
+     "id": "G4-SUB-1",
+     "use": "Reaction 1 AP",
+     "apCost": 1,
+     "advancementCost": 1,
+     "name": "Emergency Veil",
+     "description": "Spend 1 AP as a reaction when hit to instantly restore 4 Overshield points."
+    },
+    {
+     "id": "G4-SUB-2",
+     "use": "Passive",
+     "apCost": 0,
+     "advancementCost": 1,
+     "name": "Cascade Block",
+     "description": "If the veil absorbs the full attack, the next incoming hit this round also costs +1 AP for the attacker."
+    }
+   ],
+   "prerequisite": "Needs a tier-1 GHOST node."
+  },
+  {
+   "id": "G5",
+   "name": "Phase Shift",
+   "zone": "GHOST",
+   "tier": 2,
+   "description": "Briefly displace spatial signature — dodge one attack entirely.",
+   "subSkills": [
+    {
+     "id": "G5-SUB-1",
+     "use": "Reaction 2 AP",
+     "apCost": 2,
+     "advancementCost": 1,
+     "name": "Blink",
+     "description": "Teleport up to 3m as a reaction; the triggering attack misses automatically."
+    },
+    {
+     "id": "G5-SUB-2",
+     "use": "+1 AP after Blink: untargetable until your next turn",
+     "apCost": 1,
+     "advancementCost": 1,
+     "note": "Spend 1 more AP right after Blink: you stay untargetable until your next turn starts.",
+     "name": "Void Step",
+     "description": "After Blinking, remain untargetable for 1 additional AP worth of time."
+    }
+   ],
+   "prerequisite": "Needs a tier-1 GHOST node."
+  },
+  {
+   "id": "G6",
+   "name": "Signal Jammer",
+   "zone": "GHOST",
+   "tier": 2,
+   "description": "Disrupt enemy communications for one round.",
+   "subSkills": [
+    {
+     "id": "G6-SUB-1",
+     "use": "Action 2 AP",
+     "apCost": 2,
+     "advancementCost": 1,
+     "name": "Static Burst",
+     "description": "All enemy coordination bonuses are nullified for 1 round in a 10m radius."
+    },
+    {
+     "id": "G6-SUB-2",
+     "use": "Passive (with Static Burst)",
+     "apCost": 0,
+     "advancementCost": 1,
+     "name": "Comms Blackout",
+     "description": "Enemies cannot call for reinforcements or share targeting data this round."
+    }
+   ],
+   "prerequisite": "Needs a tier-1 GHOST node."
+  },
+  {
+   "id": "G7",
+   "name": "Shadow Network",
+   "zone": "GHOST",
+   "tier": 3,
+   "description": "Establish covert relay for persistent intel feed.",
+   "subSkills": [
+    {
+     "id": "G7-SUB-1",
+     "use": "Passive",
+     "apCost": 0,
+     "advancementCost": 1,
+     "name": "Dark Web Tap",
+     "description": "Passively intercept all encrypted enemy transmissions within 50m."
+    },
+    {
+     "id": "G7-SUB-2",
+     "use": "Passive",
+     "apCost": 0,
+     "advancementCost": 1,
+     "name": "Persistent Ghost",
+     "description": "Your stealth state no longer breaks when you attack with ranged weapons."
+    }
+   ],
+   "prerequisite": "Needs a tier-2 GHOST node."
+  },
+  {
+   "id": "G8",
+   "name": "System Ghost",
+   "zone": "GHOST",
+   "tier": 3,
+   "description": "Remove character from all electronic tracking entirely.",
+   "subSkills": [
+    {
+     "id": "G8-SUB-1",
+     "use": "Passive",
+     "apCost": 0,
+     "advancementCost": 1,
+     "name": "Off-Grid",
+     "description": "Your biometric data disappears from all corporate databases for the session."
+    },
+    {
+     "id": "G8-SUB-2",
+     "use": "Passive",
+     "apCost": 0,
+     "advancementCost": 1,
+     "name": "Null Identity",
+     "description": "Any facial or gait recognition systems return a null result when scanning you."
+    }
+   ],
+   "prerequisite": "Needs a tier-2 GHOST node."
+  },
+  {
+   "id": "G9",
+   "name": "Reflex Engine",
+   "zone": "GHOST",
+   "tier": 3,
+   "description": "Trigger two reactions in a single round.",
+   "subSkills": [
+    {
+     "id": "G9-SUB-1",
+     "use": "Passive",
+     "apCost": 0,
+     "advancementCost": 1,
+     "name": "Double Dodge",
+     "description": "Use Reflex Dodge twice per round instead of once."
+    },
+    {
+     "id": "G9-SUB-2",
+     "use": "Reaction 2 AP",
+     "apCost": 2,
+     "advancementCost": 1,
+     "name": "Reactive Firewall",
+     "description": "Trigger Emergency Veil and Reflex Dodge simultaneously for 2 AP."
+    }
+   ],
+   "prerequisite": "Needs a tier-2 GHOST node."
+  },
+  {
+   "id": "G10",
+   "name": "Apex Phantom",
+   "zone": "GHOST",
+   "tier": 3,
+   "description": "Eliminate target without triggering any alert state.",
+   "subSkills": [
+    {
+     "id": "G10-SUB-1",
+     "use": "Passive",
+     "apCost": 0,
+     "advancementCost": 1,
+     "note": "Heat is the scene’s alert level (Calm, Alert, Lockdown); the GM raises it when security notices you.",
+     "name": "Clean Kill",
+     "description": "Executing a target from stealth generates zero heat on the threat board."
+    },
+    {
+     "id": "G10-SUB-2",
+     "use": "Passive",
+     "apCost": 0,
+     "advancementCost": 1,
+     "name": "No Trace",
+     "description": "Bodies eliminated via Clean Kill are automatically concealed from enemy patrols."
+    }
+   ],
+   "prerequisite": "Needs a tier-2 GHOST node."
+  },
+  {
+   "id": "S1",
+   "name": "Data Tap",
+   "zone": "SPECIALIST",
+   "tier": 1,
+   "description": "Extract live intel from enemy networks during combat.",
+   "subSkills": [
+    {
+     "id": "S1-SUB-1",
+     "use": "Passive",
+     "apCost": 0,
+     "advancementCost": 1,
+     "name": "Live Feed",
+     "description": "Continuously stream enemy positions to your HUD — no action required."
+    },
+    {
+     "id": "S1-SUB-2",
+     "use": "Action 1 AP",
+     "apCost": 1,
+     "advancementCost": 1,
+     "name": "Memory Rip",
+     "description": "Download a defeated enemy's last 60 seconds of sensory memory for intel."
+    }
+   ],
+   "prerequisite": "Open to anyone."
+  },
+  {
+   "id": "S2",
+   "name": "Crowd Control",
+   "zone": "SPECIALIST",
+   "tier": 1,
+   "description": "Broadcast disruptive signals to stagger multiple enemies.",
+   "subSkills": [
+    {
+     "id": "S2-SUB-1",
+     "use": "Action 2 AP",
+     "apCost": 2,
+     "advancementCost": 1,
+     "name": "EMP Pulse",
+     "description": "Spend 2 AP to disable all electronic devices in a 5m radius for 1 round."
+    },
+    {
+     "id": "S2-SUB-2",
+     "use": "Passive (with EMP Pulse)",
+     "apCost": 0,
+     "advancementCost": 1,
+     "name": "Daze Field",
+     "description": "Enemies affected by EMP Pulse lose 1 AP on their next turn."
+    }
+   ],
+   "prerequisite": "Open to anyone."
+  },
+  {
+   "id": "S3",
+   "name": "Operator Clout",
+   "zone": "SPECIALIST",
+   "tier": 1,
+   "description": "Leverage corporate identity for resource access mid-field.",
+   "subSkills": [
+    {
+     "id": "S3-SUB-1",
+     "use": "Action 1 AP",
+     "apCost": 1,
+     "advancementCost": 1,
+     "name": "Access Override",
+     "description": "Spend 1 AP to unlock any standard corporate door or terminal without a key."
+    },
+    {
+     "id": "S3-SUB-2",
+     "use": "Action 1 AP · CLOUT save 15",
+     "apCost": 1,
+     "advancementCost": 1,
+     "name": "Corporate Bypass",
+     "description": "Invoke a false corp identity to pause a hostile NPC for 1 round."
+    }
+   ],
+   "prerequisite": "Open to anyone."
+  },
+  {
+   "id": "S4",
+   "name": "Tactical Upload",
+   "zone": "SPECIALIST",
+   "tier": 2,
+   "description": "Share targeting data with allies to boost hit accuracy.",
+   "subSkills": [
+    {
+     "id": "S4-SUB-1",
+     "use": "Passive",
+     "apCost": 0,
+     "advancementCost": 1,
+     "note": "Live Feed covers every enemy within 50 m that you or an ally can see.",
+     "name": "Shared Targeting",
+     "description": "Each round, designate one enemy you have Live Feed on: all allies gain +2 on attack rolls against it until your next turn."
+    },
+    {
+     "id": "S4-SUB-2",
+     "use": "Action 1 AP",
+     "apCost": 1,
+     "advancementCost": 1,
+     "name": "Marked Threat",
+     "description": "Designate one enemy as Priority Target; all damage against them is increased by 1 die."
+    }
+   ],
+   "prerequisite": "Needs a tier-1 SPECIALIST node."
+  },
+  {
+   "id": "S5",
+   "name": "Black Market Cache",
+   "zone": "SPECIALIST",
+   "tier": 2,
+   "description": "Access hidden gear drops from pre-planted stashes.",
+   "subSkills": [
+    {
+     "id": "S5-SUB-1",
+     "use": "Action 1 AP · once per session",
+     "apCost": 1,
+     "advancementCost": 1,
+     "note": "A cache holds one of: 1d6+2 Hardware repair, a full Overshield, or one extra use of a once-per-encounter feature.",
+     "name": "Cache Access",
+     "description": "Once per session, retrieve a concealed supply cache containing consumables or ammo."
+    },
+    {
+     "id": "S5-SUB-2",
+     "use": "Passive",
+     "apCost": 0,
+     "advancementCost": 1,
+     "name": "Emergency Supply",
+     "description": "Cache Access can be triggered as a reaction when HW Integrity drops below 30%."
+    }
+   ],
+   "prerequisite": "Needs a tier-1 SPECIALIST node."
+  },
+  {
+   "id": "S6",
+   "name": "Media Blackout",
+   "zone": "SPECIALIST",
+   "tier": 2,
+   "description": "Suppress live broadcast feeds — neutralize spectator scoring.",
+   "subSkills": [
+    {
+     "id": "S6-SUB-1",
+     "use": "Action 2 AP",
+     "apCost": 2,
+     "advancementCost": 1,
+     "note": "Arena scoring is Engagement: during the jam, nobody gains or loses Engagement.",
+     "name": "Broadcast Jam",
+     "description": "Disable arena scoring systems for 2 rounds — no points accrue for either side."
+    },
+    {
+     "id": "S6-SUB-2",
+     "use": "Passive",
+     "apCost": 0,
+     "advancementCost": 1,
+     "note": "Undo all Engagement changes from the jammed rounds.",
+     "name": "Score Wipe",
+     "description": "After Broadcast Jam ends, erase the point record of the jammed rounds entirely."
+    }
+   ],
+   "prerequisite": "Needs a tier-1 SPECIALIST node."
+  },
+  {
+   "id": "S7",
+   "name": "Network Dominator",
+   "zone": "SPECIALIST",
+   "tier": 3,
+   "description": "Seize control of local network infrastructure.",
+   "subSkills": [
+    {
+     "id": "S7-SUB-1",
+     "use": "Action 2 AP",
+     "apCost": 2,
+     "advancementCost": 1,
+     "name": "Node Capture",
+     "description": "Take control of an enemy network node; redirect its effects to benefit your team."
+    },
+    {
+     "id": "S7-SUB-2",
+     "use": "Action 3 AP",
+     "apCost": 3,
+     "advancementCost": 1,
+     "name": "Admin Override",
+     "description": "Spend 3 AP to assume root access over any facility system in range."
+    }
+   ],
+   "prerequisite": "Needs a tier-2 SPECIALIST node."
+  },
+  {
+   "id": "S8",
+   "name": "Crowd Favorite",
+   "zone": "SPECIALIST",
+   "tier": 3,
+   "description": "Live crowd engagement restores AP via spectator votes.",
+   "subSkills": [
+    {
+     "id": "S8-SUB-1",
+     "use": "Passive (GM adjudicates)",
+     "apCost": 0,
+     "advancementCost": 1,
+     "note": "The GM calls an audience vote at a highlight; operators with 10+ flair that round win it.",
+     "name": "Fan Boost",
+     "description": "When the audience votes for you, gain 1 AP immediately (GM adjudicates)."
+    },
+    {
+     "id": "S8-SUB-2",
+     "use": "Passive · once per session",
+     "apCost": 0,
+     "advancementCost": 1,
+     "note": "Temporary attribute boosts can push an attribute above 5.",
+     "name": "Viral Moment",
+     "description": "Performing a spectacular action in view of cameras grants +2 CLOUT for the session."
+    }
+   ],
+   "prerequisite": "Needs a tier-2 SPECIALIST node."
+  },
+  {
+   "id": "S9",
+   "name": "Corps Insider",
+   "zone": "SPECIALIST",
+   "tier": 3,
+   "description": "Reveal hidden corporate objectives and faction motives.",
+   "subSkills": [
+    {
+     "id": "S9-SUB-1",
+     "use": "Free · start of a scene",
+     "apCost": 0,
+     "advancementCost": 1,
+     "name": "Intel Leak",
+     "description": "Expose one hidden corporate objective at the start of a scene."
+    },
+    {
+     "id": "S9-SUB-2",
+     "use": "Passive",
+     "apCost": 0,
+     "advancementCost": 1,
+     "name": "Agenda Exposed",
+     "description": "Once exposed, allies gain advantage on all rolls related to that objective."
+    }
+   ],
+   "prerequisite": "Needs a tier-2 SPECIALIST node."
+  },
+  {
+   "id": "S10",
+   "name": "Apex Operator",
+   "zone": "SPECIALIST",
+   "tier": 3,
+   "description": "Deploy full-spectrum tactical superiority for one encounter.",
+   "subSkills": [
+    {
+     "id": "S10-SUB-1",
+     "use": "Action 3 AP · once per encounter",
+     "apCost": 3,
+     "advancementCost": 1,
+     "name": "Command Mode",
+     "description": "For 3 rounds, all allies act on your initiative and may spend your AP."
+    },
+    {
+     "id": "S10-SUB-2",
+     "use": "Passive",
+     "apCost": 0,
+     "advancementCost": 1,
+     "name": "Total Control",
+     "description": "While Command Mode is active, enemy reactions are reduced by 1 per round."
+    }
+   ],
+   "prerequisite": "Needs a tier-2 SPECIALIST node."
+  },
+  {
+   "id": "BG1",
+   "name": "Phantom Strike",
+   "zone": "BRUTE_GHOST",
+   "tier": 2,
+   "description": "Silent devastating melee attack that leaves no evidence.",
+   "subSkills": [
+    {
+     "id": "BG1-SUB-1",
+     "use": "Passive",
+     "apCost": 0,
+     "advancementCost": 1,
+     "name": "Unseen Blow",
+     "description": "Melee attack from stealth deals +2 damage dice and does not break concealment."
+    },
+    {
+     "id": "BG1-SUB-2",
+     "use": "Passive",
+     "apCost": 0,
+     "advancementCost": 1,
+     "name": "Vanish After",
+     "description": "Immediately re-enter stealth after Unseen Blow at no AP cost."
+    }
+   ],
+   "prerequisite": "Needs a node in both BRUTE and GHOST."
+  },
+  {
+   "id": "BG2",
+   "name": "Adaptive Armor",
+   "zone": "BRUTE_GHOST",
+   "tier": 2,
+   "description": "Armor morphs to match incoming damage type automatically.",
+   "subSkills": [
+    {
+     "id": "BG2-SUB-1",
+     "use": "Passive",
+     "apCost": 0,
+     "advancementCost": 1,
+     "name": "Thermal Weave",
+     "description": "On the first heat or energy hit each round, reduce damage by 3."
+    },
+    {
+     "id": "BG2-SUB-2",
+     "use": "Passive",
+     "apCost": 0,
+     "advancementCost": 1,
+     "name": "Kinetic Absorb",
+     "description": "On the first physical hit each round, reduce damage by 2 and store 1 AP."
+    }
+   ],
+   "prerequisite": "Needs a node in both BRUTE and GHOST."
+  },
+  {
+   "id": "BG3",
+   "name": "Ambush Engine",
+   "zone": "BRUTE_GHOST",
+   "tier": 3,
+   "description": "First strike from stealth deals double Hardware Integrity damage.",
+   "subSkills": [
+    {
+     "id": "BG3-SUB-1",
+     "use": "Passive",
+     "apCost": 0,
+     "advancementCost": 1,
+     "name": "Death Blow",
+     "description": "Opening strike from full stealth bypasses Overshield and hits HW directly."
+    },
+    {
+     "id": "BG3-SUB-2",
+     "use": "Passive",
+     "apCost": 0,
+     "advancementCost": 1,
+     "name": "Opener",
+     "description": "Death Blow also staggers the target, removing 1 AP from their next turn."
+    }
+   ],
+   "prerequisite": "Needs a tier-2 BRUTE ∩ GHOST node."
+  },
+  {
+   "id": "BS1",
+   "name": "Combat Broadcast",
+   "zone": "BRUTE_SPECIALIST",
+   "tier": 2,
+   "description": "Deal damage and stream it live for live-audience AP bonuses.",
+   "subSkills": [
+    {
+     "id": "BS1-SUB-1",
+     "use": "Passive",
+     "apCost": 0,
+     "advancementCost": 1,
+     "note": "Cameras are active unless a Media Blackout or a dark scene is in effect.",
+     "name": "Hype Kill",
+     "description": "Eliminating an enemy while cameras are active restores 1 AP."
+    },
+    {
+     "id": "BS1-SUB-2",
+     "use": "Passive",
+     "apCost": 0,
+     "advancementCost": 1,
+     "name": "Live Execution",
+     "description": "Performing an execution with Hype Kill active grants +1 CLOUT and 2 AP."
+    }
+   ],
+   "prerequisite": "Needs a node in both BRUTE and SPECIALIST."
+  },
+  {
+   "id": "BS2",
+   "name": "Salvage Rig",
+   "zone": "BRUTE_SPECIALIST",
+   "tier": 2,
+   "description": "Rip components from defeated enemies for field repairs.",
+   "subSkills": [
+    {
+     "id": "BS2-SUB-1",
+     "use": "Free · after you defeat an enemy",
+     "apCost": 0,
+     "advancementCost": 1,
+     "name": "Strip Salvage",
+     "description": "After defeating an enemy, recover parts worth 1d6 Hardware Integrity (self)."
+    },
+    {
+     "id": "BS2-SUB-2",
+     "use": "Action 2 AP",
+     "apCost": 2,
+     "advancementCost": 1,
+     "name": "Field Weld",
+     "description": "Spend 2 AP to immediately apply salvaged parts, restoring 1d6+2 HW Integrity."
+    }
+   ],
+   "prerequisite": "Needs a node in both BRUTE and SPECIALIST."
+  },
+  {
+   "id": "BS3",
+   "name": "Warboss Authority",
+   "zone": "BRUTE_SPECIALIST",
+   "tier": 3,
+   "description": "Impose fear through sheer presence — enemies lose 1 AP.",
+   "subSkills": [
+    {
+     "id": "BS3-SUB-1",
+     "use": "Action 1 AP · CLOUT save 18",
+     "apCost": 1,
+     "advancementCost": 1,
+     "name": "Intimidate",
+     "description": "Spend 1 AP to force one enemy to pass a CLOUT save or lose 1 AP this turn."
+    },
+    {
+     "id": "BS3-SUB-2",
+     "use": "Passive",
+     "apCost": 0,
+     "advancementCost": 1,
+     "note": "Morale penalty: -1 to save totals.",
+     "name": "Dread Aura",
+     "description": "All enemies within 5m of you begin their turn with a -1 morale penalty on saves."
+    }
+   ],
+   "prerequisite": "Needs a tier-2 BRUTE ∩ SPECIALIST node."
+  },
+  {
+   "id": "GS1",
+   "name": "Ghost Protocol",
+   "zone": "GHOST_SPECIALIST",
+   "tier": 2,
+   "description": "Wipe all electronic evidence of actions taken this round.",
+   "subSkills": [
+    {
+     "id": "GS1-SUB-1",
+     "use": "Passive",
+     "apCost": 0,
+     "advancementCost": 1,
+     "note": "Threat-level is the scene’s heat (see G10).",
+     "name": "Log Wipe",
+     "description": "At end of round, purge all enemy sensor logs of your activity this turn."
+    },
+    {
+     "id": "GS1-SUB-2",
+     "use": "Passive",
+     "apCost": 0,
+     "advancementCost": 1,
+     "name": "Clean Slate",
+     "description": "Log Wipe also removes any threat-level increases you triggered this round."
+    }
+   ],
+   "prerequisite": "Needs a node in both GHOST and SPECIALIST."
+  },
+  {
+   "id": "GS2",
+   "name": "Deep Cover",
+   "zone": "GHOST_SPECIALIST",
+   "tier": 2,
+   "description": "Maintain a false corporate identity for extended missions.",
+   "subSkills": [
+    {
+     "id": "GS2-SUB-1",
+     "use": "Action 1 AP",
+     "apCost": 1,
+     "advancementCost": 1,
+     "name": "False ID",
+     "description": "Generate a convincing corporate credential that passes automated verification."
+    },
+    {
+     "id": "GS2-SUB-2",
+     "use": "Passive",
+     "apCost": 0,
+     "advancementCost": 1,
+     "note": "NPC attitudes run Hostile, Neutral, Friendly; Neutral NPCs talk before they shoot.",
+     "name": "Legend Build",
+     "description": "Your false identity accrues a positive reputation — NPCs start as Neutral rather than Hostile."
+    }
+   ],
+   "prerequisite": "Needs a node in both GHOST and SPECIALIST."
+  },
+  {
+   "id": "GS3",
+   "name": "Phantom Operator",
+   "zone": "GHOST_SPECIALIST",
+   "tier": 3,
+   "description": "Combine total electronic invisibility with network dominance.",
+   "subSkills": [
+    {
+     "id": "GS3-SUB-1",
+     "use": "Passive",
+     "apCost": 0,
+     "advancementCost": 1,
+     "name": "Null Node",
+     "description": "Your presence on any network appears as background noise — undetectable."
+    },
+    {
+     "id": "GS3-SUB-2",
+     "use": "Action 2 AP",
+     "apCost": 2,
+     "advancementCost": 1,
+     "name": "Ghost Admin",
+     "description": "Take administrative control of any network node without triggering security alerts."
+    }
+   ],
+   "prerequisite": "Needs a tier-2 GHOST ∩ SPECIALIST node."
+  }
+ ],
+ "tiers": {
+  "Fodder": {
+   "integrity": 6,
+   "ap": 1,
+   "init": 8,
+   "defense": 13,
+   "attackDice": 3,
+   "attackBonus": 2,
+   "damage": "1d4",
+   "saveTarget": 11,
+   "saveDice": 3,
+   "threat": 1
+  },
+  "Support": {
+   "integrity": 8,
+   "ap": 2,
+   "init": 10,
+   "defense": 14,
+   "attackDice": 3,
+   "attackBonus": 2,
+   "damage": "1d4",
+   "saveTarget": 11,
+   "saveDice": 3,
+   "threat": 2
+  },
+  "Standard": {
+   "integrity": 10,
+   "ap": 2,
+   "init": 11,
+   "defense": 15,
+   "attackDice": 4,
+   "attackBonus": 1,
+   "damage": "1d6",
+   "saveTarget": 13,
+   "saveDice": 4,
+   "threat": 2
+  },
+  "Tank": {
+   "integrity": 18,
+   "ap": 3,
+   "init": 9,
+   "defense": 17,
+   "attackDice": 4,
+   "attackBonus": 2,
+   "damage": "1d8",
+   "saveTarget": 15,
+   "saveDice": 4,
+   "threat": 4
+  },
+  "Elite": {
+   "integrity": 16,
+   "ap": 3,
+   "init": 14,
+   "defense": 18,
+   "attackDice": 5,
+   "attackBonus": 1,
+   "damage": "1d8+2",
+   "saveTarget": 15,
+   "saveDice": 5,
+   "threat": 4
+  },
+  "Boss": {
+   "integrity": 28,
+   "ap": 4,
+   "init": 16,
+   "defense": 20,
+   "attackDice": 6,
+   "attackBonus": 0,
+   "damage": "2d6+2",
+   "saveTarget": 17,
+   "saveDice": 6,
+   "threat": 8
+  }
+ },
+ "bestiary": [
+  {
+   "id": 1,
+   "name": "Glitch-Scrapper",
+   "role": "Melee Swarmer",
+   "description": "Human form with jagged, rusted metal plates bolted to limbs; they twitch uncontrollably.",
+   "tier": "Standard",
+   "integrity": 10,
+   "ap": 2,
+   "init": 11,
+   "defense": 15,
+   "attack": "4d6+1",
+   "damage": "1d6",
+   "saveTarget": 13,
+   "saveDice": 4,
+   "threat": 2,
+   "kind": "Human, glitched",
+   "move": "6 m",
+   "abilities": [
+    {
+     "name": "Swarm",
+     "text": "Gets +1 die on attacks for each other Glitch-Scrapper adjacent to its target (max +2)."
+    },
+    {
+     "name": "Twitch",
+     "text": "Its first attack each encounter has disadvantage: it can’t stop shaking."
+    }
+   ],
+   "tactics": "Surround the nearest operator; never retreat."
+  },
+  {
+   "id": 2,
+   "name": "Net-Junkie",
+   "role": "Ranged Harasser",
+   "description": "Frayed cables; mismatched, buzzing weapons that spark with excess current.",
+   "tier": "Standard",
+   "integrity": 10,
+   "ap": 2,
+   "init": 11,
+   "defense": 15,
+   "attack": "4d6+1",
+   "damage": "1d6",
+   "saveTarget": 13,
+   "saveDice": 4,
+   "threat": 2,
+   "kind": "Human, wired",
+   "move": "6 m",
+   "abilities": [
+    {
+     "name": "Sparking Spray",
+     "text": "Ranged attack, 20 m. On a hit with 5+ flair, the target makes a DATA save (13) or is Glitched."
+    }
+   ],
+   "tactics": "Hang back behind cover and spray whoever is fighting the Scrappers."
+  },
+  {
+   "id": 3,
+   "name": "Debt-Dodger",
+   "role": "Skirmisher",
+   "description": "Lean, nervous figures wearing lightweight, minimalist gear for high-speed evasion.",
+   "tier": "Standard",
+   "integrity": 10,
+   "ap": 2,
+   "init": 11,
+   "defense": 15,
+   "attack": "4d6+1",
+   "damage": "1d6",
+   "saveTarget": 13,
+   "saveDice": 4,
+   "threat": 2,
+   "kind": "Human",
+   "move": "8 m",
+   "abilities": [
+    {
+     "name": "Skip Town",
+     "text": "After it attacks, it may Move 6 m for free."
+    },
+    {
+     "name": "Hard to Pin Down",
+     "text": "Ranged attacks against it have disadvantage on any round it has moved."
+    }
+   ],
+   "tactics": "Hit, run, repeat. Goes after isolated operators."
+  },
+  {
+   "id": 4,
+   "name": "Stream-Whore",
+   "role": "Support",
+   "description": "Neon-reflective fabrics and strobing LEDs; designed for high-definition feeds.",
+   "tier": "Support",
+   "integrity": 8,
+   "ap": 2,
+   "init": 10,
+   "defense": 14,
+   "attack": "3d6+2",
+   "damage": "1d4",
+   "saveTarget": 11,
+   "saveDice": 3,
+   "threat": 2,
+   "kind": "Human, broadcast rig",
+   "move": "6 m",
+   "abilities": [
+    {
+     "name": "Strobe Feed",
+     "text": "1 AP. Until its next turn, allies within 10 m get +1 die on attacks."
+    },
+    {
+     "name": "Spotlight",
+     "text": "1 AP, 20 m. One operator is Marked until the end of its next turn."
+    }
+   ],
+   "tactics": "Stay behind the line; Spotlight whoever is hurting the most."
+  },
+  {
+   "id": 5,
+   "name": "Rig-Breaker",
+   "role": "Tank",
+   "description": "Hulking silhouette in heavy industrial plating; moves with a heavy, hydraulic thud.",
+   "tier": "Tank",
+   "integrity": 18,
+   "ap": 3,
+   "init": 9,
+   "defense": 17,
+   "attack": "4d6+2",
+   "damage": "1d8",
+   "saveTarget": 15,
+   "saveDice": 4,
+   "threat": 4,
+   "kind": "Human, industrial plating",
+   "move": "5 m",
+   "abilities": [
+    {
+     "name": "Hydraulic Slam",
+     "text": "2 AP. Melee attack; on a hit the target also makes a POWER save (15) or is knocked Prone."
+    },
+    {
+     "name": "Heavy Plate",
+     "text": "Reduce physical damage from each hit by 1."
+    }
+   ],
+   "tactics": "Walk into the middle and start slamming."
+  },
+  {
+   "id": 6,
+   "name": "Code-Leech",
+   "role": "Sapper",
+   "description": "Pale-skinned with interface ports on their neck; they avoid eye contact while tracking data.",
+   "tier": "Support",
+   "integrity": 8,
+   "ap": 2,
+   "init": 10,
+   "defense": 14,
+   "attack": "3d6+2",
+   "damage": "1d4",
+   "saveTarget": 11,
+   "saveDice": 3,
+   "threat": 2,
+   "kind": "Human, interface ports",
+   "move": "6 m",
+   "abilities": [
+    {
+     "name": "Siphon",
+     "text": "1 AP, 10 m, no attack roll. The target loses 1d4 Overshield and the Leech regains that much Integrity."
+    },
+    {
+     "name": "Plant Leak",
+     "text": "2 AP. Seed a 2 m patch of pixel-rot (DATA save 11 or Glitched) on its square."
+    }
+   ],
+   "tactics": "Never melee. Siphons from range, retreats, leaves rot behind."
+  },
+  {
+   "id": 7,
+   "name": "The Desperate",
+   "role": "Fodder",
+   "description": "Shivering, gaunt figures with no armor; they fight with jagged glass or metal shanks.",
+   "tier": "Fodder",
+   "integrity": 6,
+   "ap": 1,
+   "init": 8,
+   "defense": 13,
+   "attack": "3d6+2",
+   "damage": "1d4",
+   "saveTarget": 11,
+   "saveDice": 3,
+   "threat": 1,
+   "kind": "Human",
+   "move": "6 m",
+   "abilities": [
+    {
+     "name": "Nothing to Lose",
+     "text": "When reduced to 0 Integrity, it makes one last attack immediately, for free."
+    }
+   ],
+   "tactics": "Throw them at the operators in waves."
+  },
+  {
+   "id": 8,
+   "name": "The Martyr",
+   "role": "Area Denier",
+   "description": "Heavily bandaged; their chest is rigged with a volatile, glowing core that pulses violently.",
+   "tier": "Standard",
+   "integrity": 10,
+   "ap": 2,
+   "init": 11,
+   "defense": 15,
+   "attack": "4d6+1",
+   "damage": "1d6",
+   "saveTarget": 13,
+   "saveDice": 4,
+   "threat": 2,
+   "kind": "Human, volatile core",
+   "move": "6 m",
+   "abilities": [
+    {
+     "name": "Core Breach",
+     "text": "When defeated, or as a 2 AP action, it explodes: 2d6 damage to everything within 3 m (PING save 13 for half). The Martyr is destroyed."
+    },
+    {
+     "name": "Pulse Warning",
+     "text": "Its core glows; an operator can spot an imminent breach with Perception (15)."
+    }
+   ],
+   "tactics": "Run straight at the biggest group of operators."
+  },
+  {
+   "id": 9,
+   "name": "The Traitor",
+   "role": "Variable",
+   "description": "Looks like a standard player, but eyes flicker with an unsettling, synthetic red strobe.",
+   "tier": "Standard",
+   "integrity": 10,
+   "ap": 2,
+   "init": 11,
+   "defense": 15,
+   "attack": "4d6+1",
+   "damage": "1d6",
+   "saveTarget": 13,
+   "saveDice": 4,
+   "threat": 2,
+   "kind": "Human?, synthetic",
+   "move": "6 m",
+   "abilities": [
+    {
+     "name": "Familiar Face",
+     "text": "It looks like a contestant. Until an operator sees through it (SYSTEM + Insight, 15, 1 AP), that operator can’t target it."
+    },
+    {
+     "name": "Copycat",
+     "text": "It uses the attack and damage of one operator it can see (choose each turn)."
+    }
+   ],
+   "tactics": "Walk up \"friendly\", then knife the healer."
+  },
+  {
+   "id": 10,
+   "name": "Corp Shill",
+   "role": "Elite",
+   "description": "Pristine, high-end armor branded with sponsor logos; unnerving, polished confidence.",
+   "tier": "Elite",
+   "integrity": 16,
+   "ap": 3,
+   "init": 14,
+   "defense": 18,
+   "attack": "5d6+1",
+   "damage": "1d8+2",
+   "saveTarget": 15,
+   "saveDice": 5,
+   "threat": 4,
+   "kind": "Human, sponsor armor",
+   "move": "6 m",
+   "abilities": [
+    {
+     "name": "Sponsored Armor",
+     "text": "The first hit against it each round deals 2 less damage."
+    },
+    {
+     "name": "Brand Protection",
+     "text": "An operator who damages it on camera loses 1 Engagement; the sponsor is not amused."
+    },
+    {
+     "name": "Endorsed Strike",
+     "text": "2 AP. Attack with +2 dice; on a hit the target is Staggered."
+    }
+   ],
+   "tactics": "Fight the highest-Engagement operator. It wants the camera."
+  },
+  {
+   "id": 11,
+   "name": "Auditor",
+   "role": "Garnish",
+   "description": "Humanoids in tailored suits; flat, HD screen faces display rotating currency symbols.",
+   "tier": "Fodder",
+   "integrity": 6,
+   "ap": 1,
+   "init": 8,
+   "defense": 13,
+   "attack": "3d6+2",
+   "damage": "1d4",
+   "saveTarget": 11,
+   "saveDice": 3,
+   "threat": 1,
+   "kind": "Synthetic, HD screen face",
+   "move": "6 m",
+   "abilities": [
+    {
+     "name": "Assess",
+     "text": "1 AP, 20 m. The target is Marked until the end of the encounter."
+    },
+    {
+     "name": "Line Item",
+     "text": "Each time a Marked operator is hit, they lose 2 Data Fragments."
+    }
+   ],
+   "tactics": "Stays at the edge, Assessing. Flees at the first hit."
+  },
+  {
+   "id": 12,
+   "name": "Censor",
+   "role": "Squelch Pulse",
+   "description": "Small, polished chrome spheres; they track targets with an aggressive, laser-red eye.",
+   "tier": "Standard",
+   "integrity": 10,
+   "ap": 2,
+   "init": 11,
+   "defense": 15,
+   "attack": "4d6+1",
+   "damage": "1d6",
+   "saveTarget": 13,
+   "saveDice": 4,
+   "threat": 2,
+   "kind": "Machine, chrome sphere",
+   "move": "6 m (hover)",
+   "abilities": [
+    {
+     "name": "Squelch Pulse",
+     "text": "2 AP. Operators within 5 m make a SYSTEM save (13) or are Staggered, and can’t use Callout or speak on comms until their next turn."
+    }
+   ],
+   "tactics": "Float into the middle and pulse every round."
+  },
+  {
+   "id": 13,
+   "name": "Liquidator",
+   "role": "Neural-Sever",
+   "description": "Faceless figures in long, dark trench coats made of dense, tangled data-cables.",
+   "tier": "Standard",
+   "integrity": 10,
+   "ap": 2,
+   "init": 11,
+   "defense": 15,
+   "attack": "4d6+1",
+   "damage": "1d6",
+   "saveTarget": 13,
+   "saveDice": 4,
+   "threat": 2,
+   "kind": "Network entity, cable coat",
+   "move": "6 m",
+   "abilities": [
+    {
+     "name": "Neural-Sever",
+     "text": "Its hits deal +2 damage to Hardware Integrity. If the target is in Neural Shock, it must also make a HARDWARE save (13) or be Stunned."
+    }
+   ],
+   "tactics": "Hunts operators who are already hurt."
+  },
+  {
+   "id": 14,
+   "name": "Blight-Drone",
+   "role": "Data Spillage",
+   "description": "Spherical tanks on magnetic cushions; they leave a trail of oily, flickering pixel-rot.",
+   "tier": "Standard",
+   "integrity": 10,
+   "ap": 2,
+   "init": 11,
+   "defense": 15,
+   "attack": "4d6+1",
+   "damage": "1d6",
+   "saveTarget": 13,
+   "saveDice": 4,
+   "threat": 2,
+   "kind": "Machine, drone",
+   "move": "6 m (magnetic)",
+   "abilities": [
+    {
+     "name": "Pixel-Rot Trail",
+     "text": "Every space it leaves becomes pixel-rot for the rest of the encounter: an operator entering it makes a DATA save (13) or is Glitched."
+    }
+   ],
+   "tactics": "Circle the arena, spreading rot."
+  },
+  {
+   "id": 15,
+   "name": "Wall-Stalker",
+   "role": "Blink Strike",
+   "description": "Translucent human figures that lag in and out of reality.",
+   "tier": "Standard",
+   "integrity": 10,
+   "ap": 2,
+   "init": 11,
+   "defense": 15,
+   "attack": "4d6+1",
+   "damage": "1d6",
+   "saveTarget": 13,
+   "saveDice": 4,
+   "threat": 2,
+   "kind": "Network entity, lagging",
+   "move": "6 m",
+   "abilities": [
+    {
+     "name": "Lag Blink",
+     "text": "1 AP. Teleport up to 10 m; its next attack this turn has advantage."
+    },
+    {
+     "name": "Out of Sync",
+     "text": "Opportunity-style reactions (Counter) against it have disadvantage."
+    }
+   ],
+   "tactics": "Blink behind the backline, strike, blink away."
+  },
+  {
+   "id": 16,
+   "name": "Firewall-Brute",
+   "role": "Path Blocking",
+   "description": "Towering, static-filled barriers of light that pulse with forbidden data.",
+   "tier": "Standard",
+   "integrity": 10,
+   "ap": 2,
+   "init": 11,
+   "defense": 15,
+   "attack": "4d6+1",
+   "damage": "1d6",
+   "saveTarget": 13,
+   "saveDice": 4,
+   "threat": 2,
+   "kind": "Network entity, light barrier",
+   "move": "0 m (stationary)",
+   "abilities": [
+    {
+     "name": "Wall of Light",
+     "text": "Blocks a 4 m line; nothing passes through it. Operators that start a turn adjacent take 1d4."
+    },
+    {
+     "name": "Forbidden Data",
+     "text": "Its melee hits make the target Fried (HARDWARE save 13)."
+    }
+   ],
+   "tactics": "Placed to split the squad or block the exit. Destroy it to pass."
+  },
+  {
+   "id": 17,
+   "name": "Ad-Revenue-Bot",
+   "role": "Aura Buff",
+   "description": "Covered in digital screens cycling through aggressive commercial advertisements.",
+   "tier": "Standard",
+   "integrity": 10,
+   "ap": 2,
+   "init": 11,
+   "defense": 15,
+   "attack": "4d6+1",
+   "damage": "1d6",
+   "saveTarget": 13,
+   "saveDice": 4,
+   "threat": 2,
+   "kind": "Machine, ad screens",
+   "move": "5 m",
+   "abilities": [
+    {
+     "name": "Ad Break Aura",
+     "text": "Allies within 5 m get +1 to attack totals and damage. Operators within 5 m have disadvantage on Stealth."
+    }
+   ],
+   "tactics": "Stay behind the heaviest ally and keep the aura up."
+  },
+  {
+   "id": 18,
+   "name": "System-Janitor",
+   "role": "Healer",
+   "description": "Clunky machines with sweeping appendages designed to absorb corrupted data.",
+   "tier": "Support",
+   "integrity": 8,
+   "ap": 2,
+   "init": 10,
+   "defense": 14,
+   "attack": "3d6+2",
+   "damage": "1d4",
+   "saveTarget": 11,
+   "saveDice": 3,
+   "threat": 2,
+   "kind": "Machine, utility",
+   "move": "5 m",
+   "abilities": [
+    {
+     "name": "Sweep",
+     "text": "1 AP. One ally within 3 m regains 1d6+2 Integrity."
+    },
+    {
+     "name": "Absorb Corruption",
+     "text": "1 AP. Remove Glitched or Fried from one ally within 3 m."
+    }
+   ],
+   "tactics": "Keep the Tank or Elite alive. Kill it first."
+  },
+  {
+   "id": 19,
+   "name": "Mainframe-Guardian (Anti-Cheat)",
+   "role": "Anti-Cheat Tank",
+   "description": "8-foot-tall monolith of shifting steel; hovers silently without traditional limbs.",
+   "tier": "Tank",
+   "integrity": 18,
+   "ap": 3,
+   "init": 9,
+   "defense": 17,
+   "attack": "4d6+2",
+   "damage": "1d8",
+   "saveTarget": 15,
+   "saveDice": 4,
+   "threat": 4,
+   "kind": "Machine, monolith",
+   "move": "5 m (hover)",
+   "abilities": [
+    {
+     "name": "Anti-Cheat",
+     "text": "It can target Stealthed operators within 10 m. Any operator who uses an Apex or sponsor-grade blueprint effect within 10 m is Marked."
+    },
+    {
+     "name": "Ban Hammer",
+     "text": "2 AP. Melee attack; on a hit the target is Pinned (POWER save 15 resists)."
+    }
+   ],
+   "tactics": "Stand in front of the objective and punish anything flashy."
+  },
+  {
+   "id": 20,
+   "name": "Rent-Enforcer (Collector)",
+   "role": "Fiscal Aggression",
+   "description": "Ornate gold armor; carries a heavy, industrial-sized ledger as a blunt weapon.",
+   "tier": "Standard",
+   "integrity": 10,
+   "ap": 2,
+   "init": 11,
+   "defense": 15,
+   "attack": "4d6+1",
+   "damage": "1d6",
+   "saveTarget": 13,
+   "saveDice": 4,
+   "threat": 2,
+   "kind": "Human, gold armor",
+   "move": "6 m",
+   "abilities": [
+    {
+     "name": "Ledger Slam",
+     "text": "On a hit, the target also loses 5 Data Fragments."
+    },
+    {
+     "name": "Past Due",
+     "text": "+1 die on attacks against an operator with fewer than 50 fragments."
+    }
+   ],
+   "tactics": "Goes for the poorest operator, loudly."
+  },
+  {
+   "id": 21,
+   "name": "Blight-Drone (Pusher)",
+   "role": "Magnetic Repulsion",
+   "description": "Wide-bodied drone with rotating magnetic plates that repel physical objects.",
+   "tier": "Standard",
+   "integrity": 10,
+   "ap": 2,
+   "init": 11,
+   "defense": 15,
+   "attack": "4d6+1",
+   "damage": "1d6",
+   "saveTarget": 13,
+   "saveDice": 4,
+   "threat": 2,
+   "kind": "Machine, drone",
+   "move": "6 m (magnetic)",
+   "abilities": [
+    {
+     "name": "Repulse",
+     "text": "1 AP. Every operator within 5 m is pushed 4 m away (POWER save 13 resists)."
+    },
+    {
+     "name": "Magnetic Field",
+     "text": "Ranged kinetic attacks against it have disadvantage."
+    }
+   ],
+   "tactics": "Shove operators off ledges and into hazards."
+  },
+  {
+   "id": 22,
+   "name": "Blight-Drone (Screamer)",
+   "role": "LAG Induction",
+   "description": "Multi-pronged sphere that vibrates; emits a static-filled, high-pitched shriek.",
+   "tier": "Standard",
+   "integrity": 10,
+   "ap": 2,
+   "init": 11,
+   "defense": 15,
+   "attack": "4d6+1",
+   "damage": "1d6",
+   "saveTarget": 13,
+   "saveDice": 4,
+   "threat": 2,
+   "kind": "Machine, drone",
+   "move": "6 m (hover)",
+   "abilities": [
+    {
+     "name": "Shriek",
+     "text": "2 AP. Operators within 10 m make a SYSTEM save (13) or are Lagged."
+    }
+   ],
+   "tactics": "Shriek on round one, then every other round."
+  },
+  {
+   "id": 23,
+   "name": "Wall-Stalker (Variant)",
+   "role": "Blink Strike",
+   "description": "Shimmering, translucent figure that only solidifies for a split second before striking.",
+   "tier": "Standard",
+   "integrity": 10,
+   "ap": 2,
+   "init": 11,
+   "defense": 15,
+   "attack": "4d6+1",
+   "damage": "1d6",
+   "saveTarget": 13,
+   "saveDice": 4,
+   "threat": 2,
+   "kind": "Network entity, lagging",
+   "move": "6 m",
+   "abilities": [
+    {
+     "name": "Lag Blink",
+     "text": "1 AP. Teleport up to 10 m; its next attack this turn has advantage."
+    },
+    {
+     "name": "Split-Second Solid",
+     "text": "Attacks against it have disadvantage except on the turn it attacked."
+    }
+   ],
+   "tactics": "As the Wall-Stalker, but harder to pin down."
+  },
+  {
+   "id": 24,
+   "name": "Firewall-Brute",
+   "role": "Path Blocking",
+   "description": "Towering barrier of light; pulses with forbidden data.",
+   "tier": "Standard",
+   "integrity": 10,
+   "ap": 2,
+   "init": 11,
+   "defense": 15,
+   "attack": "4d6+1",
+   "damage": "1d6",
+   "saveTarget": 13,
+   "saveDice": 4,
+   "threat": 2,
+   "kind": "Network entity, light barrier",
+   "move": "0 m (stationary)",
+   "abilities": [
+    {
+     "name": "Wall of Light",
+     "text": "Blocks a 4 m line; nothing passes through it. Operators that start a turn adjacent take 1d4."
+    },
+    {
+     "name": "Forbidden Data",
+     "text": "Its melee hits make the target Fried (HARDWARE save 13)."
+    }
+   ],
+   "tactics": "Placed to split the squad or block the exit. Destroy it to pass.",
+   "sameAs": 16
+  },
+  {
+   "id": 25,
+   "name": "Data-Wraith",
+   "role": "AP Drain",
+   "description": "Flickering, semi-transparent human form; looks like a corrupt video file.",
+   "tier": "Standard",
+   "integrity": 10,
+   "ap": 2,
+   "init": 11,
+   "defense": 15,
+   "attack": "4d6+1",
+   "damage": "1d6",
+   "saveTarget": 13,
+   "saveDice": 4,
+   "threat": 2,
+   "kind": "Network entity, corrupt video",
+   "move": "6 m (phasing)",
+   "abilities": [
+    {
+     "name": "AP Drain",
+     "text": "On a hit, the target is Staggered and the Wraith gains 1 AP."
+    },
+    {
+     "name": "Phasing",
+     "text": "Moves through walls and Firewall-Brutes."
+    }
+   ],
+   "tactics": "Drain the operator with the most AP."
+  },
+  {
+   "id": 26,
+   "name": "Logic-Bomb",
+   "role": "Explosive Trap",
+   "description": "Metallic geometric cube; shifts surface texture and pulses with warning light.",
+   "tier": "Standard",
+   "integrity": 10,
+   "ap": 2,
+   "init": 11,
+   "defense": 15,
+   "attack": "4d6+1",
+   "damage": "1d6",
+   "saveTarget": 13,
+   "saveDice": 4,
+   "threat": 2,
+   "kind": "Machine, trap",
+   "move": "0 m (stationary)",
+   "abilities": [
+    {
+     "name": "Logic Trigger",
+     "text": "When an operator ends a Move within 2 m, it explodes: 2d6 damage to everything within 3 m (PING save 13 for half)."
+    },
+    {
+     "name": "Disarm",
+     "text": "An adjacent operator can spend 1 AP on DATA + Hacking (17) to disarm it."
+    }
+   ],
+   "tactics": "Place it where operators will want to stand."
+  },
+  {
+   "id": 27,
+   "name": "Error-Core",
+   "role": "GLITCH Status",
+   "description": "Cube of shifting non-Euclidean geometry; surface looks like a missing-texture checkerboard.",
+   "tier": "Standard",
+   "integrity": 10,
+   "ap": 2,
+   "init": 11,
+   "defense": 15,
+   "attack": "4d6+1",
+   "damage": "1d6",
+   "saveTarget": 13,
+   "saveDice": 4,
+   "threat": 2,
+   "kind": "Network entity, broken geometry",
+   "move": "4 m",
+   "abilities": [
+    {
+     "name": "Missing Texture",
+     "text": "Its hits make the target Glitched (no save)."
+    },
+    {
+     "name": "Non-Euclidean",
+     "text": "Roll a d6 when an attack hits it: on a 1 the attack phases through and misses."
+    }
+   ],
+   "tactics": "Drifts toward whoever has the best gear."
+  },
+  {
+   "id": 28,
+   "name": "Mainframe-Guardian (Monolith)",
+   "role": "Tank",
+   "description": "8-foot-tall monolith of shifting steel plating; hovers silently.",
+   "tier": "Tank",
+   "integrity": 18,
+   "ap": 3,
+   "init": 9,
+   "defense": 17,
+   "attack": "4d6+2",
+   "damage": "1d8",
+   "saveTarget": 15,
+   "saveDice": 4,
+   "threat": 4,
+   "kind": "Machine, monolith",
+   "move": "5 m (hover)",
+   "abilities": [
+    {
+     "name": "Monolith",
+     "text": "Reduce damage from each hit by 2."
+    },
+    {
+     "name": "Hold the Line",
+     "text": "Operators can’t Move past it within 2 m without a PING + Acrobatics check (15)."
+    }
+   ],
+   "tactics": "Plants itself in a chokepoint."
+  },
+  {
+   "id": 29,
+   "name": "Ad-Blast Cannon",
+   "role": "Ranged AOE",
+   "description": "Stationary tripod turret; covered in flashing LCD screens blaring audio ads.",
+   "tier": "Standard",
+   "integrity": 10,
+   "ap": 2,
+   "init": 11,
+   "defense": 15,
+   "attack": "4d6+1",
+   "damage": "1d6",
+   "saveTarget": 13,
+   "saveDice": 4,
+   "threat": 2,
+   "kind": "Machine, turret",
+   "move": "0 m (stationary)",
+   "abilities": [
+    {
+     "name": "Ad Blast",
+     "text": "2 AP, 40 m. Everything in a 3 m radius takes 1d6 (PING save 13 for half)."
+    },
+    {
+     "name": "Overridable",
+     "text": "A Hacking Suite Override or Crownbreaker Key turns it on its owners."
+    }
+   ],
+   "tactics": "Bombard clusters from its perch."
+  },
+  {
+   "id": 30,
+   "name": "Greed-Spirit",
+   "role": "AC Recovery",
+   "description": "Ghostly figure shrouded in digital gold dust; constantly sheds currency symbols.",
+   "tier": "Standard",
+   "integrity": 10,
+   "ap": 2,
+   "init": 11,
+   "defense": 15,
+   "attack": "4d6+1",
+   "damage": "1d6",
+   "saveTarget": 13,
+   "saveDice": 4,
+   "threat": 2,
+   "kind": "Network entity, gold dust",
+   "move": "6 m (hover)",
+   "abilities": [
+    {
+     "name": "Collect",
+     "text": "At the start of each of its turns it regains 1d4 Integrity, unless it is Glitched."
+    },
+    {
+     "name": "Hoard",
+     "text": "Whoever defeats it gains 2d6 Data Fragments."
+    }
+   ],
+   "tactics": "Floats out of reach and heals; bait for greedy operators."
+  },
+  {
+   "id": 31,
+   "name": "Debt-Collector",
+   "role": "Harpoon Drag",
+   "description": "Hulking figure in a ragged business suit; drags a heavy, glowing spiked harpoon.",
+   "tier": "Standard",
+   "integrity": 10,
+   "ap": 2,
+   "init": 11,
+   "defense": 15,
+   "attack": "4d6+1",
+   "damage": "1d6",
+   "saveTarget": 13,
+   "saveDice": 4,
+   "threat": 2,
+   "kind": "Human, harpoon",
+   "move": "6 m",
+   "abilities": [
+    {
+     "name": "Harpoon",
+     "text": "1 AP, 15 m. Ranged attack; on a hit the target is dragged 6 m to it and Pinned (POWER save 13 resists)."
+    }
+   ],
+   "tactics": "Drag operators out of cover and into the swarm."
+  },
+  {
+   "id": 32,
+   "name": "Pixel-Hound",
+   "role": "Low-HP Hunter",
+   "description": "Fast, quadrupedal robot made of low-resolution voxels; tracks targets with a digital growl.",
+   "tier": "Fodder",
+   "integrity": 6,
+   "ap": 2,
+   "init": 8,
+   "defense": 13,
+   "attack": "3d6+2",
+   "damage": "1d4",
+   "saveTarget": 11,
+   "saveDice": 3,
+   "threat": 1,
+   "kind": "Machine, voxel hound",
+   "move": "10 m",
+   "abilities": [
+    {
+     "name": "Scent of Blood",
+     "text": "+2 dice on attacks against an operator in Neural Shock or with 0 Overshield."
+    },
+    {
+     "name": "Pack Runner",
+     "text": "Moves 10 m instead of 6."
+    }
+   ],
+   "tactics": "Ignore the healthy. Chase the bleeding."
+  },
+  {
+   "id": 33,
+   "name": "Render-Glitched",
+   "role": "LAG Zone",
+   "description": "Humanoid with missing limbs and skin; shows empty wireframe architecture underneath.",
+   "tier": "Standard",
+   "integrity": 10,
+   "ap": 2,
+   "init": 11,
+   "defense": 15,
+   "attack": "4d6+1",
+   "damage": "1d6",
+   "saveTarget": 13,
+   "saveDice": 4,
+   "threat": 2,
+   "kind": "Network entity, wireframe",
+   "move": "4 m",
+   "abilities": [
+    {
+     "name": "Lag Field",
+     "text": "An operator who starts a turn within 5 m makes a SYSTEM save (13) or is Lagged."
+    }
+   ],
+   "tactics": "Slowly walk into the squad’s backline."
+  },
+  {
+   "id": 34,
+   "name": "Ad-Drone",
+   "role": "STUN/Ads",
+   "description": "Small drone with a megaphone; screams pre-recorded corporate slogans.",
+   "tier": "Standard",
+   "integrity": 10,
+   "ap": 2,
+   "init": 11,
+   "defense": 15,
+   "attack": "4d6+1",
+   "damage": "1d6",
+   "saveTarget": 13,
+   "saveDice": 4,
+   "threat": 2,
+   "kind": "Machine, drone",
+   "move": "8 m (hover)",
+   "abilities": [
+    {
+     "name": "Slogan Blast",
+     "text": "1 AP, 10 m. The target makes a SYSTEM save (13) or is Stunned. Each operator can only be Stunned by Ad-Drones once per encounter."
+    }
+   ],
+   "tactics": "Fly over the action and stun the scariest operator."
+  },
+  {
+   "id": 35,
+   "name": "Data-Leech",
+   "role": "AP Drain",
+   "description": "Parasitic slug-like creature made of tangled fiber-optic cables.",
+   "tier": "Standard",
+   "integrity": 10,
+   "ap": 2,
+   "init": 11,
+   "defense": 15,
+   "attack": "4d6+1",
+   "damage": "1d6",
+   "saveTarget": 13,
+   "saveDice": 4,
+   "threat": 2,
+   "kind": "Network entity, parasite",
+   "move": "4 m",
+   "abilities": [
+    {
+     "name": "Latch",
+     "text": "On a hit, it attaches: the target is Staggered at the start of each turn until it’s pulled off (1 AP, POWER + Athletics 15) or destroyed."
+    }
+   ],
+   "tactics": "Latch onto the first operator in reach."
+  },
+  {
+   "id": 36,
+   "name": "Code-Executioner",
+   "role": "Ignore Overshield",
+   "description": "Towering masked figure; wields a massive scythe of solidified binary code.",
+   "tier": "Standard",
+   "integrity": 10,
+   "ap": 2,
+   "init": 11,
+   "defense": 15,
+   "attack": "4d6+1",
+   "damage": "1d6",
+   "saveTarget": 13,
+   "saveDice": 4,
+   "threat": 2,
+   "kind": "Network entity, executioner",
+   "move": "6 m",
+   "abilities": [
+    {
+     "name": "Binary Scythe",
+     "text": "Reach 2 m. Its hits bypass Overshield."
+    },
+    {
+     "name": "Execute",
+     "text": "Against a Flatlined operator, each hit counts as two crash-save failures."
+    }
+   ],
+   "tactics": "Recommended: promote to Elite or Boss for a finale."
+  },
+  {
+   "id": 37,
+   "name": "Memory-Wiper",
+   "role": "Item Loss",
+   "description": "Faceless entity in white cloth; thin, elongated fingers that dissolve objects.",
+   "tier": "Standard",
+   "integrity": 10,
+   "ap": 2,
+   "init": 11,
+   "defense": 15,
+   "attack": "4d6+1",
+   "damage": "1d6",
+   "saveTarget": 13,
+   "saveDice": 4,
+   "threat": 2,
+   "kind": "Network entity, white cloth",
+   "move": "6 m",
+   "abilities": [
+    {
+     "name": "Dissolve",
+     "text": "2 AP. Melee attack; on a hit, one item the target carries stops working until the end of the encounter (DATA save 13 negates; a Weighted Club is immune)."
+    }
+   ],
+   "tactics": "Strip the operator who relies on one big item."
+  },
+  {
+   "id": 38,
+   "name": "Security-Node",
+   "role": "Reinforcement Call",
+   "description": "Pulsing red pillar embedded in the floor; emits a rhythmic, siren-like ping.",
+   "tier": "Standard",
+   "integrity": 10,
+   "ap": 2,
+   "init": 11,
+   "defense": 15,
+   "attack": "4d6+1",
+   "damage": "1d6",
+   "saveTarget": 13,
+   "saveDice": 4,
+   "threat": 2,
+   "kind": "Machine, pillar",
+   "move": "0 m (stationary)",
+   "abilities": [
+    {
+     "name": "Siren",
+     "text": "2 AP. One The Desperate (#7) appears adjacent; at most 3 at a time."
+    },
+    {
+     "name": "Jammed",
+     "text": "A Signal Jammer’s Jam or Comms Blackout stops the Siren until its next turn."
+    }
+   ],
+   "tactics": "Keeps calling until destroyed."
+  },
+  {
+   "id": 39,
+   "name": "Proxy-Agent",
+   "role": "Explosive Trap",
+   "description": "Perfect copy of a player character, but movements are too smooth and mechanical.",
+   "tier": "Standard",
+   "integrity": 10,
+   "ap": 2,
+   "init": 11,
+   "defense": 15,
+   "attack": "4d6+1",
+   "damage": "1d6",
+   "saveTarget": 13,
+   "saveDice": 4,
+   "threat": 2,
+   "kind": "Synthetic, operator copy",
+   "move": "6 m",
+   "abilities": [
+    {
+     "name": "Perfect Copy",
+     "text": "It looks exactly like one operator; telling which is real takes SYSTEM + Insight (15)."
+    },
+    {
+     "name": "Detonate",
+     "text": "When defeated, or as a 2 AP action, it explodes: 2d6 within 3 m (PING save 13 for half)."
+    }
+   ],
+   "tactics": "Walks up beside the squad pretending to be one of them."
+  },
+  {
+   "id": 40,
+   "name": "Feedback-Loop",
+   "role": "Damage Reflection",
+   "description": "Mirrored metallic orb; reflects the image of anyone standing before it with distortions.",
+   "tier": "Standard",
+   "integrity": 10,
+   "ap": 2,
+   "init": 11,
+   "defense": 15,
+   "attack": "4d6+1",
+   "damage": "1d6",
+   "saveTarget": 13,
+   "saveDice": 4,
+   "threat": 2,
+   "kind": "Machine, mirror orb",
+   "move": "4 m (hover)",
+   "abilities": [
+    {
+     "name": "Mirror",
+     "text": "When hit by an attack, the attacker takes half the damage dealt, rounded down."
+    }
+   ],
+   "tactics": "Floats between operators and their targets."
+  },
+  {
+   "id": 41,
+   "name": "Null-Sector-Guard",
+   "role": "Data Weakness",
+   "description": "Heavily armored brute glowing with molten-orange light; etched with complex vents.",
+   "tier": "Standard",
+   "integrity": 10,
+   "ap": 2,
+   "init": 11,
+   "defense": 15,
+   "attack": "4d6+1",
+   "damage": "1d6",
+   "saveTarget": 13,
+   "saveDice": 4,
+   "threat": 2,
+   "kind": "Human, molten armor",
+   "move": "5 m",
+   "abilities": [
+    {
+     "name": "Molten Plate",
+     "text": "Reduce physical damage from each hit by 3."
+    },
+    {
+     "name": "Data Weakness",
+     "text": "Takes double damage from energy attacks and from support-gear attacks."
+    }
+   ],
+   "tactics": "Wade in; let the squad figure out the weakness."
+  },
+  {
+   "id": 42,
+   "name": "System-Janitor",
+   "role": "Healer",
+   "description": "Clunky utilitarian machine with long, sweeping appendages.",
+   "tier": "Support",
+   "integrity": 8,
+   "ap": 2,
+   "init": 10,
+   "defense": 14,
+   "attack": "3d6+2",
+   "damage": "1d4",
+   "saveTarget": 11,
+   "saveDice": 3,
+   "threat": 2,
+   "kind": "Machine, utility",
+   "move": "5 m",
+   "abilities": [
+    {
+     "name": "Sweep",
+     "text": "1 AP. One ally within 3 m regains 1d6+2 Integrity."
+    },
+    {
+     "name": "Absorb Corruption",
+     "text": "1 AP. Remove Glitched or Fried from one ally within 3 m."
+    }
+   ],
+   "tactics": "Keep the Tank or Elite alive. Kill it first.",
+   "sameAs": 18
+  },
+  {
+   "id": 43,
+   "name": "Ad-Revenue-Bot",
+   "role": "Aura Buff",
+   "description": "Covered in digital screens cycling through aggressive commercial advertisements.",
+   "tier": "Standard",
+   "integrity": 10,
+   "ap": 2,
+   "init": 11,
+   "defense": 15,
+   "attack": "4d6+1",
+   "damage": "1d6",
+   "saveTarget": 13,
+   "saveDice": 4,
+   "threat": 2,
+   "kind": "Machine, ad screens",
+   "move": "5 m",
+   "abilities": [
+    {
+     "name": "Ad Break Aura",
+     "text": "Allies within 5 m get +1 to attack totals and damage. Operators within 5 m have disadvantage on Stealth."
+    }
+   ],
+   "tactics": "Stay behind the heaviest ally and keep the aura up.",
+   "sameAs": 17
+  },
+  {
+   "id": 44,
+   "name": "Ghost-Protocol-Unit",
+   "role": "Stealth / Bypass",
+   "description": "Sleek, featureless black robot; no visible sensors or weapons until it strikes.",
+   "tier": "Standard",
+   "integrity": 10,
+   "ap": 2,
+   "init": 11,
+   "defense": 15,
+   "attack": "4d6+1",
+   "damage": "1d6",
+   "saveTarget": 13,
+   "saveDice": 4,
+   "threat": 2,
+   "kind": "Machine, black chassis",
+   "move": "8 m",
+   "abilities": [
+    {
+     "name": "Ghost Start",
+     "text": "Begins every encounter Stealthed."
+    },
+    {
+     "name": "First Strike",
+     "text": "Its first attack from Stealth bypasses Overshield."
+    },
+    {
+     "name": "Re-Hide",
+     "text": "1 AP. Hide again (its Stealth total is 4d6+4)."
+    }
+   ],
+   "tactics": "Strike from nowhere, vanish, repeat."
+  },
+  {
+   "id": 45,
+   "name": "Neural-Burner",
+   "role": "FRY Status",
+   "description": "Thin, frantic human in a damaged rig; leaking thick smoke from skull ports.",
+   "tier": "Standard",
+   "integrity": 10,
+   "ap": 2,
+   "init": 11,
+   "defense": 15,
+   "attack": "4d6+1",
+   "damage": "1d6",
+   "saveTarget": 13,
+   "saveDice": 4,
+   "threat": 2,
+   "kind": "Human, burning rig",
+   "move": "6 m",
+   "abilities": [
+    {
+     "name": "Overheat",
+     "text": "Its hits make the target Fried (HARDWARE save 13)."
+    },
+    {
+     "name": "Smoke Ports",
+     "text": "Ranged attacks through the 3 m around it have disadvantage."
+    }
+   ],
+   "tactics": "Charge the closest operator, trailing smoke."
+  },
+  {
+   "id": 46,
+   "name": "Glitch-Witch",
+   "role": "Position Swap",
+   "description": "Ethereal figure draped in color-shifting data ribbons; stares with hollow, glowing eyes.",
+   "tier": "Standard",
+   "integrity": 10,
+   "ap": 2,
+   "init": 11,
+   "defense": 15,
+   "attack": "4d6+1",
+   "damage": "1d6",
+   "saveTarget": 13,
+   "saveDice": 4,
+   "threat": 2,
+   "kind": "Network entity, data ribbons",
+   "move": "6 m (hover)",
+   "abilities": [
+    {
+     "name": "Swap",
+     "text": "1 AP, 15 m. Swap the positions of any two creatures it can see; an unwilling operator makes a SYSTEM save (13) to resist."
+    }
+   ],
+   "tactics": "Put the squad’s healer next to the Martyr."
+  },
+  {
+   "id": 47,
+   "name": "Cache-Hider",
+   "role": "Loot Carrier",
+   "description": "Hunchbacked creature; carries a massive glowing backpack overflowing with treasures.",
+   "tier": "Standard",
+   "integrity": 10,
+   "ap": 2,
+   "init": 11,
+   "defense": 15,
+   "attack": "4d6+1",
+   "damage": "1d6",
+   "saveTarget": 13,
+   "saveDice": 4,
+   "threat": 2,
+   "kind": "Creature, loot pack",
+   "move": "8 m",
+   "abilities": [
+    {
+     "name": "Run for It",
+     "text": "It doesn’t attack. If it reaches an arena exit (about 3 rounds), it escapes."
+    },
+    {
+     "name": "Jackpot",
+     "text": "If defeated, roll one extra sector loot and add 20 fragments to the payout."
+    }
+   ],
+   "tactics": "Flee. The whole encounter becomes a chase."
+  },
+  {
+   "id": 48,
+   "name": "System-Overlord",
+   "role": "Boss / Ad-Barrage",
+   "description": "Massive wall of screens and cables; speaks in a booming, multi-layered voice.",
+   "tier": "Boss",
+   "integrity": 28,
+   "ap": 4,
+   "init": 16,
+   "defense": 20,
+   "attack": "6d6",
+   "damage": "2d6+2",
+   "saveTarget": 17,
+   "saveDice": 6,
+   "threat": 8,
+   "kind": "Machine, wall of screens",
+   "move": "0 m (stationary)",
+   "abilities": [
+    {
+     "name": "Ad Barrage",
+     "text": "2 AP, once per round. Every operator who can see it makes a SYSTEM save (17) or is Stunned. An operator Stunned by Ad Barrage is immune to it for the rest of the encounter."
+    },
+    {
+     "name": "Commercial Break",
+     "text": "3 AP, once per round. Two Ad-Drones (#34) appear."
+    },
+    {
+     "name": "Multi-Layered Voice",
+     "text": "At half Integrity it gains 1 AP per turn for the rest of the fight."
+    }
+   ],
+   "tactics": "The finale. Protect it with drones and let it scream."
+  },
+  {
+   "id": 49,
+   "name": "Rent-Enforcer (Garnishee)",
+   "role": "AC Drain",
+   "description": "Polished gold armor; carries a heavy, industrial-sized ledger as a weapon.",
+   "tier": "Standard",
+   "integrity": 10,
+   "ap": 2,
+   "init": 11,
+   "defense": 15,
+   "attack": "4d6+1",
+   "damage": "1d6",
+   "saveTarget": 13,
+   "saveDice": 4,
+   "threat": 2,
+   "kind": "Human, gold armor",
+   "move": "6 m",
+   "abilities": [
+    {
+     "name": "Garnish Wages",
+     "text": "On a hit, it steals 10 Data Fragments from the target."
+    },
+    {
+     "name": "Repossessed",
+     "text": "When defeated, it drops everything it stole."
+    }
+   ],
+   "tactics": "Grab the money and run for the edge of the arena."
+  },
+  {
+   "id": 50,
+   "name": "Last-Subscriber",
+   "role": "Ally/Sponsor Gear",
+   "description": "Frantic civilian in a team jersey; armed with high-end tech they cannot use.",
+   "tier": "Standard",
+   "integrity": 10,
+   "ap": 2,
+   "init": 11,
+   "defense": 15,
+   "attack": "4d6+1",
+   "damage": "1d6",
+   "saveTarget": 13,
+   "saveDice": 4,
+   "threat": 2,
+   "kind": "Human, superfan",
+   "move": "6 m",
+   "abilities": [
+    {
+     "name": "Not Hostile",
+     "text": "A civilian with sponsor gear they can’t use. Mobs target it."
+    },
+    {
+     "name": "Grateful Fan",
+     "text": "If it survives the encounter, it hands the nearest operator a random sponsor-grade blueprint."
+    },
+    {
+     "name": "Dead on Camera",
+     "text": "If it dies on camera, every operator loses 3 Engagement."
+    }
+   ],
+   "tactics": "An escort objective in disguise."
+  }
+ ],
+ "spectacle": [
+  {
+   "key": "DULL_BROADCAST",
+   "label": "Dull Broadcast",
+   "scoreRange": [
+    1,
+    2
+   ],
+   "force": [
+    {
+     "templateId": 11,
+     "count": 1
+    },
+    {
+     "templateId": 14,
+     "count": 2
+    },
+    {
+     "templateId": 1,
+     "count": 3
+    }
+   ],
+   "modifiers": []
+  },
+  {
+   "key": "ACTIVE_ENGAGEMENT",
+   "label": "Active Engagement",
+   "scoreRange": [
+    3,
+    4
+   ],
+   "force": [
+    {
+     "templateId": 13,
+     "count": 1
+    },
+    {
+     "templateId": 12,
+     "count": 1
+    },
+    {
+     "templateId": 3,
+     "count": 2
+    },
+    {
+     "templateId": 2,
+     "count": 2
+    }
+   ],
+   "modifiers": []
+  },
+  {
+   "key": "PRIME_TIME_SURGE",
+   "label": "Prime-Time Surge",
+   "scoreRange": [
+    5,
+    6
+   ],
+   "force": [
+    {
+     "templateId": 11,
+     "count": 1
+    },
+    {
+     "templateId": 13,
+     "count": 1
+    },
+    {
+     "templateId": 12,
+     "count": 2
+    },
+    {
+     "templateId": 10,
+     "count": 1
+    }
+   ],
+   "modifiers": [
+    "Damage double effect"
+   ]
+  }
+ ],
+ "sectorLoot": {
+  "1": {
+   "foundation": 80,
+   "tactical": 20,
+   "apex": 0
+  },
+  "2": {
+   "foundation": 50,
+   "tactical": 45,
+   "apex": 5
+  },
+  "3": {
+   "foundation": 20,
+   "tactical": 60,
+   "apex": 20
+  },
+  "4": {
+   "foundation": 10,
+   "tactical": 40,
+   "apex": 50
+  },
+  "5": {
+   "foundation": 0,
+   "tactical": 20,
+   "apex": 80
+  }
+ },
+ "conditions": [
+  {
+   "id": "fried",
+   "name": "Fried",
+   "text": "At the start of each of your turns, take 1d4 Hardware damage that bypasses Overshield.",
+   "shakeOff": "HARDWARE + Endurance (15)"
+  },
+  {
+   "id": "glitched",
+   "name": "Glitched",
+   "text": "Before each attack or gear feature, roll 1d6. On a 1 it fails and the AP is spent. Ends when the encounter ends.",
+   "shakeOff": "DATA + Hacking (15)"
+  },
+  {
+   "id": "lagged",
+   "name": "Lagged",
+   "text": "You act last in the round, and Dash costs 2 AP. Ends at the end of your next turn."
+  },
+  {
+   "id": "marked",
+   "name": "Marked",
+   "text": "Attacks against you get +1 die. Ends when the effect that marked you ends."
+  },
+  {
+   "id": "pinned",
+   "name": "Pinned",
+   "text": "You can't move, and attacks against you have advantage. Inmates have advantage on saves against it.",
+   "shakeOff": "POWER + Athletics (15)"
+  },
+  {
+   "id": "prone",
+   "name": "Prone",
+   "text": "Melee attacks against you have advantage; ranged attacks from more than 2 m have disadvantage. Your attacks have disadvantage. Standing up uses your free Move."
+  },
+  {
+   "id": "staggered",
+   "name": "Staggered",
+   "text": "Start your next turn with 1 less AP, then it ends."
+  },
+  {
+   "id": "stealthed",
+   "name": "Stealthed",
+   "text": "You can't be targeted. Your first attack has advantage and then reveals you."
+  },
+  {
+   "id": "stunned",
+   "name": "Stunned",
+   "text": "You gain no AP on your next turn (banked AP stays) and can't take reactions. Ends at the end of that turn. Inmates have advantage on saves against it."
+  },
+  {
+   "id": "surprised",
+   "name": "Surprised",
+   "text": "You gain no AP on your first turn of the encounter (banked AP stays)."
+  }
+ ]
+}
